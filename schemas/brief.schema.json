@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/facebook-education-post/brief.schema.json",
+  "title": "Educational Content Brief",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["post_job_id", "teaching_question", "concept", "why_it_matters", "practical_takeaway", "facts", "observations", "needs_verification"],
+  "properties": {
+    "post_job_id": { "type": "string", "minLength": 3 },
+    "teaching_question": { "type": "string", "minLength": 1 },
+    "concept": { "type": "string", "minLength": 1 },
+    "why_it_matters": { "type": "string", "minLength": 1 },
+    "practical_takeaway": { "type": "string", "minLength": 1 },
+    "audience": { "type": "string" },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "source_refs"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1 },
+          "source_refs": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "observations": { "type": "array", "items": { "type": "string" } },
+    "needs_verification": { "type": "array", "items": { "type": "string" } },
+    "angle_excluded": { "type": "array", "items": { "type": "string" } }
+  }
+}

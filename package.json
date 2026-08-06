@@ -1,0 +1,25 @@
+{
+  "name": "facebook-education-post-hybrid",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Tool-agnostic workflow contracts for educational Facebook Page posts.",
+  "type": "module",
+  "scripts": {
+    "check:input": "node scripts/check-input.mjs",
+    "check:artifacts": "node scripts/check-artifacts.mjs",
+    "check:quality": "node scripts/check-quality.mjs",
+    "check:media-quality": "node scripts/check-media-quality.mjs",
+    "check:schemas": "node scripts/check-schemas.mjs",
+    "hash:post": "node scripts/hash-post.mjs",
+    "meta:oauth": "node backend/meta-oauth/server.mjs",
+    "meta:connect": "node scripts/connect-meta.mjs",
+    "meta:publish": "node backend/publisher/publish-approved-post.mjs",
+    "meta:retry": "node backend/publisher/retry-worker.mjs",
+    "check:multi-page": "node scripts/check-multi-page-store.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}

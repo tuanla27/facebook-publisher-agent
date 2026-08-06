@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/facebook-education-post/generated-post.schema.json",
+  "title": "Generated Facebook Education Post",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["post_job_id", "version", "page_id", "asset_ids", "asset_manifest", "asset_manifest_hash", "publish_media", "selected_variant_id", "variants", "image_analysis", "policy_review", "content_hash", "status"],
+  "properties": {
+    "post_job_id": { "type": "string", "minLength": 3 },
+    "version": { "type": "integer", "minimum": 1 },
+    "page_id": { "type": "string", "minLength": 1 },
+    "asset_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "asset_manifest": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_id", "sha256", "media_type", "publish_order"],
+          "properties": {
+            "asset_id": { "type": "string", "minLength": 1 },
+            "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+            "media_type": { "const": "image" },
+            "publish_order": { "type": "integer", "minimum": 1 },
+            "mime_type": { "type": "string", "pattern": "^image/" }
+        }
+      }
+    },
+    "asset_manifest_hash": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+    "publish_media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "upload_strategy", "primary_asset_id"],
+      "properties": {
+        "type": { "const": "image" },
+        "upload_strategy": { "const": "upload_then_publish" },
+        "primary_asset_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "selected_variant_id": { "type": "string", "minLength": 1 },
+    "variants": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["variant_id", "body", "alt_text", "claims", "practical_takeaway", "cta"],
+        "properties": {
+          "variant_id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "maxLength": 100 },
+          "body": { "type": "string", "minLength": 80, "maxLength": 10000 },
+          "alt_text": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "hashtags": { "type": "array", "maxItems": 10, "items": { "type": "string", "pattern": "^#[^\\s#]+$" } },
+          "practical_takeaway": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "cta": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["claim_id", "text", "support_status", "source_refs"],
+              "properties": {
+                "claim_id": { "type": "string", "minLength": 1 },
+                "text": { "type": "string", "minLength": 1 },
+                "support_status": { "type": "string", "enum": ["supported", "observation", "needs_verification"] },
+                "source_refs": { "type": "array", "items": { "type": "string" } },
+                "verification_note": { "type": "string", "maxLength": 500 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "image_analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_observations", "ocr_text", "safety_status", "relevance_status"],
+      "properties": {
+        "asset_observations": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "ocr_text": { "type": "array", "items": { "type": "string" } },
+        "safety_status": { "type": "string", "enum": ["clear", "needs_review", "unsafe"] },
+        "relevance_status": { "type": "string", "enum": ["relevant", "uncertain", "unrelated"] },
+        "quality_notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "policy_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "blocking_errors", "warnings", "reviewed_rules"],
+      "properties": {
+        "status": { "type": "string", "enum": ["pass", "pass_with_warnings", "blocked"] },
+        "blocking_errors": { "type": "array", "items": { "type": "string" } },
+        "warnings": { "type": "array", "items": { "type": "string" } },
+        "reviewed_rules": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+      }
+    },
+    "content_hash": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+    "status": { "type": "string", "enum": ["DRAFT_GENERATED", "POLICY_REVIEWED", "NEEDS_HUMAN_APPROVAL", "APPROVED", "CHANGES_REQUESTED", "REJECTED"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

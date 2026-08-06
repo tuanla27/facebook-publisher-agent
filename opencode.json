@@ -1,0 +1,41 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "build",
+  "instructions": ["AGENTS.md", "CLAUDE.md"],
+  "skills": {
+    "paths": [".opencode/skills"]
+  },
+  "agent": {
+    "educational-copywriter": {
+      "mode": "subagent",
+      "description": "Writes source-aware, education-first Vietnamese Facebook Page post variants.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "policy-reviewer": {
+      "mode": "subagent",
+      "description": "Reviews educational Facebook Page drafts for unsupported claims and policy risks.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "visual-analyst": {
+      "mode": "subagent",
+      "description": "Analyzes attached images without inventing visual facts.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    }
+  },
+  "permission": {
+    "edit": "ask",
+    "bash": {
+      "*": "ask",
+      "npm run check:*": "allow"
+    }
+  }
+}

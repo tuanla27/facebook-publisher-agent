@@ -1,0 +1,37 @@
+{
+  "post_job_id": "edu-coffee-001",
+  "page": {
+    "page_id": "PAGE_ID_FROM_ALLOWLIST",
+    "page_name": "Ten Thuong Hieu",
+    "allowlisted": true
+  },
+  "keywords": [
+    "cà phê rang xay",
+    "cách bảo quản cà phê",
+    "hương vị và độ tươi"
+  ],
+  "assets": [
+    {
+      "asset_id": "asset-coffee-001",
+      "kind": "image",
+      "uri": "./inputs/example-coffee.svg",
+      "publish": true,
+      "alt_context": "Ảnh minh họa túi cà phê và một tách cà phê trên bàn"
+    }
+  ],
+  "objective": "teach",
+  "audience": "Người mới pha cà phê tại nhà",
+  "language": "vi",
+  "tone": "thân thiện, dễ hiểu, giáo dục",
+  "cta": "Lưu lại để tham khảo khi bảo quản cà phê.",
+  "verified_facts": [],
+  "constraints": {
+    "max_variants": 3,
+    "max_body_characters": 1800,
+    "must_include": ["một mẹo thực hành"],
+    "must_avoid": ["cam kết hương vị", "số liệu chưa có nguồn"]
+  },
+  "status": "INPUT_RECEIVED",
+  "created_by": "example-user",
+  "created_at": "2026-08-04T09:00:00Z"
+}

@@ -1,0 +1,30 @@
+{
+  "post_job_id": "education-topic-001",
+  "page": {
+    "page_id": "FACEBOOK_PAGE_ID_THAT",
+    "page_name": "Tên Fanpage",
+    "allowlisted": true
+  },
+  "keywords": [
+    "chủ đề cần giáo dục",
+    "khái niệm chính",
+    "mẹo thực hành"
+  ],
+  "assets": [
+    {
+      "asset_id": "asset-001",
+      "kind": "image",
+      "uri": "/duong-dan/toi/anh-that.jpg",
+      "publish": true
+    }
+  ],
+  "objective": "teach",
+  "audience": "Đối tượng người đọc",
+  "language": "vi",
+  "tone": "thân thiện, dễ hiểu, có dẫn chứng",
+  "cta": "Lưu lại để tham khảo.",
+  "verified_facts": [],
+  "status": "INPUT_RECEIVED",
+  "created_by": "your-name",
+  "created_at": "2026-08-04T09:00:00Z"
+}

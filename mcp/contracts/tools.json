@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Facebook Education MCP Tool Boundary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["allowed_publish_tool", "forbidden_publish_tools"],
+  "properties": {
+    "allowed_publish_tool": { "const": "publish_approved_post(post_job_id)" },
+    "forbidden_publish_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    }
+  }
+}

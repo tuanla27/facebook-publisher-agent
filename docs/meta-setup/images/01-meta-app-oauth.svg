@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <rect width="1200" height="700" fill="#f8fafc"/>
+  <text x="60" y="70" font-family="Arial" font-size="34" font-weight="700" fill="#0f172a">Cấu hình Meta App một lần</text>
+  <g font-family="Arial" font-size="22" fill="#0f172a">
+    <rect x="70" y="140" width="250" height="180" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+    <text x="105" y="190">1. Tạo App</text><text x="105" y="235">Meta for</text><text x="105" y="270">Developers</text>
+    <rect x="475" y="140" width="250" height="180" rx="18" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+    <text x="510" y="190">2. Thêm</text><text x="510" y="235">Facebook Login</text><text x="510" y="270">Web OAuth</text>
+    <rect x="880" y="140" width="250" height="180" rx="18" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
+    <text x="915" y="190">3. Thêm redirect</text><text x="915" y="240" font-size="16">https://localhost:8787/</text><text x="915" y="270" font-size="16">auth/callback</text>
+    <path d="M330 230h120M735 230h120" stroke="#64748b" stroke-width="6" marker-end="url(#arrow)"/>
+    <rect x="210" y="430" width="780" height="150" rx="18" fill="#fff" stroke="#94a3b8" stroke-width="3"/>
+    <text x="255" y="485">Lưu App ID và App Secret trong cấu hình local.</text>
+    <text x="255" y="530">Không gửi App Secret vào chat hoặc commit vào Git.</text>
+  </g>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker></defs>
+</svg>

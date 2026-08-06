@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <rect width="1200" height="700" fill="#f8fafc"/>
+  <text x="60" y="70" font-family="Arial" font-size="34" font-weight="700" fill="#0f172a">Người dùng kết nối Fanpage</text>
+  <g font-family="Arial" font-size="23" fill="#0f172a">
+    <rect x="70" y="150" width="220" height="150" rx="18" fill="#e0e7ff" stroke="#4f46e5" stroke-width="3"/><text x="112" y="215">Mở command</text><text x="112" y="255">Kết nối Page</text>
+    <rect x="350" y="150" width="220" height="150" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/><text x="390" y="215">Trình duyệt</text><text x="390" y="255">Đăng nhập Meta</text>
+    <rect x="630" y="150" width="220" height="150" rx="18" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/><text x="675" y="215">Chọn Page</text><text x="675" y="255">theo tên</text>
+    <rect x="910" y="150" width="220" height="150" rx="18" fill="#fef3c7" stroke="#d97706" stroke-width="3"/><text x="950" y="215">Hoàn tất</text><text x="950" y="255">Được phép đăng</text>
+    <path d="M295 225h45M575 225h45M855 225h45" stroke="#64748b" stroke-width="6" marker-end="url(#arrow)"/>
+    <rect x="180" y="430" width="840" height="120" rx="18" fill="#fff" stroke="#94a3b8" stroke-width="3"/>
+    <text x="235" y="485">Không nhập Page ID. Không copy token.</text>
+    <text x="235" y="525">Page đã chọn được lưu vào vault local mã hóa.</text>
+  </g>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker></defs>
+</svg>

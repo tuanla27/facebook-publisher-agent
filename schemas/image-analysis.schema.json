@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/facebook-education-post/image-analysis.schema.json",
+  "title": "Image Analysis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["post_job_id", "assets", "status"],
+  "properties": {
+    "post_job_id": { "type": "string", "minLength": 3 },
+    "assets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_id", "asset_observations", "ocr_text", "safety_status", "relevance_status", "alt_text"],
+        "properties": {
+          "asset_id": { "type": "string", "minLength": 1 },
+          "asset_observations": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "ocr_text": { "type": "array", "items": { "type": "string" } },
+          "safety_status": { "type": "string", "enum": ["clear", "needs_review", "unsafe"] },
+          "relevance_status": { "type": "string", "enum": ["relevant", "uncertain", "unrelated"] },
+          "quality_notes": { "type": "array", "items": { "type": "string" } },
+          "alt_text": { "type": "string", "minLength": 1, "maxLength": 1000 }
+        }
+      }
+    },
+    "status": { "type": "string", "enum": ["IMAGE_ANALYZED", "FAILED"] }
+  }
+}

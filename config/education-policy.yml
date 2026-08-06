@@ -1,0 +1,28 @@
+purpose: "Educational Facebook Page content"
+defaults:
+  language: "vi"
+  max_variants: 3
+  max_body_characters: 2200
+  require_practical_takeaway: true
+  require_source_for_external_claims: true
+  require_human_approval: true
+claim_policy:
+  allowed_without_external_source:
+    - "Định nghĩa phổ thông, không gây tranh cãi"
+    - "Hướng dẫn cách đọc hoặc cách đặt câu hỏi"
+    - "Mô tả những gì nhìn thấy trực tiếp trong ảnh"
+  needs_verification:
+    - "Số liệu, phần trăm, mốc thời gian"
+    - "Claim về sức khỏe, an toàn, tài chính hoặc pháp lý"
+    - "Hiệu quả, chứng nhận, giải thưởng, so sánh"
+    - "Thông tin sản phẩm không có trong input được xác minh"
+  block:
+    - "Cam kết chữa bệnh hoặc kết quả chắc chắn"
+    - "Thông tin sai lệch cố ý"
+    - "Kích động sợ hãi để thúc đẩy tương tác"
+    - "Nội dung phân biệt đối xử, thù ghét hoặc gây hại"
+accessibility:
+  use_short_paragraphs: true
+  explain_acronyms: true
+  provide_alt_text: true
+  avoid_all_caps: true

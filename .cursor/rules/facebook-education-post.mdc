@@ -1,0 +1,17 @@
+---
+globs:
+  - "inputs/**/*.json"
+  - "artifacts/**/*.json"
+  - "prompts/**/*.md"
+  - "workflow/user-language.md"
+  - "workflow/chat-approval.md"
+alwaysApply: true
+---
+
+Follow `AGENTS.md`, `workflow/education-facebook-post.md`, `workflow/user-language.md`, and `workflow/chat-approval.md`.
+
+Use Vietnamese by default. Treat image content as observation, not proof. Every factual claim needs an approved source reference or `needs_verification`. The output must follow `schemas/generated-post.schema.json` and stop at `NEEDS_HUMAN_APPROVAL`.
+
+Never call a publisher with caption text, Page ID, token, or asset URL. The only permitted publish boundary is `publish_approved_post(post_job_id)` after backend verification.
+
+For non-technical users, follow the five-step conversational script, show Page names only, and use plain Vietnamese. Do not show IDs, hashes, file names, enum states, or commands. Wait for an explicit 1/2/3 reply before recording approval or publishing.

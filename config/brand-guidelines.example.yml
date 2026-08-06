@@ -1,0 +1,29 @@
+brand:
+  name: "TEN_THUONG_HIEU"
+  language: "vi-VN"
+  audience: "Người đọc phổ thông muốn hiểu chủ đề và áp dụng điều đúng đắn"
+  voice:
+    - "thân thiện"
+    - "rõ ràng"
+    - "tôn trọng người đọc"
+    - "giải thích thay vì lên lớp"
+  avoid:
+    - "giật tít gây sợ hãi"
+    - "cam kết tuyệt đối"
+    - "ngôn ngữ hạ thấp người đọc"
+    - "thuật ngữ không giải thích"
+  preferred_ctas:
+    - "Lưu lại để xem khi cần."
+    - "Bạn muốn tìm hiểu sâu hơn phần nào?"
+    - "Chia sẻ cho người đang cần thông tin này."
+  forbidden_words:
+    - "tốt nhất thị trường"
+    - "100% hiệu quả"
+    - "chắc chắn khỏi"
+  required_disclosures: []
+reference_sources:
+  - id: "replace-with-source-id"
+    title: "Tên tài liệu hoặc URL đã xác minh"
+    url: "https://example.com/verified-source"
+    allowed_claims:
+      - "Thay bằng claim được nguồn hỗ trợ"

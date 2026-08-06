@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/facebook-education-post/policy-review.schema.json",
+  "title": "Policy Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "blocking_errors", "warnings", "reviewed_rules"],
+  "properties": {
+    "post_job_id": { "type": "string", "minLength": 3 },
+    "version": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["pass", "pass_with_warnings", "blocked"] },
+    "blocking_errors": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "reviewed_rules": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "selected_variant_id": { "type": "string", "minLength": 1 },
+    "content_hash": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+    "asset_manifest_hash": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+    "page_id": { "type": "string", "minLength": 1 },
+    "reviewed_at": { "type": "string", "format": "date-time" }
+  }
+}

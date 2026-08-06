@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder illustration for coffee education input</title>
+  <desc id="desc">A simple cup and bag illustration used only to test the workflow.</desc>
+  <rect width="1200" height="800" fill="#f5ead8"/>
+  <rect x="720" y="190" width="260" height="360" rx="18" fill="#8a5a3b"/>
+  <text x="770" y="390" font-family="sans-serif" font-size="36" fill="#fff8ed">COFFEE</text>
+  <path d="M260 300h300v220c0 66-54 120-120 120h-60c-66 0-120-54-120-120z" fill="#fff8ed" stroke="#4b3024" stroke-width="18"/>
+  <path d="M560 350h68c58 0 82 48 58 96-16 32-42 50-86 50h-40" fill="none" stroke="#4b3024" stroke-width="18"/>
+  <path d="M320 250c-30-72 58-68 28-140M430 250c-30-72 58-68 28-140" fill="none" stroke="#c58b5a" stroke-width="18" stroke-linecap="round"/>
+</svg>

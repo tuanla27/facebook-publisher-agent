@@ -1,0 +1,55 @@
+{
+  "post_job_id": "edu-example-001",
+  "version": 1,
+  "page_id": "PAGE_ID_FROM_ALLOWLIST",
+  "asset_ids": ["asset-example-001"],
+  "asset_manifest": [
+    {
+      "asset_id": "asset-example-001",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "media_type": "image",
+      "publish_order": 1
+    }
+  ],
+  "asset_manifest_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "publish_media": {
+    "type": "image",
+    "upload_strategy": "upload_then_publish",
+    "primary_asset_id": "asset-example-001"
+  },
+  "selected_variant_id": "v1-example",
+  "variants": [
+    {
+      "variant_id": "v1-example",
+      "label": "Bảo quản cà phê",
+      "body": "Cà phê sau khi mở túi nên được bảo quản ở nơi khô, mát và tránh ánh nắng trực tiếp.\n\nNhiệt, ẩm và không khí có thể làm hương vị thay đổi nhanh hơn. Vì vậy, hãy đóng kín bao bì sau mỗi lần lấy cà phê và không đặt gần bếp hoặc nơi có hơi nước.\n\nMẹo dễ nhớ: chọn một vị trí cố định, sạch và khô để bảo quản cà phê mỗi ngày.",
+      "alt_text": "Túi cà phê và một tách cà phê đặt trên mặt bàn.",
+      "hashtags": ["#BaoQuanCaPhe", "#HocCachPhaCaPhe"],
+      "practical_takeaway": "Đóng kín bao bì và đặt cà phê ở nơi khô, mát.",
+      "cta": "Lưu lại để tham khảo khi bảo quản cà phê.",
+      "claims": [
+        {
+          "claim_id": "c1",
+          "text": "Nên bảo quản cà phê ở nơi khô, mát và tránh ánh nắng trực tiếp.",
+          "support_status": "supported",
+          "source_refs": ["education-policy-example"]
+        }
+      ]
+    }
+  ],
+  "image_analysis": {
+    "asset_observations": ["Ảnh minh họa túi cà phê và một tách cà phê."],
+    "ocr_text": [],
+    "safety_status": "clear",
+    "relevance_status": "relevant"
+  },
+  "policy_review": {
+    "status": "pass",
+    "blocking_errors": [],
+    "warnings": [],
+    "reviewed_rules": ["education-first", "practical-takeaway", "alt-text"]
+  },
+  "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "status": "POLICY_REVIEWED",
+  "created_at": "2026-08-06T00:00:00Z"
+}

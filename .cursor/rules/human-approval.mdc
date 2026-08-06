@@ -1,0 +1,8 @@
+---
+globs:
+  - "artifacts/**/*.json"
+  - "workflow/**/*.md"
+alwaysApply: true
+---
+
+An approval is valid only for the exact content hash, selected variant, asset IDs, and Page ID shown to the reviewer. Any edit creates a new version and invalidates approval. AI may prepare `NEEDS_HUMAN_APPROVAL`; only an authenticated reviewer/backend may create `APPROVED`. In chat mode, the authenticated human's explicit reply is recorded verbatim; the agent must never infer approval or choose option 1.
