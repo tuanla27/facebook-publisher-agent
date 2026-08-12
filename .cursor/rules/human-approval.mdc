@@ -5,4 +5,4 @@ globs:
 alwaysApply: true
 ---
 
-An approval is valid only for the exact content hash, selected variant, asset IDs, and Page ID shown to the reviewer. Any edit creates a new version and invalidates approval. AI may prepare `NEEDS_HUMAN_APPROVAL`; only an authenticated reviewer/backend may create `APPROVED`. In chat mode, the authenticated human's explicit reply is recorded verbatim; the agent must never infer approval or choose option 1.
+An approval is valid only for the exact content hash, selected variant, asset IDs, Page ID, and any per-post quality override shown to the reviewer. The chat draft must be materialized into the local review profile before the preview and approval dialog. Any edit creates a new version and invalidates approval. AI may prepare `NEEDS_HUMAN_APPROVAL`; only an authenticated reviewer/backend may create `APPROVED`. In chat mode, the authenticated human's explicit `AskQuestion` selection (or explicit text fallback) is recorded verbatim; the agent must never infer approval or choose option 1.

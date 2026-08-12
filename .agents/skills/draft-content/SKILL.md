@@ -1,0 +1,112 @@
+---
+name: draft-content
+description: Distilled caption rules for Khoa Kinh tế – Học viện Ngân hàng Fanpage. Use when writing or reviewing Facebook captions for education, events, people, admissions, career, or community content under the HVNH Economics brand.
+---
+
+# Draft Content — Khoa Kinh tế HVNH
+
+Canonical brand source: `config/brand-guidelines.yml`  
+Full reference: `docs/brand/hvnh-khoa-kinh-te-brand-guideline.md`  
+Image rules: `config/image-selection-checklist.yml`  
+Strategy first: `.agents/skills/content-strategy/SKILL.md`
+
+This skill is the **caption distill**. Do not invent visual/graphic assets here;
+the current pipeline writes text and selects among supplied photos. Reel and
+carousel may appear only as format hints.
+
+Always load `config/program-promotion-footer.yml` and append the selected footer
+after the main body and before hashtags. Treat it as a separate promotional
+block. Do not let it replace the post's Learn/Meet/Experience/Discover value.
+The user may edit the footer for the current post, but may not omit it; never
+mutate the global default. Footer links and admissions claims need a source or
+a backend-verified admin institutional attestation scoped to
+`official_program_information`.
+
+## Voice
+
+Write as a **young academic ~25–30**: smart, current, confident, open, stylish.
+Understand Gen Z without mimicking childish slang.
+
+Remember:
+
+- Young ≠ childish  
+- Academic ≠ dry  
+- Professional ≠ ceremonial  
+
+## Emotional storytelling
+
+Write with a narrative arc, not a template. Move the reader from one
+emotional state to another — from outsider to belonging, from uncertainty
+to excitement, from "chưa biết" to "đã bắt đầu".
+
+- Open with a feeling, not a fact.
+- Each paragraph: 1–2 sentences. Short, scannable, like a letter.
+- Use 3–5 emoji as emotional anchors (💙🎉🎀💗✨🌟), not spam. One
+  emoji per key emotional beat, not every line.
+- End soft: a warm promise or invitation, not always a question.
+  "Hẹn gặp bạn" > "Bạn muốn thử gì?"
+- Speak to "bạn" directly, like writing a letter to one person.
+
+## Every caption must
+
+1. Serve at least one brand test: **Learn / Meet / Experience / Discover an opportunity**.
+2. Show at least one core attribute (**INSIGHTFUL / DYNAMIC / CONNECTED**); prefer two.
+3. Map to exactly one primary **content pillar** from the brand config.
+4. Follow the content intent from content-strategy (education, event_recap,
+   people_story, admissions, career, community).
+5. Stay people- and experience-centered — prefer real moments over ceremony.
+6. Prefer short, readable Vietnamese paragraphs — 1–2 sentences each,
+   like a letter to one person. For Real Event Photostory,
+   keep caption focused; do not dump 400–700-word recaps on Facebook.
+7. Use an intent-appropriate structure internally, but never print drafting
+   labels in the body. Write with a narrative arc, not a template:
+   - education: Hook → Explanation → Example/distinction → Takeaway → Gentle CTA
+   - event_recap: Moment hook → What happened → What was practiced/felt → Short takeaway → Soft CTA
+   - people_story: Person + context → Quote/moment → What readers gain → Soft CTA
+   - admissions/career: Opportunity → Verified facts → Who it is for → Clear next step
+   - community: Before → Now → What's ahead → Belonging → Soft promise
+8. End with a soft CTA — a warm promise, invitation, or gentle question.
+   Prefer "Hẹn gặp bạn" over "Bạn muốn thử gì?" when the post is
+   community/welcome. Not aggressive sales pressure.
+9. Use **5–8 hashtags**: always `#KhoaKinhTeHVNH`, plus `#EconomicsBAV`
+   or `#HocVienNganHang`, program tags (#KinhTeDauTu, #ChatLuongCao,
+   #KinhTeQuocTe), and campaign tag (#Tuyensinh2026, #WelcomeK29).
+
+## Prefer
+
+- Emotional narrative arc — move the reader from one feeling to another.
+- Short paragraphs: 1–2 sentences each, like a letter.
+- 3–5 emoji as emotional anchors (💙🎉🎀💗✨🌟), one per key beat.
+- Specific insight from the moment/topic (what students practiced, what skill
+  formed, who readers meet, what opportunity opened).
+- Real people and real experience language.
+- One clear takeaway, person, experience, or opportunity a reader can reuse.
+- Soft endings: "Hẹn gặp bạn", "Welcome", "Chào mừng bạn đến" — warm,
+  not always a question.
+- Naming the format when helpful (photostory, insight, people story) without
+  sounding like a CMS template.
+
+## Avoid / reduce
+
+- Ceremonial congratulate templates and repeated “vinh danh” wording.
+- Forced trends unrelated to Economics BAV.
+- Fear, false urgency, absolute superlatives, sales pressure.
+- Invented stats, dates, awards, sponsor claims, job offers, or identities not
+  supplied/verified.
+- Overlong administrative recap; point long detail to a verified website source
+  when needed.
+- More than 8 hashtags; emoji spam (3–5 tasteful emoji are OK, more is spam).
+
+## Claims discipline
+
+- Image = observation only.
+- OCR = lead for review, not proof.
+- Unsupported facts → `needs_verification`.
+- Do not claim PMC/EC outcomes, rankings, admissions numbers, sponsor lists, or
+  career offers unless verified in input.
+
+## Output
+
+Follow `prompts/copywriter.md` and `schemas/generated-post.schema.json`.  
+After drafting, run `prompts/quality-review.md` and brand checks in
+`prompts/policy-review.md`.

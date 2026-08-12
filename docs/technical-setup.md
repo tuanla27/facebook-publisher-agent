@@ -3,6 +3,10 @@
 Tài liệu này dành cho người phụ trách cài đặt một lần. Người dùng cuối chỉ
 cần đọc `docs/user-guide.md`.
 
+Runbook đầy đủ cho bàn giao, cấu hình, demo và vận hành nằm ở
+`docs/transfer-and-demo.md`. Dùng tài liệu đó làm checklist chính; tài liệu này
+giữ phần setup kỹ thuật rút gọn.
+
 ## Cài Đặt Core
 
 Yêu cầu Node.js 18 trở lên. Trong thư mục pipeline, chạy:
