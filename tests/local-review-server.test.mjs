@@ -61,6 +61,23 @@ function sessionOptions(data, extra = {}) {
   };
 }
 
+async function getCsrf(session) {
+  const page = await fetch(session.url);
+  assert.equal(page.status, 200);
+  const setCookie = page.headers.get("set-cookie") || "";
+  const match = setCookie.match(/csrf=([^;]+)/);
+  return match ? match[1] : null;
+}
+
+async function postForm(session, path, params, { origin } = {}) {
+  const csrf = await getCsrf(session);
+  const body = new URLSearchParams({ csrf, ...params });
+  const headers = { "content-type": "application/x-www-form-urlencoded" };
+  if (origin) headers.origin = origin;
+  if (csrf) headers.cookie = `csrf=${csrf}`;
+  return fetch(`${session.url}${path}`, { method: "POST", headers, body });
+}
+
 test("serves the preview page and assets only behind the token URL", async () => {
   const data = await fixture();
   const session = await createLocalReviewSession(sessionOptions(data));
@@ -93,11 +110,7 @@ test("an approve click writes a signed approval, flips status, and publishes", a
   const session = await createLocalReviewSession(sessionOptions(data, {
     publishApproved: async (jobId) => { published.push(jobId); return { post_url: "https://www.facebook.com/post-1" }; }
   }));
-  const response = await fetch(`${session.url}/decision`, {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ decision: "APPROVED" })
-  });
+  const response = await postForm(session, "/decision", { decision: "APPROVED" });
   const html = await response.text();
   assert.equal(response.status, 200);
   assert.match(html, /Bài đã được đăng thành công/);
@@ -117,11 +130,7 @@ test("an approve click writes a signed approval, flips status, and publishes", a
   const post = JSON.parse(await readFile(resolve(data.dir, "generated-post.json"), "utf8"));
   assert.equal(post.status, "APPROVED");
 
-  const again = await fetch(`${session.url}/decision`, {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ decision: "APPROVED" })
-  });
+  const again = await postForm(session, "/decision", { decision: "APPROVED" });
   assert.equal(again.status, 409);
 });
 
@@ -132,18 +141,10 @@ test("change requests need feedback and reject without a publish call", async ()
     publishApproved: async () => { publishCalled = true; return {}; }
   }));
 
-  const missing = await fetch(`${session.url}/decision`, {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ decision: "CHANGES_REQUESTED" })
-  });
+  const missing = await postForm(session, "/decision", { decision: "CHANGES_REQUESTED" });
   assert.equal(missing.status, 400);
 
-  const response = await fetch(`${session.url}/decision`, {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ decision: "CHANGES_REQUESTED", feedback: "Đổi câu mở đầu giúp mình." })
-  });
+  const response = await postForm(session, "/decision", { decision: "CHANGES_REQUESTED", feedback: "Đổi câu mở đầu giúp mình." });
   assert.equal(response.status, 200);
   const outcome = await session.result;
   assert.equal(outcome.status, "CHANGES_REQUESTED");
@@ -170,11 +171,7 @@ test("posts that still need source attestation cannot be approved on the local p
   const page = await fetch(session.url);
   assert.match(await page.text(), /Chưa thể duyệt trên trang này/);
 
-  const response = await fetch(`${session.url}/decision`, {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ decision: "APPROVED" })
-  });
+  const response = await postForm(session, "/decision", { decision: "APPROVED" });
   assert.equal(response.status, 403);
   const outcome = await session.result;
   assert.equal(outcome.status, "PENDING");
@@ -188,4 +185,62 @@ test("refuses jobs that are not waiting for review", async () => {
   post.status = "DRAFT_GENERATED";
   await writeFile(resolve(data.dir, "generated-post.json"), `${JSON.stringify(post, null, 2)}\n`);
   await assert.rejects(() => createLocalReviewSession(sessionOptions(data)), { code: "INVALID_STATE_TRANSITION" });
+});
+
+test("rejects a decision POST without a csrf cookie", async () => {
+  const data = await fixture();
+  const session = await createLocalReviewSession(sessionOptions(data, {
+    publishApproved: async () => ({})
+  }));
+  try {
+    const csrf = await getCsrf(session);
+    const response = await fetch(`${session.url}/decision`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ csrf: csrf || "", decision: "APPROVED" })
+    });
+    assert.equal(response.status, 403);
+    const outcome = await session.result;
+    assert.equal(outcome.status, "PENDING");
+  } finally {
+    session.close();
+  }
+});
+
+test("rejects a decision POST with a mismatched csrf cookie", async () => {
+  const data = await fixture();
+  const session = await createLocalReviewSession(sessionOptions(data, {
+    publishApproved: async () => ({})
+  }));
+  try {
+    const csrf = await getCsrf(session);
+    const response = await fetch(`${session.url}/decision`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+        cookie: `csrf=wrong-value`
+      },
+      body: new URLSearchParams({ csrf, decision: "APPROVED" })
+    });
+    assert.equal(response.status, 403);
+    const outcome = await session.result;
+    assert.equal(outcome.status, "PENDING");
+  } finally {
+    session.close();
+  }
+});
+
+test("rejects a decision POST from a cross-origin Origin header", async () => {
+  const data = await fixture();
+  const session = await createLocalReviewSession(sessionOptions(data, {
+    publishApproved: async () => ({})
+  }));
+  try {
+    const response = await postForm(session, "/decision", { decision: "APPROVED" }, { origin: "https://evil.example" });
+    assert.equal(response.status, 403);
+    const outcome = await session.result;
+    assert.equal(outcome.status, "PENDING");
+  } finally {
+    session.close();
+  }
 });

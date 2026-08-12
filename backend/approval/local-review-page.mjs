@@ -45,6 +45,7 @@ function renderResult(result) {
  */
 export function renderLocalReviewPage({
   token,
+  csrfToken,
   pageName,
   selectedVariant,
   assetCount,
@@ -60,6 +61,7 @@ export function renderLocalReviewPage({
   const hashtags = Array.isArray(variant.hashtags) ? variant.hashtags.join(" ") : "";
   const body = [variant.body, hashtags].filter(Boolean).join("\n\n");
   const action = `/r/${encodeURIComponent(token)}/decision`;
+  const csrfField = csrfToken ? `<input type="hidden" name="csrf" value="${escapeHtml(csrfToken)}">` : "";
   const allWarnings = [...warnings];
   if (qualityOverride?.enabled) {
     allWarnings.push("Ảnh đang dưới độ phân giải khuyến nghị; ngoại lệ này chỉ áp dụng cho bài hiện tại.");
@@ -72,6 +74,7 @@ export function renderLocalReviewPage({
     ? adminKeyHash
       ? `<section class="notice"><strong>Xác minh admin để duyệt</strong><p>Bài còn thông tin tuyển sinh cần xác minh. Nhập admin key để xác nhận thông tin chính thức cho bài này.</p>
 <form method="post" action="${action.replace(/\/decision$/, "/attest")}" class="attest-form">
+${csrfField}
 <input type="password" name="admin_key" placeholder="Admin key" autocomplete="off" class="key-input">
 <button type="submit" class="attest-btn">Xác nhận admin</button>
 </form>
@@ -102,6 +105,7 @@ ${variant.practical_takeaway ? `<h2>Điều ngưởi đọc sẽ nhớ</h2><p>${
 ${renderWarnings(allWarnings)}
 ${attestationNotice}
 <form method="post" action="${action}" class="actions">
+${csrfField}
 <button class="approve" name="decision" value="APPROVED" ${disabled ? "disabled" : ""}>Duyệt và đăng</button>
 <button class="changes" name="decision" value="CHANGES_REQUESTED" ${closed || result ? "disabled" : ""}>Yêu cầu sửa</button>
 <button class="reject" name="decision" value="REJECTED" ${closed || result ? "disabled" : ""}>Hủy bài này</button>

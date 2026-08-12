@@ -16,13 +16,42 @@ function errorWithCode(message, code) {
   return error;
 }
 
-function html(response, status, body) {
+function html(response, status, body, headers = {}) {
   response.writeHead(status, {
     "content-type": "text/html; charset=utf-8",
     "cache-control": "no-store",
-    "content-security-policy": "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'"
+    "content-security-policy": "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'",
+    ...headers
   });
   response.end(body);
+}
+
+function parseCookies(header) {
+  const map = new Map();
+  if (!header) return map;
+  for (const part of header.split(/;\s*/)) {
+    const eq = part.indexOf("=");
+    if (eq > 0) map.set(part.slice(0, eq), part.slice(eq + 1));
+  }
+  return map;
+}
+
+function originMatchesLocal(request, port) {
+  const origin = request.headers.origin;
+  if (!origin) return true;
+  try {
+    const url = new URL(origin);
+    return (url.hostname === "127.0.0.1" || url.hostname === "localhost") && String(url.port) === String(port);
+  } catch {
+    return false;
+  }
+}
+
+function verifyCsrf(request, form, csrfToken) {
+  const cookies = parseCookies(request.headers.cookie);
+  const cookieValue = cookies.get("csrf");
+  const formValue = String(form.get("csrf") || "");
+  return cookieValue === csrfToken && formValue === csrfToken;
 }
 
 async function readForm(request, maxBytes) {
@@ -84,6 +113,8 @@ export async function createLocalReviewSession({
   const signingKey = signingKeyFromEnv(env);
   const adminKeyHash = env.ADMIN_KEY_HASH || null;
   const token = randomBytes(24).toString("base64url");
+  const csrfToken = randomBytes(24).toString("base64url");
+  const cookiePath = `/r/${token}`;
   const reviewerId = String(env.LOCAL_REVIEWER_ID || "local-owner");
   const pageName = input?.page?.page_name || "Fanpage";
   const publishableAssets = (input?.assets ?? []).filter((asset) => post.asset_ids?.includes(asset.asset_id));
@@ -114,6 +145,7 @@ export async function createLocalReviewSession({
     if (pageMatch && request.method === "GET") {
       return html(response, 200, renderLocalReviewPage({
         token,
+        csrfToken,
         pageName,
         selectedVariant: selected,
         assetCount: publishableAssets.length,
@@ -124,7 +156,7 @@ export async function createLocalReviewSession({
         attested,
         closed: Boolean(decision),
         result: decision?.pageResult ?? null
-      }));
+      }), { "set-cookie": `csrf=${csrfToken}; SameSite=Strict; HttpOnly; Path=${cookiePath}` });
     }
 
     if (assetMatch && request.method === "GET") {
@@ -148,9 +180,12 @@ export async function createLocalReviewSession({
     if (attestMatch && request.method === "POST") {
       if (decision || attested) {
         return html(response, 409, renderLocalReviewPage({
-          token, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
+          token, csrfToken, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
           attestationRequired, adminKeyHash, attested: true, closed: Boolean(decision)
         }));
+      }
+      if (!originMatchesLocal(request, port)) {
+        return html(response, 403, "<p>Không hợp lệ.</p>");
       }
       let form;
       try {
@@ -158,10 +193,13 @@ export async function createLocalReviewSession({
       } catch {
         return html(response, 400, "<p>Yêu cầu quá lớn.</p>");
       }
+      if (!verifyCsrf(request, form, csrfToken)) {
+        return html(response, 403, "<p>Phiên không hợp lệ. Vui lòng tải lại trang.</p>");
+      }
       const adminKey = String(form.get("admin_key") || "").trim();
       if (!adminKeyHash) {
         return html(response, 403, renderLocalReviewPage({
-          token, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
+          token, csrfToken, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
           warnings: post.policy_review?.warnings ?? [],
           attestationRequired: true,
           attestationError: "Chưa cấu hình admin key. Hãy thêm ADMIN_KEY_HASH vào .env."
@@ -171,7 +209,7 @@ export async function createLocalReviewSession({
         verifyAdminKey(adminKey, adminKeyHash);
       } catch {
         return html(response, 403, renderLocalReviewPage({
-          token, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
+          token, csrfToken, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
           warnings: post.policy_review?.warnings ?? [],
           attestationRequired: true, adminKeyHash,
           attestationError: "Admin key không đúng. Vui lòng thử lại."
@@ -207,7 +245,7 @@ export async function createLocalReviewSession({
       await appendAudit(root, jobId, { event: "ADMIN_ATTESTATION", reviewer_id: reviewerId, mechanism: "local_browser_review" });
       attested = true;
       return html(response, 200, renderLocalReviewPage({
-        token, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
+        token, csrfToken, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
         warnings: post.policy_review?.warnings ?? [],
         qualityOverride: post.publish_media?.quality_override ?? null,
         attestationRequired: false, adminKeyHash, attested: true
@@ -217,15 +255,21 @@ export async function createLocalReviewSession({
     if (decisionMatch && request.method === "POST") {
       if (decision) {
         return html(response, 409, renderLocalReviewPage({
-          token, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
+          token, csrfToken, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
           closed: true, result: decision.pageResult
         }));
+      }
+      if (!originMatchesLocal(request, port)) {
+        return html(response, 403, "<p>Không hợp lệ.</p>");
       }
       let form;
       try {
         form = await readForm(request, maxBodyBytes);
       } catch {
         return html(response, 400, "<p>Yêu cầu quá lớn.</p>");
+      }
+      if (!verifyCsrf(request, form, csrfToken)) {
+        return html(response, 403, "<p>Phiên không hợp lệ. Vui lòng tải lại trang.</p>");
       }
       const chosen = form.get("decision");
       const feedback = String(form.get("feedback") || "").trim();
@@ -234,7 +278,7 @@ export async function createLocalReviewSession({
       }
       if (chosen === "CHANGES_REQUESTED" && !feedback) {
         return html(response, 400, renderLocalReviewPage({
-          token, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
+          token, csrfToken, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
           warnings: post.policy_review?.warnings ?? [],
           qualityOverride: post.publish_media?.quality_override ?? null,
           attestationRequired,
@@ -243,7 +287,7 @@ export async function createLocalReviewSession({
       }
       if (chosen === "APPROVED" && attestationRequired && !attested) {
         return html(response, 403, renderLocalReviewPage({
-          token, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
+          token, csrfToken, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
           warnings: post.policy_review?.warnings ?? [],
           attestationRequired: true, adminKeyHash,
           attestationError: "Cần xác minh admin key trước khi duyệt."
@@ -300,7 +344,7 @@ export async function createLocalReviewSession({
 
       decision = { status: chosen, feedback: feedback || null, pageResult, publishOutcome };
       html(response, 200, renderLocalReviewPage({
-        token, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
+        token, csrfToken, pageName, selectedVariant: selected, assetCount: publishableAssets.length,
         closed: true, result: pageResult
       }));
       finishSession({
