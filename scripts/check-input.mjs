@@ -29,8 +29,13 @@ if (input.page && (!input.page.page_id || !input.page.page_name)) {
 if (!Array.isArray(input.keywords) || input.keywords.length < 1) {
   errors.push("keywords must contain at least one item");
 }
-if (!Array.isArray(input.assets) || input.assets.length < 1) {
-  errors.push("assets must contain at least one image");
+if (!Array.isArray(input.assets)) {
+  errors.push("assets must be an array");
+}
+const preMaterializeStatuses = new Set(["CONVERSATIONAL_INTAKE", "ATTACHMENTS_RECEIVED"]);
+const requiresAssets = !preMaterializeStatuses.has(input.status);
+if (requiresAssets && (!Array.isArray(input.assets) || input.assets.length < 1)) {
+  errors.push("assets must contain at least one image after materialization");
 }
 for (const [index, asset] of (input.assets ?? []).entries()) {
   if (asset.kind !== "image") errors.push(`assets[${index}].kind must be image`);

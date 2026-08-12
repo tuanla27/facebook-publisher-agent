@@ -25,7 +25,7 @@
     },
     "assets": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 0,
       "maxItems": 10,
       "items": {
         "type": "object",
@@ -92,6 +92,34 @@
     "created_at": { "type": "string", "format": "date-time" }
   },
   "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "ASSETS_MATERIALIZED",
+              "INPUT_RECEIVED",
+              "IMAGE_ANALYZED",
+              "BRIEF_READY",
+              "DRAFT_GENERATED",
+              "POLICY_REVIEWED",
+              "NEEDS_HUMAN_APPROVAL",
+              "APPROVED",
+              "CHANGES_REQUESTED",
+              "REJECTED",
+              "PUBLISHING",
+              "PUBLISHED",
+              "FAILED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": { "minItems": 1 }
+        }
+      }
+    },
     {
       "if": {
         "properties": {
