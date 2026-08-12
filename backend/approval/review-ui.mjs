@@ -45,6 +45,18 @@ function renderWarnings(warnings = []) {
   return `<section class="notice"><strong>Lưu ý trước khi duyệt</strong><ul>${warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}</ul></section>`;
 }
 
+function renderAttestationFields(review) {
+  if (!review.requires_attestation) return "";
+  const labels = {
+    admissions_scores: "mức điểm tuyển sinh",
+    admissions_dates: "mốc thời gian tuyển sinh",
+    admissions_procedure: "quy trình tuyển sinh",
+    official_program_information: "thông tin chính thức về chương trình"
+  };
+  const scopes = (review.attestation_scopes ?? []).map((scope) => labels[scope] || "thông tin được cấp phạm vi").join(", ");
+  return `<section class="notice"><strong>Cần xác nhận thêm trước khi đăng</strong><p>Bài có ${escapeHtml(scopes)} chưa kèm nguồn công khai. Nếu bạn đã kiểm tra, nhập mã xác nhận được cấp riêng cho bài này và ghi lại xác nhận của bạn.</p><label>Mã xác nhận riêng cho bài<input name="attestation_code" type="password" autocomplete="one-time-code"></label><label>Xác nhận của người duyệt<textarea name="attestation_confirmation" placeholder="Tôi xác nhận các thông tin trong phạm vi trên đã được kiểm tra."></textarea></label></section>`;
+}
+
 export function renderReviewPage({ review, csrfToken, result = null }) {
   const variant = review.selected_variant || {};
   const hashtags = Array.isArray(variant.hashtags) ? variant.hashtags.join(" ") : "";
@@ -70,6 +82,7 @@ ${variant.practical_takeaway ? `<h2>Điều người đọc sẽ nhớ</h2><p>${
 ${renderWarnings(review.warnings)}
 <form method="post" action="${action}" class="actions">
 <input type="hidden" name="csrf_token" value="${escapeHtml(csrfToken)}">
+${renderAttestationFields(review)}
 <button class="approve" name="decision" value="APPROVED" ${disabled ? "disabled" : ""}>Duyệt và đăng</button>
 <button class="changes" name="decision" value="CHANGES_REQUESTED" ${disabled ? "disabled" : ""}>Yêu cầu sửa</button>
 <button class="reject" name="decision" value="REJECTED" ${disabled ? "disabled" : ""}>Từ chối</button>

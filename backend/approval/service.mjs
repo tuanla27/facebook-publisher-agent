@@ -4,7 +4,9 @@ import {
   assertPolicyPassed,
   assertTenantAccess,
   deriveApprovedHashes,
-  requireAuthenticatedActor
+  requireAuthenticatedActor,
+  requiredReviewerAttestationScopes,
+  isReviewerAttestablePolicy
 } from "./validation.mjs";
 import { buildReviewPreview } from "./review-preview.mjs";
 
@@ -16,7 +18,13 @@ function assertState(actual, expected) {
   }
 }
 
-export function createApprovalService({ repository, reviewBaseUrl, assetPreviewUrl, now = () => Date.now() }) {
+export function createApprovalService({
+  repository,
+  reviewBaseUrl,
+  assetPreviewUrl,
+  consumeReviewerAttestationCode,
+  now = () => Date.now()
+}) {
   if (!repository?.transaction) throw new Error("Approval service requires a transactional repository");
   if (!reviewBaseUrl) throw new Error("reviewBaseUrl is required");
 
@@ -90,7 +98,14 @@ export function createApprovalService({ repository, reviewBaseUrl, assetPreviewU
       });
     },
 
-    async decideReview({ reviewId, decision, feedback, actor }) {
+    async decideReview({
+      reviewId,
+      decision,
+      feedback,
+      attestationCode,
+      attestationConfirmation,
+      actor
+    }) {
       requireAuthenticatedActor(actor, ["reviewer", "admin"]);
       const review = await repository.getReviewById(reviewId);
       assertTenantAccess(actor, review);
@@ -100,11 +115,23 @@ export function createApprovalService({ repository, reviewBaseUrl, assetPreviewU
         decision,
         selectedVariantId: review.selected_variant_id,
         feedback,
+        attestationCode,
+        attestationConfirmation,
         actor
       });
     },
 
-    async decide({ postJobId, version, decision, selectedVariantId, expiresAt, feedback, actor }) {
+    async decide({
+      postJobId,
+      version,
+      decision,
+      selectedVariantId,
+      expiresAt,
+      feedback,
+      attestationCode,
+      attestationConfirmation,
+      actor
+    }) {
       requireAuthenticatedActor(actor, ["reviewer", "admin"]);
       if (!["APPROVED", "CHANGES_REQUESTED", "REJECTED"].includes(decision)) {
         const error = new Error("Unsupported review decision");
@@ -138,8 +165,49 @@ export function createApprovalService({ repository, reviewBaseUrl, assetPreviewU
           error.code = "APPROVAL_INVALID";
           throw error;
         }
+        let reviewerAttestation;
         if (decision === "APPROVED") {
-          assertPolicyPassed(document);
+          const requiredScopes = requiredReviewerAttestationScopes(document);
+          const blocked = document.policy_review?.status === "blocked" || document.policy_review?.blocking_errors?.length;
+          if (blocked && !isReviewerAttestablePolicy(document)) {
+            const error = new Error("Blocked policy review cannot be approved");
+            error.code = "POLICY_BLOCKED";
+            throw error;
+          }
+          if (requiredScopes.length) {
+            if (typeof consumeReviewerAttestationCode !== "function") {
+              const error = new Error("A reviewer attestation code verifier is required");
+              error.code = "REVIEWER_ATTESTATION_REQUIRED";
+              throw error;
+            }
+            if (!String(attestationConfirmation || "").trim()) {
+              const error = new Error("Reviewer attestation confirmation is required");
+              error.code = "ATTESTATION_CONFIRMATION_REQUIRED";
+              throw error;
+            }
+            const consumed = await consumeReviewerAttestationCode({
+              code: attestationCode,
+              postJobId,
+              version,
+              selectedVariantId: hashes.selected_variant_id,
+              pageId: document.page_id,
+              reviewerId: actor.actor_id,
+              requiredScopes,
+              now: now()
+            });
+            reviewerAttestation = {
+              code_id: consumed.code_id,
+              attester_id: actor.actor_id,
+              attester_role: actor.role,
+              scopes: consumed.scopes,
+              confirmation_text: String(attestationConfirmation).trim(),
+              code_consumed_at: consumed.consumed_at,
+              backend_verified: true
+            };
+          }
+        }
+        if (decision === "APPROVED") {
+          assertPolicyPassed(document, actor, reviewerAttestation);
           const resolvedExpiry = resolveExpiry(expiresAt);
           assertApprovalNotExpired(resolvedExpiry.toISOString(), now());
           await tx.insertApproval({
@@ -154,6 +222,10 @@ export function createApprovalService({ repository, reviewBaseUrl, assetPreviewU
             reviewedAssetIds: hashes.asset_ids,
             reviewedAssetHash: hashes.asset_manifest_hash,
             reviewedPageId: document.page_id,
+            reviewerAttestation,
+            institutionalAttestation: document.claim_verification?.mode === "institutional_attested"
+              ? document.claim_verification.institutional_attestation
+              : undefined,
             reviewedAt: new Date(now()),
             expiresAt: resolvedExpiry
           });
@@ -170,7 +242,15 @@ export function createApprovalService({ repository, reviewBaseUrl, assetPreviewU
             tenantId: actor.tenant_id,
             actorId: actor.actor_id,
             eventType: `REVIEW_${decision}`,
-            metadata: { version, content_hash: hashes.content_hash, feedback: feedback || null }
+            metadata: {
+              version,
+              content_hash: hashes.content_hash,
+              feedback: feedback || null,
+              reviewer_attestation: reviewerAttestation || null,
+              institutional_attestation: document.claim_verification?.mode === "institutional_attested"
+                ? document.claim_verification.institutional_attestation
+                : null
+            }
           });
         }
         return { post_job_id: postJobId, version, status: decision, content_hash: hashes.content_hash };

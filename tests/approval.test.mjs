@@ -2,7 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createApprovalService } from "../backend/approval/service.mjs";
 import { createApprovalHttpServer } from "../backend/approval/http-server.mjs";
-import { deriveApprovedHashes } from "../backend/approval/validation.mjs";
+import {
+  assertInstitutionalAttestation,
+  deriveApprovedHashes,
+  requiredReviewerAttestationScopes
+} from "../backend/approval/validation.mjs";
 import { createCsrfProtection } from "../backend/approval/csrf.mjs";
 
 const actor = { authenticated: true, actor_id: "reviewer-1", tenant_id: "tenant-1", role: "reviewer" };
@@ -75,6 +79,85 @@ test("approval service derives hashes and requires a future expiry", async () =>
   assert.equal(repository.calls.some(([type, value]) => type === "job" && value === "APPROVED"), true);
 });
 
+test("approval requires and records a scoped reviewer attestation code", async () => {
+  const doc = {
+    ...document(),
+    policy_review: {
+      status: "blocked",
+      blocking_errors: ["Ba mức điểm chuẩn chưa có nguồn tuyển sinh chính thức."]
+    },
+    variants: [{
+      variant_id: "v1",
+      body: "body",
+      cta: "save",
+      claims: [{
+        claim_id: "score",
+        text: "ECON01: 25,35",
+        support_status: "needs_verification",
+        attestation_scope: "admissions_scores",
+        source_refs: [],
+        verification_note: "Nguồn chính thức chưa có trong hồ sơ."
+      }]
+    }]
+  };
+  const repository = fakeRepository(doc, "NEEDS_HUMAN_APPROVAL");
+  const service = createApprovalService({
+    repository,
+    reviewBaseUrl: "https://review.example",
+    consumeReviewerAttestationCode: async (value) => {
+      assert.deepEqual(value, {
+        code: "scoped-code",
+        postJobId: "job-1",
+        version: 1,
+        selectedVariantId: "v1",
+        pageId: "page-1",
+        reviewerId: "reviewer-1",
+        requiredScopes: ["admissions_scores"],
+        now: Date.parse("2026-01-01T00:00:00Z")
+      });
+      return {
+        code_id: "code-1",
+        scopes: ["admissions_scores"],
+        consumed_at: "2026-01-01T00:01:00.000Z"
+      };
+    },
+    now: () => Date.parse("2026-01-01T00:00:00Z")
+  });
+
+  await assert.rejects(
+    () => service.decide({
+      postJobId: "job-1",
+      version: 1,
+      decision: "APPROVED",
+      selectedVariantId: "v1",
+      expiresAt: "2026-01-02T00:00:00Z",
+      actor
+    }),
+    { code: "ATTESTATION_CONFIRMATION_REQUIRED" }
+  );
+
+  await service.decide({
+    postJobId: "job-1",
+    version: 1,
+    decision: "APPROVED",
+    selectedVariantId: "v1",
+    expiresAt: "2026-01-02T00:00:00Z",
+    attestationCode: "scoped-code",
+    attestationConfirmation: "Tôi xác nhận thông tin đã được kiểm tra.",
+    actor
+  });
+  const approval = repository.calls.find(([type]) => type === "approval")?.[1];
+  assert.deepEqual(approval.reviewerAttestation, {
+    code_id: "code-1",
+    attester_id: "reviewer-1",
+    attester_role: "reviewer",
+    scopes: ["admissions_scores"],
+    confirmation_text: "Tôi xác nhận thông tin đã được kiểm tra.",
+    code_consumed_at: "2026-01-01T00:01:00.000Z",
+    backend_verified: true
+  });
+});
+
 test("change requests require actionable feedback", async () => {
   const repository = fakeRepository(document(), "NEEDS_HUMAN_APPROVAL");
   const service = createApprovalService({ repository, reviewBaseUrl: "https://review.example" });
@@ -91,6 +174,94 @@ test("approval service does not disclose another tenant's job", async () => {
     () => service.createReviewTask({ postJobId: "job-1", version: 1, actor: { ...actor, tenant_id: "tenant-2" } }),
     { code: "NOT_FOUND" }
   );
+});
+
+test("institutional claims require a backend-verified school role and scope", () => {
+  const attestation = {
+    attester_id: "faculty-1",
+    attester_role: "faculty",
+    scopes: ["admissions_scores"],
+    confirmation_text: "Tôi xác nhận đây là thông tin chính thức cho bài này.",
+    confirmed_at: "2026-08-10T04:00:00.000Z",
+    backend_verified: true
+  };
+  const documentWithAttestation = {
+    ...document(),
+    claim_verification: {
+      mode: "institutional_attested",
+      institutional_attestation: attestation
+    },
+    variants: [{
+      variant_id: "v1",
+      body: "body",
+      cta: "save",
+      claims: [{
+        claim_id: "score",
+        text: "ECON01: 25,35",
+        support_status: "institutional_attested",
+        attestation_scope: "admissions_scores",
+        source_refs: []
+      }]
+    }]
+  };
+  assert.doesNotThrow(() => assertInstitutionalAttestation(documentWithAttestation, {
+    actor_id: "faculty-1",
+    institutional_role: "faculty"
+  }));
+  assert.throws(
+    () => assertInstitutionalAttestation(documentWithAttestation, { actor_id: "chat-user" }),
+    { code: "INSTITUTIONAL_ATTESTATION_REQUIRED" }
+  );
+});
+
+test("reviewer attestation never replaces a missing footer source", () => {
+  assert.throws(
+    () => requiredReviewerAttestationScopes({
+      variants: [{
+        claims: [{
+          claim_id: "promotion-footer",
+          support_status: "needs_verification",
+          attestation_scope: "official_program_information"
+        }]
+      }]
+    }),
+    { code: "SOURCE_REQUIRED" }
+  );
+});
+
+test("backend-verified admin attestation covers footer claims without a reviewer code", () => {
+  const documentWithAdminAttestation = {
+    ...document(),
+    claim_verification: {
+      mode: "institutional_attested",
+      institutional_attestation: {
+        attester_id: "admin-1",
+        attester_role: "admin",
+        scopes: ["official_program_information"],
+        confirmation_text: "Tôi xác nhận footer là thông tin chính thức.",
+        confirmed_at: "2026-08-10T04:00:00.000Z",
+        backend_verified: true
+      }
+    },
+    variants: [{
+      variant_id: "v1",
+      body: "body",
+      cta: "save",
+      claims: [{
+        claim_id: "promotion-footer",
+        text: "Thông tin tuyển sinh chính thức",
+        support_status: "institutional_attested",
+        attestation_scope: "official_program_information",
+        source_refs: []
+      }]
+    }]
+  };
+
+  assert.deepEqual(requiredReviewerAttestationScopes(documentWithAdminAttestation), []);
+  assert.doesNotThrow(() => assertInstitutionalAttestation(documentWithAdminAttestation, {
+    actor_id: "admin-1",
+    institutional_role: "admin"
+  }));
 });
 
 test("approval HTTP boundary requires injected authentication", async () => {
