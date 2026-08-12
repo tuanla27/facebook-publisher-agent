@@ -7,6 +7,7 @@
   "scripts": {
     "check:input": "node scripts/check-input.mjs",
     "asset:intake": "node scripts/asset-intake.mjs",
+    "setup:scanner": "node scripts/setup-scanner.mjs",
     "check:artifacts": "node scripts/check-artifacts.mjs",
     "check:quality": "node scripts/check-quality.mjs",
     "check:media-quality": "node scripts/check-media-quality.mjs",

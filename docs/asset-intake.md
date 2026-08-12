@@ -54,3 +54,10 @@ exits non-zero. Common failures: `ASSET_NOT_FOUND`, `ASSET_PATH_OUTSIDE_REPO`,
 - The script rejects paths outside the repo root.
 - The materializer re-checks bytes, MIME, size, hash, and scan before
   publishing; this script does not bypass any publisher guard.
+
+## Malware scanning
+
+Set `ASSET_SCAN_REQUIRED=true` and `ASSET_SCANNER_BIN=node backend/assets/clamav-scanner.mjs`
+in `.env` to enforce ClamAV scanning. Run `npm run setup:scanner` to detect
+ClamAV and write these keys automatically. When scanning is required, the
+materializer refuses any asset whose scan status is not `clean`.
