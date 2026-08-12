@@ -174,6 +174,20 @@ It starts the local connector if necessary and opens the browser. The coding-age
 
 Open `https://localhost:8787`, nhập App ID/Secret trên form (hoặc dùng `.env`), Connect with Meta, rồi tick nhiều Page để thêm cùng lúc. Callback URI: `https://localhost:8787/auth/callback`. Chi tiết: `backend/meta-oauth/README.md`. Publish: `publish_approved_post(post_job_id)` lấy token theo `page_id` đã duyệt.
 
+## Asset Intake and Malware Scanning
+
+Before publishing, every image must be materialized and malware-scanned.
+
+```bash
+npm run setup:scanner          # one-time: detect ClamAV, write scanner keys to .env
+npm run asset:intake -- inputs/<post_job_id>.json   # per post: materialize + scan
+```
+
+`asset:intake` accepts both `assets[].uri` (file-mode, demo) and
+`assets[].local_path` (chat-mode, host-confirmed original). It rejects paths
+outside the repo, preview-only attachments, and unsigned bytes. See
+`docs/asset-intake.md`.
+
 ## Artifact Layout
 
 ```text

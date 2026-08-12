@@ -199,8 +199,11 @@ ASSET_MAX_BYTES=10485760
 ASSET_MIN_WIDTH=1080
 ASSET_MIN_HEIGHT=0
 ASSET_SCAN_REQUIRED=true
-ASSET_SCANNER_BIN=
+ASSET_SCANNER_BIN=node backend/assets/clamav-scanner.mjs
 ASSET_SCANNER_ARGS=[]
+ASSET_SCANNER_USE_CLAMDSCAN=true
+CLAMSCAN_BIN=clamscan
+CLAMDSCAN_BIN=clamdscan
 META_RETRY_BASE_MS=5000
 META_RETRY_MAX_MS=900000
 ```
@@ -225,8 +228,11 @@ META_RETRY_MAX_MS=900000
 - `ASSET_MAX_BYTES`, `ASSET_MIN_WIDTH`, `ASSET_MIN_HEIGHT`: cổng chất lượng
   ảnh. Với cấu hình mặc định, ảnh phải rộng tối thiểu 1080 px.
 - `ASSET_SCAN_REQUIRED=true`: publisher không đăng nếu scanner chưa trả trạng
-  thái sạch. Nếu chưa có scanner tích hợp, operator phải kiểm tra đúng cách
-  triển khai trước khi chạy publish thật; không tắt guard chỉ để demo.
+  thái sạch. Chạy `npm run setup:scanner` để dò ClamAV và điền tự động các
+  khóa `ASSET_SCANNER_BIN`, `CLAMSCAN_BIN`, `CLAMDSCAN_BIN`,
+  `ASSET_SCANNER_USE_CLAMDSCAN`. Nếu chưa có ClamAV, cài qua `brew install
+  clamav` (macOS) hoặc `sudo apt-get install -y clamav clamav-daemon`
+  (Debian/Ubuntu) rồi chạy lại setup. Không tắt guard chỉ để demo.
 - `META_RETRY_*`: backoff cho lỗi Meta tạm thời; không biến lỗi quyền hoặc
   content thành retry vô hạn.
 - `DATABASE_URL`: chỉ dành cho extension PostgreSQL, không cần cài database
@@ -423,11 +429,24 @@ Không viết ngày, giải thưởng, tên đội, sponsor hoặc xếp hạng 
 Kéo ảnh demo vào cùng cuộc trò chuyện. Không gửi `.env`, App Secret, Page
 token, khóa mã hóa, Page ID hoặc hash.
 
-### Bước 3 — Xác nhận intake
+### Bước 3 — Materialize ảnh và xác nhận intake
 
-Agent phải tóm tắt bằng ngôn ngữ người dùng, gồm Page name, chủ đề, đối tượng,
-ảnh và góc nội dung. Chỉ trả lời câu hỏi đang chặn tiến trình. Không cần tự
-gõ JSON.
+Khi ảnh được kéo vào chat, agent viết input json tới `inputs/<post_job_id>.json`
+với `assets[].local_path` trỏ tới ảnh gốc đã được host file tool xác nhận, rồi
+chạy:
+
+```bash
+npm run asset:intake -- inputs/<post_job_id>.json
+```
+
+Kết quả `ASSETS_MATERIALIZED` nghĩa là ảnh đã được quét malware, hash SHA-256,
+lưu immutable tại `artifacts/<post_job_id>/assets/` và `input.json` đã cập nhật.
+Nếu host chỉ có preview, agent yêu cầu copy ảnh gốc vào `inputs/` và gửi lại
+đường dẫn (file-mode fallback).
+
+Sau đó agent phải tóm tắt bằng ngôn ngữ người dùng, gồm Page name, chủ đề,
+đối tượng, ảnh và góc nội dung. Chỉ trả lời câu hỏi đang chặn tiến trình. Không
+cần tự gõ JSON.
 
 Nếu user yêu cầu Reel, video, carousel, graphic mới, lịch tự động, dashboard,
 server hoặc database, dừng ở technical consultation gate; không tiếp tục
@@ -726,6 +745,8 @@ Không ghi các giá trị này vào tài liệu, ticket công khai hoặc chat 
 - [ ] Đúng Page đã kết nối bằng tên.
 - [ ] `META_ALLOWED_PAGE_IDS` chỉ chứa Page được phép.
 - [ ] `/status` không trả secret/token.
+- [ ] ClamAV đã cài và `npm run setup:scanner` đã chạy; `ASSET_SCAN_REQUIRED=true`.
+- [ ] `npm run asset:intake` materialize thành công với ảnh demo.
 - [ ] `npm test`, schema check và multi-page check thành công.
 
 ### Nội dung

@@ -20,10 +20,10 @@ Fanpage theo tên. Nếu đã có Fanpage được kết nối, có thể bỏ q
 1. Dùng command `/create-facebook-education-post`.
 2. Viết chủ đề bạn muốn đăng: giải thích kiến thức, recap hoạt động, people
    story, tuyển sinh, nghề nghiệp, hoặc đời sống cộng đồng.
-3. Kéo ảnh sẽ đăng vào cuộc trò chuyện. Ưu tiên ảnh đang hành động hơn ảnh xếp hàng. Hệ thống sẽ tự lấy ảnh gốc; bạn không cần chép ảnh vào thư mục hay sửa JSON.
+3. Kéo ảnh sẽ đăng vào cuộc trò chuyện. Ưu tiên ảnh đang hành động hơn ảnh xếp hàng. Hệ thống sẽ tự lấy ảnh gốc; bạn không cần chép ảnh vào thư mục hay sửa JSON. Nếu ứng dụng chỉ gửi được ảnh xem trước, hệ thống sẽ yêu cầu bạn copy ảnh gốc vào thư mục `inputs/` và gửi lại đường dẫn — ảnh xem trước không được dùng để đăng.
 4. Nói thêm đối tượng đọc và giọng văn nếu cần.
 5. Xem phần tóm tắt và trả lời câu hỏi còn thiếu nếu có.
-6. Chờ hệ thống tạo bản nháp.
+6. Chờ hệ thống quét ảnh, tạo bản nháp và mở trang duyệt.
 
 Ví dụ:
 
