@@ -282,6 +282,35 @@ test("requires a scoped reviewer attestation for needs-verification claims", asy
   );
 });
 
+test("ignores needs-verification claims on non-selected draft variants", async () => {
+  // Regression: multi-variant drafts left OCR leads as needs_verification on
+  // unselected variants; publisher used to flatMap all variants and fail with
+  // SOURCE_REQUIRED / ATTESTATION_SCOPE_REQUIRED after a clean approval.
+  const data = await fixture();
+  const postPath = resolve(data.dir, "generated-post.json");
+  const post = JSON.parse(await readFile(postPath, "utf8"));
+  post.variants.push({
+    variant_id: "v-unused",
+    body: "Unused draft caption",
+    cta: "Save",
+    claims: [{
+      claim_id: "c3-pmc-name",
+      text: "PMC name from OCR",
+      support_status: "needs_verification",
+      source_refs: ["image_observation:asset-1"]
+    }],
+    hashtags: []
+  });
+  await writeFile(postPath, `${JSON.stringify(post, null, 2)}\n`);
+
+  const fakeApi = {
+    uploadImage: async () => ({ id: "media-selected-only" }),
+    createPagePost: async () => ({ id: "post-selected-only" })
+  };
+  const result = await publishApprovedPost(data.jobId, options(fakeApi, data));
+  assert.equal(result.meta_post_id, "post-selected-only");
+});
+
 test("rejects an approval that was not created by the guarded review page", async () => {
   const data = await fixture({ unsignedApproval: true });
   await assert.rejects(() => publishApprovedPost(data.jobId, options({}, data)), { code: "APPROVAL_REQUIRED" });

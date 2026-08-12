@@ -6,8 +6,7 @@ export function buildReviewPreview({ review, document, pageName, assets = [] }) 
     throw error;
   }
   const attestationScopes = [...new Set(
-    (document.variants ?? [])
-      .flatMap((variant) => variant.claims ?? [])
+    (selectedVariant.claims ?? [])
       .filter((claim) => claim.support_status === "needs_verification")
       .map((claim) => claim.attestation_scope)
       .filter(Boolean)

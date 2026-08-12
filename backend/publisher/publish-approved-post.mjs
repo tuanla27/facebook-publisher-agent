@@ -65,9 +65,14 @@ function validateQualityOverride(post, currentTime = Date.now()) {
   return true;
 }
 
+function selectedClaims(post) {
+  const selected = (post.variants ?? []).find((variant) => variant.variant_id === post.selected_variant_id);
+  return selected?.claims ?? [];
+}
+
 function validateInstitutionalAttestation(post, approval) {
-  const attestedClaims = (post.variants ?? [])
-    .flatMap((variant) => variant.claims ?? [])
+  // ponytail: publish only the selected caption — sibling draft claims must not block
+  const attestedClaims = selectedClaims(post)
     .filter((claim) => claim.support_status === "institutional_attested");
   if (!attestedClaims.length) return false;
 
@@ -93,8 +98,7 @@ function validateInstitutionalAttestation(post, approval) {
 }
 
 function validateReviewerAttestation(post, approval, currentTime = Date.now()) {
-  const claims = (post.variants ?? [])
-    .flatMap((variant) => variant.claims ?? [])
+  const claims = selectedClaims(post)
     .filter((claim) => claim.support_status === "needs_verification");
   if (!claims.length) return false;
 

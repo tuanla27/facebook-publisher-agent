@@ -217,7 +217,9 @@ test("institutional claims require a backend-verified school role and scope", ()
 test("reviewer attestation never replaces a missing footer source", () => {
   assert.throws(
     () => requiredReviewerAttestationScopes({
+      selected_variant_id: "v1",
       variants: [{
+        variant_id: "v1",
         claims: [{
           claim_id: "promotion-footer",
           support_status: "needs_verification",
@@ -226,6 +228,33 @@ test("reviewer attestation never replaces a missing footer source", () => {
       }]
     }),
     { code: "SOURCE_REQUIRED" }
+  );
+});
+
+test("needs-verification on non-selected draft variants does not require attestation", () => {
+  assert.deepEqual(
+    requiredReviewerAttestationScopes({
+      selected_variant_id: "v2",
+      variants: [
+        {
+          variant_id: "v1",
+          claims: [{
+            claim_id: "c3-pmc-name",
+            support_status: "needs_verification",
+            source_refs: []
+          }]
+        },
+        {
+          variant_id: "v2",
+          claims: [{
+            claim_id: "c2-image",
+            support_status: "observation",
+            source_refs: []
+          }]
+        }
+      ]
+    }),
+    []
   );
 });
 

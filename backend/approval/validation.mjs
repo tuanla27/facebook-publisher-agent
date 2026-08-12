@@ -31,11 +31,22 @@ const REVIEWER_ROLES = new Set(["reviewer", "admin"]);
 const SOURCE_TERMS = /source|nguồn|xác minh|verify|link/i;
 const HARD_BLOCK_TERMS = /page|allowlist|unsafe|unrelated|safety|image|brand|medical|legal|financial|policy/i;
 
+/** Only the selected variant is published and hashed — ignore draft siblings. */
+export function selectedVariantClaims(document) {
+  const selected = (document.variants ?? []).find(
+    (variant) => variant.variant_id === document.selected_variant_id
+  );
+  if (selected) return selected.claims ?? [];
+  // ponytail: no selected_variant_id yet (unit fixtures) — fall back to first/all only when single-variant
+  const variants = document.variants ?? [];
+  if (variants.length === 1) return variants[0].claims ?? [];
+  return [];
+}
+
 export function assertInstitutionalAttestation(document, actor) {
   const verification = document.claim_verification;
   const attestation = verification?.institutional_attestation;
-  const attestedClaims = (document.variants ?? [])
-    .flatMap((variant) => variant.claims ?? [])
+  const attestedClaims = selectedVariantClaims(document)
     .filter((claim) => claim.support_status === "institutional_attested");
 
   if (!attestedClaims.length) return;
@@ -71,8 +82,7 @@ export function assertInstitutionalAttestation(document, actor) {
 }
 
 export function requiredReviewerAttestationScopes(document) {
-  const claims = (document.variants ?? [])
-    .flatMap((variant) => variant.claims ?? [])
+  const claims = selectedVariantClaims(document)
     .filter((claim) => claim.support_status === "needs_verification");
   if (claims.some((claim) => /(^|[-_])footer([-_]|$)/i.test(String(claim.claim_id || "")))) {
     const error = new Error("Footer links still require a normal source");

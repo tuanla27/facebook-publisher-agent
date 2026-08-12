@@ -216,17 +216,15 @@ export async function createLocalReviewSession({
         }));
       }
       const confirmedAt = new Date(now()).toISOString();
-      const needsVerificationClaims = (post.variants ?? [])
-        .flatMap((variant) => variant.claims ?? [])
+      // Only the selected variant is reviewed/published; sibling drafts stay untouched.
+      const needsVerificationClaims = (selected.claims ?? [])
         .filter((claim) => claim.support_status === "needs_verification");
       const requiredScopes = [...new Set(
         needsVerificationClaims.map((claim) => claim.attestation_scope).filter(Boolean)
       )];
-      for (const variant of post.variants ?? []) {
-        for (const claim of variant.claims ?? []) {
-          if (claim.support_status === "needs_verification" && requiredScopes.includes(claim.attestation_scope)) {
-            claim.support_status = "institutional_attested";
-          }
+      for (const claim of selected.claims ?? []) {
+        if (claim.support_status === "needs_verification" && requiredScopes.includes(claim.attestation_scope)) {
+          claim.support_status = "institutional_attested";
         }
       }
       post.claim_verification = {
