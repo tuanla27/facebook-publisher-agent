@@ -1,26 +1,87 @@
-purpose: "Educational Facebook Page content"
+purpose: "Branded Facebook Page content for Khoa Kinh tế – Học viện Ngân hàng across education, events, people, admissions, career, and community"
 defaults:
   language: "vi"
   max_variants: 3
   max_body_characters: 2200
+  prefer_short_event_captions: true
+  max_hashtags: 5
   require_practical_takeaway: true
   require_source_for_external_claims: true
   require_human_approval: true
+  require_brand_test: true
+  require_brand_attribute: true
+brand_alignment:
+  config: "config/brand-guidelines.yml"
+  image_checklist: "config/image-selection-checklist.yml"
+  draft_skill: ".agents/skills/draft-content/SKILL.md"
+  required_hashtag: "#KhoaKinhTeHVNH"
 claim_policy:
   allowed_without_external_source:
     - "Định nghĩa phổ thông, không gây tranh cãi"
     - "Hướng dẫn cách đọc hoặc cách đặt câu hỏi"
     - "Mô tả những gì nhìn thấy trực tiếp trong ảnh"
+    - "Giọng young-academic và khung Learn/Meet/Experience/Discover theo brand đã duyệt"
   needs_verification:
     - "Số liệu, phần trăm, mốc thời gian"
     - "Claim về sức khỏe, an toàn, tài chính hoặc pháp lý"
-    - "Hiệu quả, chứng nhận, giải thưởng, so sánh"
-    - "Thông tin sản phẩm không có trong input được xác minh"
+    - "Hiệu quả, chứng nhận, giải thưởng, xếp hạng, so sánh"
+    - "Thông tin sản phẩm/chương trình không có trong input được xác minh"
+    - "Danh sách nhà tài trợ hoặc đối tác không đọc rõ từ nguồn đã duyệt"
   block:
     - "Cam kết chữa bệnh hoặc kết quả chắc chắn"
     - "Thông tin sai lệch cố ý"
     - "Kích động sợ hãi để thúc đẩy tương tác"
     - "Nội dung phân biệt đối xử, thù ghét hoặc gây hại"
+    - "Caption chỉ ceremonial/vinh danh template mà không phục vụ Learn/Meet/Experience/Discover"
+    - "Bịa ngày, giải thưởng, xếp hạng, chỉ tiêu tuyển sinh, offer việc làm hoặc danh sách tài trợ"
+institutional_attestation:
+  enabled: true
+  requires_backend_verified_identity: true
+  allowed_roles:
+    - "faculty"
+    - "staff"
+    - "admin"
+  allowed_scopes:
+    - "admissions_scores"
+    - "admissions_dates"
+    - "admissions_procedure"
+    - "official_program_information"
+  source_bypass_only_for_attested_claims: true
+  footer_links_still_require_source: true
+  footer_links_admin_attestation_bypass: true
+reviewer_attestation:
+  enabled: true
+  requires_scoped_one_time_code: true
+  allowed_roles:
+    - "reviewer"
+    - "admin"
+  allowed_scopes:
+    - "admissions_scores"
+    - "admissions_dates"
+    - "admissions_procedure"
+    - "official_program_information"
+  source_bypass_only_for_scoped_claims: true
+  code_must_bind:
+    - "post"
+    - "version"
+    - "selected_variant"
+    - "Page"
+    - "reviewer"
+    - "claim_scopes"
+  code_must_expire_and_be_consumed_once: true
+  footer_links_still_require_source: true
+  footer_links_admin_attestation_bypass: true
+style_policy:
+  prefer:
+    - "people in action"
+    - "insight + trải nghiệm thật + cơ hội thật"
+    - "hashtag 3–5, có #KhoaKinhTeHVNH"
+    - "caption ngắn cho event photostory"
+  reduce:
+    - "recap 400–700 từ trên Facebook"
+    - "ảnh lineup posed làm cover"
+    - "trend không liên quan Economics BAV"
+    - "footer tuyển sinh dài, không liên quan hoặc không được chỉnh cho phù hợp với bài"
 accessibility:
   use_short_paragraphs: true
   explain_acronyms: true

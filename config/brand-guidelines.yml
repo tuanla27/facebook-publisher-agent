@@ -1,0 +1,141 @@
+# Brand Guidelines — Khoa Kinh tế, Học viện Ngân hàng
+
+# Nguồn sự thật vận hành cho agent. Bản đầy đủ: docs/brand/hvnh-khoa-kinh-te-brand-guideline.md
+# Checklist ảnh: docs/brand/checklist-chon-anh.md
+# Caption distill: .agents/skills/draft-content/SKILL.md
+
+brand:
+  name: "Khoa Kinh tế – Học viện Ngân hàng"
+  short_name: "Khoa Kinh tế HVNH"
+  language: "vi-VN"
+  audience: "Sinh viên, thí sinh tiềm năng, phụ huynh, alumni, doanh nghiệp và cộng đồng quan tâm economics BAV"
+  essence: "Kinh tế để hiểu thế giới. Trải nghiệm để sẵn sàng cho tương lai."
+  creative_direction: "Economics in Motion"
+  personality: "Young academic 25–30: thông minh, cập nhật, tự tin, cởi mở, có gu; hiểu Gen Z nhưng không cố nói như Gen Z"
+  personality_rules:
+    - "Young ≠ childish"
+    - "Academic ≠ dry"
+    - "Professional ≠ ceremonial"
+  core_attributes:
+    - id: insightful
+      label: "INSIGHTFUL"
+      meaning: "Có chiều sâu: học được gì, vấn đề kinh tế nào, năng lực nào hình thành"
+    - id: dynamic
+      label: "DYNAMIC"
+      meaning: "Năng động: hoạt động, cạnh tranh, trải nghiệm, con người đang làm việc thật"
+    - id: connected
+      label: "CONNECTED"
+      meaning: "Kết nối: giảng viên – sinh viên – alumni – doanh nghiệp – chuyên gia – xã hội – quốc tế"
+  attribute_rule: "Mỗi post thể hiện ít nhất 1/3 thuộc tính; tốt nhất 2/3"
+  brand_test:
+    - "Learn something"
+    - "Meet someone"
+    - "Experience something"
+    - "Discover an opportunity"
+  brand_test_rule: "Nếu không làm được ít nhất một trong bốn việc trên, cân nhắc không đăng"
+  voice:
+    - "học thuật nhưng dễ tiếp cận"
+    - "trẻ trung nhưng có chiều sâu"
+    - "chuyên nghiệp nhưng gần gũi"
+    - "lấy con người thật, trải nghiệm thật, giá trị thật làm trung tâm"
+    - "giải thích thay vì lên lớp"
+    - "không ceremonial / không template chúc mừng sáo"
+  avoid:
+    - "giọng Gen Z ép buộc / slang rẻ tiền"
+    - "giọng nghi lễ / hành chính khô"
+    - "giật tít gây sợ hãi"
+    - "cam kết tuyệt đối"
+    - "recap 400–700 từ trên Facebook (đưa bản dài sang website)"
+    - "trend không liên quan brand"
+    - "template vinh danh lặp lại"
+  preferred_ctas:
+    - "Hẹn gặp bạn tại Khoa Kinh tế – Học viện Ngân hàng."
+    - "Welcome [Kxx]! Hành trình của bạn chính thức bắt đầu."
+    - "Chào mừng bạn đến với ngôi nhà mới."
+    - "Bạn học được điều gì từ khoảnh khắc này?"
+    - "Lưu lại nếu bạn đang chuẩn bị cho một trải nghiệm tương tự."
+    - "Tag một người nên xem khoảnh khắc này."
+    - "Muốn tìm hiểu sâu hơn phần nào?"
+  forbidden_words:
+    - "tốt nhất thị trường"
+    - "100% hiệu quả"
+    - "chắc chắn khỏi"
+    - "đỉnh của chóp"
+    - "săn ngay kẻo lỡ"
+  hashtags:
+    max: 8
+    always_include:
+      - "#KhoaKinhTeHVNH"
+    brand:
+      - "#EconomicsBAV"
+      - "#HocVienNganHang"
+    program:
+      - "#KinhTeDauTu"
+      - "#ChatLuongCao"
+      - "#KinhTeQuocTe"
+      - "#QuanLyKinhTe"
+    series_examples:
+      - "#ECONInsight"
+      - "#HumansOfEconomics"
+      - "#MeetOurLecturer"
+      - "#WhereAreTheyNow"
+      - "#ECONAlumni"
+      - "#MyEconomicsJourney"
+      - "#Quanlyduan"
+    campaign_examples:
+      - "#Tuyensinh2026"
+      - "#WelcomeK29"
+    rule: "Tối đa 5–8 hashtag: luôn có #KhoaKinhTeHVNH, 1–2 brand, program tags nếu liên quan, 1 campaign nếu có"
+  content_pillars:
+    - id: econ_academic_insights
+      name: "Econ Academic & Insights"
+      weight: 0.20
+    - id: learning_experience
+      name: "Learning Experience"
+      weight: 0.20
+    - id: econ_people
+      name: "Econ People"
+      weight: 0.15
+    - id: econ_experiences_community
+      name: "Econ Experiences & Community"
+      weight: 0.15
+    - id: career_connection
+      name: "Career & Connection"
+      weight: 0.15
+    - id: admissions_information
+      name: "Admissions & Information"
+      weight: 0.15
+  preferred_formats:
+    - "Real Event Photostory"
+    - "Short-form Video/Reel"
+    - "Editorial Carousel"
+    - "People Story"
+    - "Econ Data/Econ Explainer"
+  reduce_formats:
+    - "poster quá nhiều chữ"
+    - "ảnh tập thể xếp hàng làm cover"
+    - "caption recap dài 400–700 từ"
+    - "bài chúc mừng/vinh danh template"
+    - "trend không liên quan brand"
+  visual:
+    colors:
+      primary_blue: "#252A73"
+      signature_yellow: "#F4D52C"
+      warm_white: "#F8F7F2"
+      soft_grey: "#E8E9EC"
+      slate_text: "#626674"
+      sage_accent: "#4F8078"
+    image_mix_target: "70% người / 20% editorial-data / 10% poster"
+    people_in_action_rule: "Action shot > posed shot"
+  required_disclosures: []
+reference_sources:
+  - id: "hvnh-brand-guideline-2026"
+    title: "Fanpage Brand DNA & Content Guideline — Khoa Kinh tế HVNH 2026–2027"
+    url: "docs/brand/hvnh-khoa-kinh-te-brand-guideline.md"
+    allowed_claims:
+      - "Định hướng brand essence, personality, pillars, hashtag và visual DNA của Khoa"
+  - id: "hvnh-image-checklist"
+    title: "Checklist chọn ảnh trước khi đưa vào pipeline"
+    url: "docs/brand/checklist-chon-anh.md"
+    allowed_claims:
+      - "Tiêu chí ưu tiên ảnh action, người thật, khoảnh khắc thật trước khi đưa vào pipeline"

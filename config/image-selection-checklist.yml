@@ -1,0 +1,44 @@
+# Checklist chọn ảnh — Khoa Kinh tế HVNH (vận hành agent)
+
+# Nguồn: docs/brand/checklist-chon-anh.md
+# Visual analyst và policy review phải áp dụng checklist này trước khi đề xuất ảnh cover/chính.
+
+purpose: "Đánh giá ảnh trước và trong pipeline đăng Facebook Khoa Kinh tế HVNH"
+
+priority_order:
+  - "Ảnh đang hành động (thuyết trình, tranh biện, thảo luận, làm việc nhóm)"
+  - "Có con người rõ nét, biểu cảm thật"
+  - "Khoảnh khắc thật hơn ảnh dàn dựng"
+  - "Ảnh ngang nếu có nhiều lựa chọn"
+  - "Ánh sáng tự nhiên / không khí học thuật thật (ảnh điện thoại tốt vẫn OK)"
+
+prefer:
+  - "people_in_action"
+  - "real_moments"
+  - "visible_faces_expressions"
+  - "landscape_orientation"
+  - "natural_light_academic_atmosphere"
+
+avoid_as_primary_cover:
+  - "posed_group_lineup_looking_at_camera"
+  - "empty_backdrop_no_people"
+  - "blurry_or_too_far_to_see_faces"
+  - "heavy_sponsor_logo_banner_clutter"
+  - "over_filtered_or_fake_blur"
+
+rules:
+  action_over_posed: "Action shot > posed shot. Ảnh trao chứng nhận/chụp kỷ niệm cứng nhắc không ưu tiên làm ảnh chính."
+  multi_image: "Nếu user gửi 2–3 ảnh, đánh giá từng ảnh và khuyến nghị ảnh cover tốt nhất; ảnh posed có thể để vị trí 3–5 trong photostory."
+  phone_photos_ok: true
+  studio_not_required: true
+
+blocking:
+  - "Ảnh unsafe / không liên quan chủ đề"
+  - "Không đọc được nội dung chính của ảnh"
+
+warnings:
+  - "Ảnh chính là lineup posed → cảnh báo, đề xuất đổi cover nếu còn ảnh action"
+  - "Sponsor/logo dày đặc che nội dung → cảnh báo không dùng làm ảnh chính"
+  - "Không thấy mặt / quá xa / mờ → cảnh báo chất lượng"
+
+reviewer_note: "Đây là khâu then chốt cho tính nhất quán hình ảnh page — agent viết chữ, không chỉnh sửa ảnh."
