@@ -16,7 +16,7 @@
 | `PUBLISHING` | `PUBLISHED`, `FAILED` | backend publisher |
 | `PUBLISHED` | none | backend |
 | `REJECTED` | none | reviewer |
-| `FAILED` | `INPUT_RECEIVED`, `DRAFT_GENERATED`, `PUBLISHING` | authorized operator |
+| `FAILED` | `ATTACHMENTS_RECEIVED`, `INPUT_RECEIVED`, `DRAFT_GENERATED`, `PUBLISHING` | authorized operator |
 
 ## Approval Invariants
 

@@ -71,7 +71,11 @@ attestation path — do not try to approve them on the local page.
 ## Step 4 — Act on the result
 
 The `review:open` command blocks until the owner decides (or the timeout
-passes). The agent may also poll with:
+passes). When the owner clicks **Duyệt và đăng**, the local review server
+publishes server-side inside the same Node process before resolving; the
+agent must not call `npm run meta:publish` itself afterwards. Only use
+`npm run meta:retry -- <post_job_id>` when a transient Meta error is reported.
+The agent may also poll with:
 
 ```bash
 npm run review:status -- <post_job_id>

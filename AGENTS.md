@@ -56,6 +56,14 @@ TECHNICAL_REQUIREMENT_CHECK
 
 The agent may move a job forward through `POLICY_REVIEWED`, but it must stop at `NEEDS_HUMAN_APPROVAL`. Only an authenticated reviewer or backend approval endpoint can create `APPROVED`.
 
+In the local single-owner setup, the `APPROVED -> PUBLISHING` transition is
+triggered server-side by the local review server inside the same Node process
+that recorded the approval. The agent must not call
+`publish_approved_post(post_job_id)` itself after the review page returns
+APPROVED; publishing has already happened (or has been scheduled as a retry).
+The agent only calls `npm run meta:retry -- <post_job_id>` when a transient
+Meta error is reported by the review page.
+
 Host attachments are normalized by the host adapter only. The Node.js asset
 materializer owns reading original local files or bytes, MIME and size checks,
 hashing, scanning, immutable local storage, and `input.json` updates. A model
