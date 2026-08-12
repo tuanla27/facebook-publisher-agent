@@ -11,6 +11,11 @@ import { appendAudit, acquirePublishLock, createAttempt, nextAttemptNumber, rele
 import { assetManifestHashOf, contentHashOf } from "./hash.mjs";
 import { MetaApiAdapter } from "./meta-api.mjs";
 import { removeRetry, scheduleRetry } from "./retry-queue.mjs";
+import {
+  isReviewerAttestablePolicy,
+  requiredReviewerAttestationScopes
+} from "../approval/validation.mjs";
+import { assertApprovalSignature } from "../approval/approval-signer.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -43,6 +48,83 @@ async function readJson(path) {
 
 function exactArray(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function validateQualityOverride(post, currentTime = Date.now()) {
+  const override = post.publish_media?.quality_override ?? null;
+  if (!override) return false;
+  const confirmedAt = Date.parse(override.confirmed_at || "");
+  if (
+    override.enabled !== true ||
+    !String(override.reason || "").trim() ||
+    !Number.isFinite(confirmedAt) ||
+    confirmedAt > currentTime
+  ) {
+    fail("APPROVAL_INVALIDATED", "Quality override is incomplete");
+  }
+  return true;
+}
+
+function validateInstitutionalAttestation(post, approval) {
+  const attestedClaims = (post.variants ?? [])
+    .flatMap((variant) => variant.claims ?? [])
+    .filter((claim) => claim.support_status === "institutional_attested");
+  if (!attestedClaims.length) return false;
+
+  const attestation = post.claim_verification?.institutional_attestation;
+  const reviewed = approval.institutional_attestation;
+  const confirmedAt = Date.parse(attestation?.confirmed_at || "");
+  if (
+    post.claim_verification?.mode !== "institutional_attested" ||
+    !attestation?.backend_verified ||
+    !String(attestation.confirmation_text || "").trim() ||
+    !Number.isFinite(confirmedAt) ||
+    confirmedAt > Date.now() ||
+    !reviewed ||
+    JSON.stringify(attestation) !== JSON.stringify(reviewed)
+  ) {
+    fail("APPROVAL_INVALIDATED", "Institutional attestation does not match the approved profile");
+  }
+  const scopes = new Set(attestation.scopes ?? []);
+  if (attestedClaims.some((claim) => !claim.attestation_scope || !scopes.has(claim.attestation_scope))) {
+    fail("APPROVAL_INVALIDATED", "Institutional claim scope is not covered by the approved attestation");
+  }
+  return true;
+}
+
+function validateReviewerAttestation(post, approval, currentTime = Date.now()) {
+  const claims = (post.variants ?? [])
+    .flatMap((variant) => variant.claims ?? [])
+    .filter((claim) => claim.support_status === "needs_verification");
+  if (!claims.length) return false;
+
+  const attestation = approval.reviewer_attestation;
+  let requiredScopes;
+  try {
+    requiredScopes = requiredReviewerAttestationScopes(post);
+  } catch (error) {
+    fail("SOURCE_REQUIRED", error.message);
+  }
+  if (
+    !attestation ||
+    !attestation.code_id ||
+    !attestation.backend_verified ||
+    attestation.attester_id !== approval.reviewer_id ||
+    attestation.attester_role !== approval.reviewer_role ||
+    !["reviewer", "admin"].includes(attestation.attester_role) ||
+    !String(attestation.confirmation_text || "").trim()
+  ) {
+    fail("APPROVAL_REQUIRED", "A scoped reviewer attestation is required");
+  }
+  const consumedAt = Date.parse(attestation.code_consumed_at || "");
+  if (!Number.isFinite(consumedAt) || consumedAt > currentTime) {
+    fail("APPROVAL_INVALIDATED", "Reviewer attestation is invalid");
+  }
+  const grantedScopes = new Set(attestation.scopes ?? []);
+  if (requiredScopes.some((scope) => !grantedScopes.has(scope))) {
+    fail("APPROVAL_INVALIDATED", "Reviewer attestation does not cover the approved claims");
+  }
+  return true;
 }
 
 function allowedPageIds(env, explicit, connection) {
@@ -113,8 +195,14 @@ export async function publishApprovedPost(jobId, options = {}) {
   const post = await readJson(postPath);
   const approval = await readJson(approvalPath);
   const input = await readJson(inputPath).catch(() => null);
+  // Identity/signature gate runs first: a hand-written or edited approval.json
+  // is rejected before any hash, Page, asset, or token check.
+  assertApprovalSignature(approval, env, now());
   const pageConnection = await (options.loadPageConnection || loadPageConnection)(post.page_id);
   validateApproval(post, approval, input, env, options.allowedPageIds, pageConnection, now());
+  const qualityOverride = validateQualityOverride(post, now());
+  validateInstitutionalAttestation(post, approval);
+  validateReviewerAttestation(post, approval, now());
   validateManifest(post, approval);
 
   const selected = (post.variants ?? []).find((variant) => variant.variant_id === post.selected_variant_id);
@@ -129,7 +217,11 @@ export async function publishApprovedPost(jobId, options = {}) {
     fail("MEDIA_APPROVAL_INVALIDATED", "Asset manifest hash mismatch");
   }
   if (approval.reviewed_page_id !== post.page_id) fail("PAGE_NOT_ALLOWED", "reviewed_page_id does not match post.page_id");
-  if (Array.isArray(post.policy_review?.blocking_errors) && post.policy_review.blocking_errors.length) {
+  if (
+    Array.isArray(post.policy_review?.blocking_errors) &&
+    post.policy_review.blocking_errors.length &&
+    !(approval.reviewer_attestation && isReviewerAttestablePolicy(post))
+  ) {
     fail("APPROVAL_REQUIRED", "Policy review still has blocking errors");
   }
 
@@ -175,6 +267,13 @@ export async function publishApprovedPost(jobId, options = {}) {
     for (const manifest of sortedManifest) {
       const inputAsset = input?.assets?.find((asset) => asset.asset_id === manifest.asset_id);
       if (!inputAsset?.uri) fail("MEDIA_APPROVAL_INVALIDATED", `Missing uri for ${manifest.asset_id}`);
+      if (
+        inputAsset.publish !== true
+        || inputAsset.original_or_preview !== "original"
+        || !["local_file", "host_original"].includes(inputAsset.source_type)
+      ) {
+        fail("MEDIA_APPROVAL_INVALIDATED", `Asset ${manifest.asset_id} is not a confirmed original attachment`);
+      }
       const bytes = options.loadAsset
         ? await options.loadAsset({ asset: inputAsset, manifest, root: baseRoot })
         : await readFile(resolve(baseRoot, inputAsset.uri));
@@ -183,7 +282,7 @@ export async function publishApprovedPost(jobId, options = {}) {
         asset: inputAsset,
         manifest,
         maxBytes,
-        minWidth: Number(env.ASSET_MIN_WIDTH ?? 1080),
+        minWidth: qualityOverride ? 0 : Number(env.ASSET_MIN_WIDTH ?? 1080),
         minHeight: Number(env.ASSET_MIN_HEIGHT ?? 0)
       });
       const scan = await assetScanner({ asset: inputAsset, manifest, bytes, mimeType: inspected.mimeType });

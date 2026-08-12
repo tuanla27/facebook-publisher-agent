@@ -19,7 +19,9 @@ export function contentHashOf(post, selected) {
     page_id: post.page_id,
     selected_variant: selected,
     asset_ids: post.asset_ids ?? [],
-    asset_manifest: post.asset_manifest ?? []
+    asset_manifest: post.asset_manifest ?? [],
+    quality_override: post.publish_media?.quality_override ?? null,
+    claim_verification: post.claim_verification ?? null
   });
   return `sha256:${sha256Hex(JSON.stringify(hashInput))}`;
 }
