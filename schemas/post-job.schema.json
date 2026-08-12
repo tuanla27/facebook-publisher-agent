@@ -25,7 +25,7 @@
     },
     "assets": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 0,
       "maxItems": 10,
       "items": {
         "type": "object",
@@ -39,7 +39,13 @@
           "publish": { "const": true },
           "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
           "alt_context": { "type": "string", "maxLength": 1000 },
-          "mime_type": { "type": "string", "pattern": "^image/" }
+          "mime_type": { "type": "string", "pattern": "^image/" },
+          "byte_size": { "type": "integer", "minimum": 1 },
+          "width": { "type": ["integer", "null"], "minimum": 1 },
+          "height": { "type": ["integer", "null"], "minimum": 1 },
+          "scan_status": { "type": "string", "minLength": 1 },
+          "source_type": { "enum": ["local_file", "host_original", "host_preview", "asset_reference"] },
+          "original_or_preview": { "enum": ["original", "preview", "unknown"] }
         }
       }
     },
@@ -80,9 +86,59 @@
     },
     "status": {
       "type": "string",
-      "enum": ["CONVERSATIONAL_INTAKE", "INPUT_RECEIVED", "IMAGE_ANALYZED", "BRIEF_READY", "DRAFT_GENERATED", "POLICY_REVIEWED", "NEEDS_HUMAN_APPROVAL", "APPROVED", "CHANGES_REQUESTED", "REJECTED", "PUBLISHING", "PUBLISHED", "FAILED"]
+      "enum": ["CONVERSATIONAL_INTAKE", "ATTACHMENTS_RECEIVED", "ASSETS_MATERIALIZED", "INPUT_RECEIVED", "IMAGE_ANALYZED", "BRIEF_READY", "DRAFT_GENERATED", "POLICY_REVIEWED", "NEEDS_HUMAN_APPROVAL", "APPROVED", "CHANGES_REQUESTED", "REJECTED", "PUBLISHING", "PUBLISHED", "FAILED"]
     },
     "created_by": { "type": "string", "maxLength": 200 },
     "created_at": { "type": "string", "format": "date-time" }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "ASSETS_MATERIALIZED",
+              "INPUT_RECEIVED",
+              "IMAGE_ANALYZED",
+              "BRIEF_READY",
+              "DRAFT_GENERATED",
+              "POLICY_REVIEWED",
+              "NEEDS_HUMAN_APPROVAL",
+              "APPROVED",
+              "CHANGES_REQUESTED",
+              "REJECTED",
+              "PUBLISHING",
+              "PUBLISHED",
+              "FAILED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": { "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "ASSETS_MATERIALIZED" }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "items": {
+              "required": ["sha256", "mime_type", "byte_size", "width", "height", "scan_status", "source_type", "original_or_preview"],
+              "properties": {
+                "source_type": { "enum": ["local_file", "host_original"] },
+                "original_or_preview": { "const": "original" }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

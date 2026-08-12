@@ -1,0 +1,54 @@
+{
+  "post_job_id": "demo-econ-official-001",
+  "page": {
+    "page_id": "REPLACE_WITH_ALLOWLISTED_PAGE_ID",
+    "page_name": "Khoa Kinh tế – Học viện Ngân hàng",
+    "allowlisted": true
+  },
+  "keywords": [
+    "Khoa Kinh tế HVNH",
+    "Economics BAV",
+    "trải nghiệm học tập",
+    "people in action",
+    "Real Event Photostory"
+  ],
+  "assets": [
+    {
+      "asset_id": "asset-demo-cover-001",
+      "kind": "image",
+      "uri": "./inputs/demo/REPLACE_COVER_IMAGE.jpg",
+      "publish": true,
+      "alt_context": "Ảnh action: sinh viên đang thuyết trình hoặc thảo luận — không dùng lineup posed làm cover"
+    }
+  ],
+  "objective": "teach",
+  "audience": "Sinh viên Khoa Kinh tế, thí sinh quan tâm Economics BAV, alumni",
+  "language": "vi",
+  "tone": "young academic, gần gũi, insightful, không ceremonial",
+  "cta": "Bạn học được điều gì từ khoảnh khắc này?",
+  "verified_facts": [
+    {
+      "fact_id": "f1",
+      "text": "Thay bằng fact đã xác minh về sự kiện/chương trình (không suy diễn từ ảnh).",
+      "source_refs": ["hvnh-brand-guideline-2026"]
+    }
+  ],
+  "constraints": {
+    "max_variants": 3,
+    "max_body_characters": 1800,
+    "must_include": [
+      "Ít nhất một brand test: Learn/Meet/Experience/Discover",
+      "Ít nhất một thuộc tính: INSIGHTFUL hoặc DYNAMIC hoặc CONNECTED",
+      "Hashtag #KhoaKinhTeHVNH"
+    ],
+    "must_avoid": [
+      "Template chúc mừng/vinh danh sáo",
+      "Recap hành chính 400–700 từ",
+      "Ngày/giải thưởng/sponsor chưa xác minh",
+      "Giọng childish hoặc trend không liên quan"
+    ]
+  },
+  "status": "INPUT_RECEIVED",
+  "created_by": "demo-official",
+  "created_at": "2026-08-10T03:00:00Z"
+}

@@ -41,3 +41,27 @@ test("review preview escapes untrusted caption and image values", () => {
   assert.doesNotMatch(html, /<img src=x onerror/);
   assert.match(html, /&lt;script&gt;bad/);
 });
+
+test("review preview asks for a scoped code when claims lack sources", () => {
+  const review = buildReviewPreview({
+    review: { review_id: "review-1", status: "NEEDS_HUMAN_APPROVAL" },
+    document: {
+      selected_variant_id: "v1",
+      variants: [{
+        variant_id: "v1",
+        body: "Nội dung",
+        claims: [{
+          support_status: "needs_verification",
+          attestation_scope: "admissions_scores"
+        }]
+      }]
+    },
+    pageName: "Fanpage",
+    assets: []
+  });
+  const html = renderReviewPage({ review, csrfToken: "token" });
+  assert.equal(review.requires_attestation, true);
+  assert.match(html, /name="attestation_code"/);
+  assert.match(html, /name="attestation_confirmation"/);
+  assert.match(html, /mức điểm tuyển sinh/);
+});

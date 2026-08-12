@@ -1,5 +1,5 @@
 const STATES = [
-  "CONVERSATIONAL_INTAKE", "INPUT_RECEIVED", "IMAGE_ANALYZED", "BRIEF_READY",
+  "CONVERSATIONAL_INTAKE", "ATTACHMENTS_RECEIVED", "ASSETS_MATERIALIZED", "INPUT_RECEIVED", "IMAGE_ANALYZED", "BRIEF_READY",
   "DRAFT_GENERATED", "POLICY_REVIEWED", "NEEDS_HUMAN_APPROVAL", "APPROVED",
   "CHANGES_REQUESTED", "REJECTED", "PUBLISHING", "PUBLISHED", "FAILED"
 ];
@@ -47,12 +47,14 @@ function repositoryForClient(client) {
         `INSERT INTO approvals
           (approval_id, post_job_id, version, decision, reviewer_id, reviewer_role,
            reviewer_authenticated, reviewed_content_hash, reviewed_asset_ids,
-           reviewed_asset_hash, reviewed_page_id, reviewed_at, expires_at, review_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13,
+           reviewed_asset_hash, reviewed_page_id, institutional_attestation,
+           reviewer_attestation, reviewed_at, expires_at, review_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12::jsonb, $13::jsonb, $14, $15,
            (SELECT review_id FROM review_tasks WHERE post_job_id = $2 AND version = $3 ORDER BY created_at DESC LIMIT 1))`,
         [approval.approvalId, approval.postJobId, approval.version, approval.decision, approval.reviewerId,
           approval.reviewerRole, approval.reviewerAuthenticated, approval.reviewedContentHash,
           JSON.stringify(approval.reviewedAssetIds), approval.reviewedAssetHash, approval.reviewedPageId,
+          JSON.stringify(approval.institutionalAttestation || null), JSON.stringify(approval.reviewerAttestation || null),
           approval.reviewedAt, approval.expiresAt]
       );
     },

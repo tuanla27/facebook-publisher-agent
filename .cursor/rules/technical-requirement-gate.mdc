@@ -1,0 +1,28 @@
+---
+globs:
+  - "backend/**/*"
+  - "config/**/*"
+  - "docs/**/*"
+  - "mcp/**/*"
+  - "opencode.json"
+  - "package.json"
+  - "package-lock.json"
+  - "prompts/**/*"
+  - "schemas/**/*"
+  - "scripts/**/*"
+  - "workflow/**/*"
+alwaysApply: true
+---
+
+Before implementing a new dependency, service, permission, hosting need,
+scale requirement, data-retention change, provider, channel, scheduler,
+dashboard, or approval/publisher change, follow
+`workflow/technical-requirement-gate.md`.
+
+Stop and consult the user in plain Vietnamese with three tailored choices,
+impact, prerequisites, recommendation, and detailed follow-up guidance only
+after an explicit choice. Use the `AskQuestion` dialog for the three choices
+when available, including its `Other` input for a different preference. Do not
+silently change architecture, install dependencies, request secrets, or select
+an option for the user. The technical consultation gate is separate from the
+human content-approval gate.

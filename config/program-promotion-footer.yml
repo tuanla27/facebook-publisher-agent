@@ -1,0 +1,29 @@
+name: "Khoa Kinh tế — thông tin quảng bá chương trình mặc định"
+enabled_by_default: true
+confirmation_required_per_post: true
+required_for_all_posts: true
+allow_user_edit_per_post: true
+allow_omit: false
+append_position: "after_body_before_hashtags"
+source_status: "user_provided_needs_verification"
+source_note: "Xác minh link, tên chương trình, tổ hợp và thông tin tuyển sinh trước khi duyệt."
+admin_attestation_bypass: true
+admin_attestation_scope: "official_program_information"
+
+default_text: |
+  ----------------------------
+  📌 CÁC CTĐT CỬ NHÂN CỦA KHOA KINH TẾ
+  🎓 ECON01: Kinh tế đầu tư
+  🔗 https://tinyurl.com/Kinh-te-dau-tu
+  🎓 ECON02: Chất lượng cao Kinh tế đầu tư
+  🔗 https://tinyurl.com/CLC-Kinh-te-dau-tu
+  🎓 ECON03: Kinh tế quốc tế
+  🔗 https://tinyurl.com/CN-Kinh-te-quoc-te
+  📍 Tổ hợp xét tuyển: A01, D01, D07, D09
+  📥 Thông tin tuyển sinh chi tiết:
+  🔗 https://tinyurl.com/Tuyen-sinh-KKT
+  📌 CTĐT THẠC SĨ QUẢN LÝ KINH TẾ
+  🔗 https://tinyurl.com/CTDT-ThS-QLKT
+  📍 Xét tuyển thẳng và xét tuyển theo hồ sơ
+  📥 Thông tin tuyển sinh chi tiết:
+  🔗 https://tinyurl.com/Tuyen-sinh-ThS-QLKT

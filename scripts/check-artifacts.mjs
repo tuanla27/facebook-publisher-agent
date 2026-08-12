@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateJsonFile } from "./lib/schema-validator.mjs";
 import { reviewContentQuality } from "./lib/content-quality.mjs";
+import { isReviewerAttestablePolicy } from "../backend/approval/validation.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -43,7 +44,12 @@ if (post.publish_media?.type !== "image" || post.publish_media?.upload_strategy 
 if (!/^sha256:[a-f0-9]{64}$/i.test(post.content_hash ?? "")) errors.push("content_hash must use sha256:<64 hex chars>");
 if (!/^sha256:[a-f0-9]{64}$/i.test(post.asset_manifest_hash ?? "")) errors.push("asset_manifest_hash must use sha256:<64 hex chars>");
 if (post.status !== "NEEDS_HUMAN_APPROVAL") errors.push("Artifact must stop at NEEDS_HUMAN_APPROVAL before review");
-if (post.policy_review?.status === "blocked") errors.push("Blocked policy review cannot be handed to approval");
+if (
+  post.policy_review?.status === "blocked" &&
+  !isReviewerAttestablePolicy(post)
+) {
+  errors.push("Blocked policy review cannot be handed to approval");
+}
 if (post.publish_media?.primary_asset_id && !post.asset_ids?.includes(post.publish_media.primary_asset_id)) {
   errors.push("publish_media.primary_asset_id must be in asset_ids");
 }

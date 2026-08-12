@@ -1,3 +1,5 @@
+import { isReviewerAttestablePolicy } from "../../backend/approval/validation.mjs";
+
 const technicalMarkers = /sha256:|post_job_id|asset_id|page_id|NEEDS_HUMAN_APPROVAL|DRAFT_GENERATED|npm run|artifacts\//i;
 const internalLabels = /(^|\n)\s*(Hook|Explanation|Example\s*\/\s*distinction|Practical takeaway|Gentle CTA)\s*:/i;
 
@@ -21,6 +23,8 @@ export function reviewContentQuality(post) {
   }
 
   if ((post.variants ?? []).length > 3) errors.push("No more than three variants are allowed");
-  if (post.policy_review?.status === "blocked") errors.push("Blocked policy review cannot pass quality handoff");
+  if (post.policy_review?.status === "blocked" && !isReviewerAttestablePolicy(post)) {
+    errors.push("Blocked policy review cannot pass quality handoff");
+  }
   return { errors, warnings };
 }

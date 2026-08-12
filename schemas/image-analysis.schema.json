@@ -21,7 +21,20 @@
           "safety_status": { "type": "string", "enum": ["clear", "needs_review", "unsafe"] },
           "relevance_status": { "type": "string", "enum": ["relevant", "uncertain", "unrelated"] },
           "quality_notes": { "type": "array", "items": { "type": "string" } },
-          "alt_text": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          "alt_text": { "type": "string", "minLength": 1, "maxLength": 1000 },
+          "brand_image_assessment": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "action_over_posed": { "type": "string", "enum": ["pass", "warn", "fail"] },
+              "people_visible": { "type": "string", "enum": ["pass", "warn", "fail"] },
+              "real_moment": { "type": "string", "enum": ["pass", "warn", "fail"] },
+              "sponsor_clutter": { "type": "string", "enum": ["pass", "warn", "fail"] },
+              "orientation": { "type": "string", "enum": ["landscape", "portrait", "square", "unknown"] },
+              "recommended_as_cover": { "type": "boolean" },
+              "notes": { "type": "array", "items": { "type": "string" } }
+            }
+          }
         }
       }
     },

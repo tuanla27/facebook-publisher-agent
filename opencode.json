@@ -32,6 +32,7 @@
     }
   },
   "permission": {
+    "question": "allow",
     "edit": "ask",
     "bash": {
       "*": "ask",

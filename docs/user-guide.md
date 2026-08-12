@@ -18,11 +18,12 @@ Fanpage theo tên. Nếu đã có Fanpage được kết nối, có thể bỏ q
 ## Tạo Bài Đăng
 
 1. Dùng command `/create-facebook-education-post`.
-2. Viết chủ đề bạn muốn giải thích.
-3. Kéo ảnh sẽ đăng vào cuộc trò chuyện.
+2. Viết chủ đề bạn muốn đăng: giải thích kiến thức, recap hoạt động, people
+   story, tuyển sinh, nghề nghiệp, hoặc đời sống cộng đồng.
+3. Kéo ảnh sẽ đăng vào cuộc trò chuyện. Ưu tiên ảnh đang hành động hơn ảnh xếp hàng. Hệ thống sẽ tự lấy ảnh gốc; bạn không cần chép ảnh vào thư mục hay sửa JSON. Nếu ứng dụng chỉ gửi được ảnh xem trước, hệ thống sẽ yêu cầu bạn copy ảnh gốc vào thư mục `inputs/` và gửi lại đường dẫn — ảnh xem trước không được dùng để đăng.
 4. Nói thêm đối tượng đọc và giọng văn nếu cần.
 5. Xem phần tóm tắt và trả lời câu hỏi còn thiếu nếu có.
-6. Chờ hệ thống tạo bản nháp.
+6. Chờ hệ thống quét ảnh, tạo bản nháp và mở trang duyệt.
 
 Ví dụ:
 
@@ -30,6 +31,12 @@ Ví dụ:
 Viết bài giáo dục về cách đọc ảnh lễ trao giải.
 Đối tượng là người đọc phổ thông, giọng thân thiện và dễ hiểu.
 Ảnh đính kèm là ảnh sẽ đăng.
+```
+
+```text
+Viết caption recap buổi Economics Challenge.
+Ảnh đính kèm là các khoảnh khắc đang tranh biện.
+Đối tượng là sinh viên và phụ huynh.
 ```
 
 ## Duyệt Bài
@@ -54,11 +61,16 @@ Nếu muốn sửa, nói rõ phần cần sửa. Hệ thống sẽ tạo bản m
 ## Ảnh Nên Gửi
 
 - Gửi ảnh gốc, không phải ảnh chụp màn hình.
+- Nếu hệ thống chỉ nhận được ảnh xem trước, hãy gửi lại bằng nút đính kèm tệp
+  để hệ thống lấy đúng ảnh gốc. Ảnh xem trước không được dùng để đăng.
 - Nên dùng ảnh rộng ít nhất khoảng 1080 pixel.
+- Ưu tiên ảnh đang thuyết trình, thảo luận, làm việc nhóm hơn ảnh đứng xếp hàng.
 - Không gửi ảnh đã bị ứng dụng chat nén nhiều lần.
-- Nếu ảnh nhỏ hoặc mờ, hệ thống có thể yêu cầu gửi ảnh khác.
+- Nếu ảnh nhỏ nhưng vẫn đọc được và liên quan, hệ thống có thể hỏi bạn xác nhận
+  đăng riêng bài đó; ảnh vẫn hiện cảnh báo chất lượng trong bản xem trước.
+- Nếu ảnh mờ, không đọc được, không an toàn hoặc không liên quan, cần gửi ảnh khác.
 
-Chi tiết: `docs/image-quality.md`.
+Chi tiết: `docs/image-quality.md` và `docs/brand/checklist-chon-anh.md`.
 
 ## Khi Có Lỗi
 

@@ -1,3 +1,11 @@
+# Brand Guidelines Example (template)
+
+# For Khoa Kinh tế – Học viện Ngân hàng production, use:
+#   config/brand-guidelines.yml
+#   config/image-selection-checklist.yml
+#   .agents/skills/draft-content/SKILL.md
+#   docs/brand/
+
 brand:
   name: "TEN_THUONG_HIEU"
   language: "vi-VN"

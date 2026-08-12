@@ -2,7 +2,9 @@
 
 | Current state | Allowed next states | Owner |
 |---|---|---|
-| `CONVERSATIONAL_INTAKE` | `INPUT_RECEIVED`, `FAILED` | intake agent |
+| `CONVERSATIONAL_INTAKE` | `ATTACHMENTS_RECEIVED`, `INPUT_RECEIVED`, `FAILED` | intake agent |
+| `ATTACHMENTS_RECEIVED` | `ASSETS_MATERIALIZED`, `FAILED` | attachment materializer |
+| `ASSETS_MATERIALIZED` | `INPUT_RECEIVED`, `FAILED` | workflow |
 | `INPUT_RECEIVED` | `IMAGE_ANALYZED`, `FAILED` | workflow |
 | `IMAGE_ANALYZED` | `BRIEF_READY`, `FAILED` | workflow |
 | `BRIEF_READY` | `DRAFT_GENERATED`, `FAILED` | workflow |
@@ -14,7 +16,7 @@
 | `PUBLISHING` | `PUBLISHED`, `FAILED` | backend publisher |
 | `PUBLISHED` | none | backend |
 | `REJECTED` | none | reviewer |
-| `FAILED` | `INPUT_RECEIVED`, `DRAFT_GENERATED`, `PUBLISHING` | authorized operator |
+| `FAILED` | `ATTACHMENTS_RECEIVED`, `INPUT_RECEIVED`, `DRAFT_GENERATED`, `PUBLISHING` | authorized operator |
 
 ## Approval Invariants
 

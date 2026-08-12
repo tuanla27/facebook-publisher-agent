@@ -17,16 +17,18 @@ The tool accepts exactly one business input: `post_job_id`. It must not accept c
 5. Recompute the asset set and SHA-256 manifest; compare it to both `reviewed_asset_ids` and `reviewed_asset_hash`.
 6. Compare the approved Page ID with the allowlisted Page ID.
 7. Check reviewer role, approval expiry, and job ownership/tenant.
-8. Get the Page token from the secret manager. Never return it to the model.
-9. Create an idempotency key: `post_job_id + approved_content_hash`.
-10. If the key already has a successful publish attempt, return the stored result without posting again.
-11. Load the exact approved image assets in `publish_order`; reject missing, changed, or non-image assets.
-12. Upload all approved image assets in `publish_order` with their detected MIME types. Keep the returned media IDs server-side.
-13. Create the Page post using the approved caption and all uploaded media IDs. Do not fall back to a text-only post.
-14. Store each execution as a separate `publish_attempt`; only write `publish-result` after a successful Page post.
-15. Classify Meta failures as retryable or permanent. Retry only bounded transient failures with exponential backoff.
-16. Store the Meta post ID, URL, uploaded media IDs, response status, timestamp, and sanitized error metadata.
-17. Transition to `PUBLISHED` only after the post and required media have succeeded.
+8. If institutional-attested claims exist, require the exact backend-verified attestation in the approval record and verify its claim scopes.
+9. Get the Page token from the secret manager. Never return it to the model.
+10. Create an idempotency key: `post_job_id + approved_content_hash`.
+11. If the key already has a successful publish attempt, return the stored result without posting again.
+12. Load the exact approved image assets in `publish_order`; reject missing, changed, or non-image assets.
+13. If the approved profile contains a per-post quality override, skip only the minimum-width check; keep MIME, size, hash, scan, and all approval checks mandatory.
+14. Upload all approved image assets in `publish_order` with their detected MIME types. Keep the returned media IDs server-side.
+15. Create the Page post using the approved caption and all uploaded media IDs. Do not fall back to a text-only post.
+16. Store each execution as a separate `publish_attempt`; only write `publish-result` after a successful Page post.
+17. Classify Meta failures as retryable or permanent. Retry only bounded transient failures with exponential backoff.
+18. Store the Meta post ID, URL, uploaded media IDs, response status, timestamp, and sanitized error metadata.
+19. Transition to `PUBLISHED` only after the post and required media have succeeded.
 
 ## Failure Rules
 

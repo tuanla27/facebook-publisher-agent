@@ -14,8 +14,19 @@ restoring lost detail.
 
 The current pilot asset is 500x261 pixels. It is already too small to produce a
 sharp Facebook post; the correct fix is to attach the original higher-resolution
-image, not to enlarge this file.
+image, not to enlarge this file. For event photostories, prefer action frames
+over posed group lineups as the cover image.
 
 The publisher checks the real dimensions before upload. Configure the minimum
 with `ASSET_MIN_WIDTH` and `ASSET_MIN_HEIGHT`. These checks are part of the
 approval boundary so the reviewer sees the same asset that will be published.
+
+## Controlled Exception
+
+If no replacement exists and the image is readable and relevant, the user may
+explicitly confirm a one-post quality override through the `AskQuestion` dialog.
+The override skips only the minimum-width check for that materialized profile.
+The publisher still enforces MIME, maximum file size, SHA-256, malware scan,
+Page allowlist, human approval, and idempotency. The preview must show a
+low-resolution warning, and changing or removing the override invalidates the
+approval hash. The global minimum is never changed.

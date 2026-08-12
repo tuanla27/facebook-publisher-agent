@@ -56,7 +56,22 @@ function errorStatus(error) {
   if (error.code === "FORBIDDEN") return 403;
   if (["NOT_FOUND", "INVALID_VERSION"].includes(error.code)) return 404;
   if (["INVALID_STATE_TRANSITION", "APPROVAL_INVALID", "APPROVAL_INVALIDATED"].includes(error.code)) return 409;
-  if (["INVALID_DECISION", "FEEDBACK_REQUIRED", "REQUEST_TOO_LARGE", "INVALID_JSON"].includes(error.code)) return 400;
+  if ([
+    "INVALID_DECISION",
+    "FEEDBACK_REQUIRED",
+    "REQUEST_TOO_LARGE",
+    "INVALID_JSON",
+    "ATTESTATION_CONFIRMATION_REQUIRED",
+    "ATTESTATION_SCOPE_REQUIRED",
+    "ATTESTATION_SCOPE_INVALID",
+    "ATTESTATION_SCOPE_MISMATCH",
+    "SOURCE_REQUIRED",
+    "REVIEWER_ATTESTATION_REQUIRED",
+    "APPROVAL_CODE_INVALID",
+    "APPROVAL_CODE_EXPIRED",
+    "APPROVAL_CODE_ALREADY_USED",
+    "APPROVAL_CODE_SCOPE_MISMATCH"
+  ].includes(error.code)) return 400;
   if (error.code === "CSRF_INVALID") return 403;
   return 500;
 }
@@ -100,6 +115,8 @@ export function createApprovalHttpServer({ service, authenticate, csrf, publishA
           reviewId,
           decision: form.get("decision"),
           feedback: form.get("feedback") || "",
+          attestationCode: form.get("attestation_code") || "",
+          attestationConfirmation: form.get("attestation_confirmation") || "",
           actor
         });
         let publishResult = null;
@@ -142,6 +159,8 @@ export function createApprovalHttpServer({ service, authenticate, csrf, publishA
           decision: body.decision,
           selectedVariantId: body.selected_variant_id,
           expiresAt: body.expires_at,
+          attestationCode: body.attestation_code,
+          attestationConfirmation: body.attestation_confirmation,
           actor
         }));
       }
@@ -163,7 +182,13 @@ export function createApprovalHttpServer({ service, authenticate, csrf, publishA
       const known = [
         "AUTHENTICATION_REQUIRED", "FORBIDDEN", "NOT_FOUND", "INVALID_VERSION",
         "INVALID_STATE_TRANSITION", "APPROVAL_INVALID", "APPROVAL_INVALIDATED",
-        "INVALID_DECISION", "FEEDBACK_REQUIRED", "REQUEST_TOO_LARGE", "INVALID_JSON"
+        "INVALID_DECISION", "FEEDBACK_REQUIRED", "REQUEST_TOO_LARGE", "INVALID_JSON",
+        "ATTESTATION_CONFIRMATION_REQUIRED", "ATTESTATION_SCOPE_REQUIRED",
+        "ATTESTATION_SCOPE_INVALID", "ATTESTATION_SCOPE_MISMATCH",
+        "SOURCE_REQUIRED",
+        "REVIEWER_ATTESTATION_REQUIRED", "APPROVAL_CODE_INVALID",
+        "APPROVAL_CODE_EXPIRED", "APPROVAL_CODE_ALREADY_USED",
+        "APPROVAL_CODE_SCOPE_MISMATCH"
       ].includes(error.code);
       return json(response, errorStatus(error), {
         error: error.code || "INTERNAL_ERROR",

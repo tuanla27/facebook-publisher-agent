@@ -1,21 +1,35 @@
 # Content Quality Review Prompt
 
-Review the generated Vietnamese Facebook post for reader quality before human approval. This is separate from policy safety review.
+Review the generated Vietnamese Facebook post for **Khoa Kinh tế HVNH** reader
+quality before human approval. This is separate from policy safety review.
+
+Required reads: `config/brand-guidelines.yml`,
+`.agents/skills/content-strategy/SKILL.md`,
+`.agents/skills/draft-content/SKILL.md`.
 
 Check every variant for:
 
-- a specific hook that matches the image and teaching question;
-- a clear explanation, not a generic announcement;
-- at least one concrete observation, example, or useful distinction;
-- exactly one practical takeaway that appears naturally in the body;
-- a gentle CTA that does not repeat the takeaway;
-- short readable paragraphs and natural Vietnamese;
+- a specific hook that matches the image and content intent;
+- a clear explanation, story, opportunity, or experience — not a generic announcement or ceremonial template;
+- at least one concrete observation, learning moment, skill, person, experience, or useful distinction;
+- evidence of at least one brand attribute (insightful / dynamic / connected);
+- service of at least one brand test (Learn / Meet / Experience / Discover);
+- exactly one practical takeaway that appears naturally in the body (insight, person, experience, or opportunity);
+- a gentle CTA that does not repeat the takeaway and matches the intent;
+- short readable paragraphs and natural Vietnamese (young academic tone);
 - no internal labels such as `Hook:`, `Explanation:`, or `Practical takeaway:` in the final body;
 - no repeated disclaimer that makes the post sound like an audit report;
 - no JSON, hashes, IDs, workflow states, or tool instructions in the caption;
-- an alt text that describes only visible content.
+- hashtags within 3–5, including `#KhoaKinhTeHVNH` when applicable;
+- an alt text that describes only visible content;
+- the required promotion footer appears after the main body, before hashtags,
+  and matches the per-post selected text exactly;
+- event photostories stay concise rather than 400–700-word recaps;
+- admissions/career copy uses only verified opportunity facts.
 
-Keep unsupported claims in `claims[]` and policy review metadata. Do not fill the caption with technical verification language unless the verification limitation is itself the educational point.
+Keep unsupported claims in `claims[]` and policy review metadata. Do not fill
+the caption with technical verification language unless the verification
+limitation is itself the educational point.
 
 Return JSON only:
 

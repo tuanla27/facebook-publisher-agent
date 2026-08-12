@@ -34,7 +34,17 @@
       "properties": {
         "type": { "const": "image" },
         "upload_strategy": { "const": "upload_then_publish" },
-        "primary_asset_id": { "type": "string", "minLength": 1 }
+        "primary_asset_id": { "type": "string", "minLength": 1 },
+        "quality_override": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "reason", "confirmed_at"],
+          "properties": {
+            "enabled": { "const": true },
+            "reason": { "type": "string", "minLength": 1, "maxLength": 500 },
+            "confirmed_at": { "type": "string", "format": "date-time" }
+          }
+        }
       }
     },
     "selected_variant_id": { "type": "string", "minLength": 1 },
@@ -63,8 +73,12 @@
               "properties": {
                 "claim_id": { "type": "string", "minLength": 1 },
                 "text": { "type": "string", "minLength": 1 },
-                "support_status": { "type": "string", "enum": ["supported", "observation", "needs_verification"] },
+              "support_status": { "type": "string", "enum": ["supported", "observation", "institutional_attested", "needs_verification"] },
                 "source_refs": { "type": "array", "items": { "type": "string" } },
+              "attestation_scope": {
+                "type": "string",
+                "enum": ["admissions_scores", "admissions_dates", "admissions_procedure", "official_program_information"]
+              },
                 "verification_note": { "type": "string", "maxLength": 500 }
               }
             }
@@ -94,6 +108,45 @@
         "warnings": { "type": "array", "items": { "type": "string" } },
         "reviewed_rules": { "type": "array", "minItems": 1, "items": { "type": "string" } }
       }
+    },
+    "claim_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["source_verified", "institutional_attested"] },
+        "institutional_attestation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["attester_id", "attester_role", "scopes", "confirmation_text", "confirmed_at", "backend_verified"],
+          "properties": {
+            "attester_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+            "attester_role": { "type": "string", "enum": ["faculty", "staff", "admin"] },
+            "scopes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "enum": ["admissions_scores", "admissions_dates", "admissions_procedure", "official_program_information"]
+              }
+            },
+            "confirmation_text": { "type": "string", "minLength": 1, "maxLength": 500 },
+            "confirmed_at": { "type": "string", "format": "date-time" },
+            "backend_verified": { "const": true }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "institutional_attested" } } },
+          "then": { "required": ["institutional_attestation"] }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "source_verified" } } },
+          "then": { "not": { "required": ["institutional_attestation"] } }
+        }
+      ]
     },
     "content_hash": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
     "status": { "type": "string", "enum": ["DRAFT_GENERATED", "POLICY_REVIEWED", "NEEDS_HUMAN_APPROVAL", "APPROVED", "CHANGES_REQUESTED", "REJECTED"] },
