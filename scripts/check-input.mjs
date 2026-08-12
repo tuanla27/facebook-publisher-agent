@@ -37,6 +37,16 @@ for (const [index, asset] of (input.assets ?? []).entries()) {
   if (!asset.asset_id || !asset.uri) errors.push(`assets[${index}] needs asset_id and uri`);
   if (asset.publish !== true) errors.push(`assets[${index}].publish must be true because attached images are publish media`);
   if (/^https?:\/\//i.test(asset.uri)) errors.push(`assets[${index}].uri must be an opaque asset reference, not a signed/private URL`);
+  if (asset.source_type === "host_preview" || asset.original_or_preview === "preview") {
+    errors.push(`assets[${index}] cannot use a preview as publish media`);
+  }
+  if (input.status === "ASSETS_MATERIALIZED") {
+    for (const field of ["sha256", "mime_type", "byte_size", "width", "height", "scan_status", "source_type", "original_or_preview"]) {
+      if (!(field in asset)) errors.push(`assets[${index}] is missing materialized field ${field}`);
+    }
+    if (asset.original_or_preview !== "original") errors.push(`assets[${index}] must be confirmed original`);
+    if (!["local_file", "host_original"].includes(asset.source_type)) errors.push(`assets[${index}] source_type is not publishable`);
+  }
 }
 if (input.objective && !["explain", "teach", "clarify", "awareness", "verified_product_education"].includes(input.objective)) {
   errors.push(`Unsupported objective: ${input.objective}`);

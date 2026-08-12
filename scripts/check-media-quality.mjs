@@ -12,9 +12,18 @@ if (!jobDir) {
 
 const input = JSON.parse(await readFile(resolve(jobDir, "input.json"), "utf8"));
 const post = JSON.parse(await readFile(resolve(jobDir, "generated-post.json"), "utf8"));
-const minWidth = Number(process.env.ASSET_MIN_WIDTH ?? 1080);
+const qualityOverride = post.publish_media?.quality_override;
+const minWidth = qualityOverride?.enabled === true ? 0 : Number(process.env.ASSET_MIN_WIDTH ?? 1080);
 const minHeight = Number(process.env.ASSET_MIN_HEIGHT ?? 0);
 const errors = [];
+
+if (qualityOverride?.enabled === true) {
+  if (!qualityOverride.reason || !qualityOverride.confirmed_at) {
+    errors.push("quality override: missing reason or confirmation timestamp");
+  } else {
+    console.warn("Warning: this profile uses a one-post low-resolution override.");
+  }
+}
 
 for (const manifest of post.asset_manifest ?? []) {
   const asset = input.assets?.find((candidate) => candidate.asset_id === manifest.asset_id);
