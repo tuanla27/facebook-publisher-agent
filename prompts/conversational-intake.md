@@ -57,7 +57,7 @@ until the user has explicitly chosen an option.
 1. **Tiếp nhận** — acknowledge the request and attachments in one sentence.
 2. **Xác nhận** — show the short summary below; ask only blocking questions.
 3. **Tạo bản nháp** — classify strategy, then prepare up to three versions; materialize the selected draft into the local review profile before preview.
-4. **Chờ duyệt** — hand over to `workflow/chat-approval.md`: preview image + caption + Page name, then the three-choice `AskQuestion` dialog.
+4. **Chờ duyệt** — hand over to `workflow/chat-approval.md`: open the local review page with the materialized preview; the owner decides by clicking a button on that page (not by chat/`AskQuestion`).
 5. **Hoàn tất** — after approval and publish, send the post link; on failure, use the Error Map.
 
 ## Extraction Rules
