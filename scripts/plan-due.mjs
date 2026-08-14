@@ -10,6 +10,7 @@ import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDriveClient, readPlanSheet, evaluateReadiness, todayInVietnam } from "../backend/sources/google-drive-reader.mjs";
+import { loadGoogleDriveConfig, resolvePlansSheetId } from "../backend/sources/google-drive-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -25,8 +26,9 @@ function loadDotEnv(baseRoot) {
 }
 
 export async function runCli() {
-  const sheetId = process.env.GOOGLE_DRIVE_PLANS_SHEET_ID;
-  if (!sheetId) { console.error("GOOGLE_DRIVE_PLANS_SHEET_ID chưa cấu hình."); process.exitCode = 1; return; }
+  const config = await loadGoogleDriveConfig();
+  const sheetId = resolvePlansSheetId(process.env, config);
+  if (!sheetId) { console.error("Chạy `npm run google:connect` để chọn sheet, hoặc đặt GOOGLE_DRIVE_PLANS_SHEET_ID."); process.exitCode = 1; return; }
   const client = await buildDriveClient(process.env);
   const { rows } = await readPlanSheet({ sheetId, env: process.env, client });
   const today = todayInVietnam();

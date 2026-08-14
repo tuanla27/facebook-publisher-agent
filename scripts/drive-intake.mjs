@@ -15,6 +15,7 @@ import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { buildDriveClient, readPlanSheet, evaluateReadiness, planRowToJobInput, resolveImageRefs, downloadResolvedImages } from "../backend/sources/google-drive-reader.mjs";
+import { loadGoogleDriveConfig, resolvePlansSheetId, resolveSharedFolderId } from "../backend/sources/google-drive-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -67,8 +68,9 @@ async function writeJobInput(baseRoot, input) {
 
 export async function runCli(args = process.argv.slice(2)) {
   const opts = parseArgs(args);
-  const sheetId = opts.sheetId || process.env.GOOGLE_DRIVE_PLANS_SHEET_ID;
-  if (!sheetId) fail("DRIVE_SHEET_ID_MISSING", "Set GOOGLE_DRIVE_PLANS_SHEET_ID in .env or pass --sheet-id.");
+  const config = await loadGoogleDriveConfig();
+  const sheetId = opts.sheetId || resolvePlansSheetId(process.env, config);
+  if (!sheetId) fail("DRIVE_SHEET_ID_MISSING", "Chạy `npm run google:connect` để tự chọn sheet, hoặc đặt GOOGLE_DRIVE_PLANS_SHEET_ID trong .env.");
   const client = await buildDriveClient(process.env);
   const { rows } = await readPlanSheet({ sheetId, sheetRange: opts.sheetRange, env: process.env, client });
 
@@ -86,7 +88,7 @@ export async function runCli(args = process.argv.slice(2)) {
     if (!page) fail("PAGE_CONFIG_MISSING", "Set META_TARGET_PAGE_ID and META_TARGET_PAGE_NAME in .env to map a plan row to a job.");
 
     // Resolve images from Drive (subfolder name / folder URL / file URL) or FB link.
-    const sharedFolderId = process.env.GOOGLE_DRIVE_SHARED_FOLDER_ID || null;
+    const sharedFolderId = resolveSharedFolderId(process.env, config);
     const resolved = await resolveImageRefs({
       refs: row.image_folder_or_urls || [],
       sharedFolderId, drive: client.drive, fetchImpl: globalThis.fetch

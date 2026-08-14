@@ -5,9 +5,35 @@ Google Drive. **Bạn không cần terminal, không cần biết lập trình.**
 
 Người triển khai đã cài sẵn trên máy này. Việc của bạn:
 
-1. Chuẩn bị ảnh + dòng sheet (kéo thả trên Google Drive).
-2. Mở Cursor và gõ một câu bên dưới.
-3. Admin Fanpage duyệt draft trên Facebook.
+1. Lần đầu: nhắn câu bắt đầu bên dưới, đăng nhập Google (và Fanpage nếu chưa).
+2. Chuẩn bị ảnh + dòng sheet (kéo thả trên Google Drive).
+3. Hàng ngày: mở Cursor và gõ một câu trong mục prompt.
+4. Admin Fanpage duyệt draft trên Facebook.
+
+## Lần đầu dùng — nhắn đúng câu này
+
+Mở Cursor (Agent) và gõ:
+
+```text
+Mình mới dùng. Hãy kết nối Google Drive và Fanpage giúp mình.
+```
+
+Hoặc gõ `/bat-dau-su-dung`.
+
+Trình duyệt sẽ mở. Bạn:
+
+1. Đăng nhập **tài khoản Google của Khoa**, bấm **Cho phép**.
+2. Nếu hiện hộp thoại chọn file: chọn file kế hoạch (thường tên có chữ Timeline / KH / RACI).
+3. Nếu hiện hộp thoại chọn thư mục: chọn thư mục ảnh (thường tên có chữ Ảnh bài Khoa Kinh tế).
+4. Khi được hỏi kết nối Fanpage: đăng nhập Facebook, chọn Page **Khoa Kinh tế**, bấm cho phép.
+
+Không gửi mật khẩu, mã xác thực, hay link Drive vào chat.
+
+Xong bước này, nhắn:
+
+```text
+Hôm nay có bài nào sẵn sàng không?
+```
 
 ## Chuẩn bị ảnh cho một bài
 
@@ -67,9 +93,9 @@ Không có câu "tự chạy nền". Pipeline chỉ chạy khi bạn mở Cursor
 |---|---|
 | Báo thiếu ảnh | Thêm ≥2 ảnh vào thư mục STT, gõ lại tên thư mục trên sheet |
 | Báo chưa đến ngày | Chờ đúng ngày, hoặc nhờ người triển khai đổi sang chạy khi sẵn sàng |
-| Không đọc được Drive | Nhờ người triển khai chạy lại kết nối Google |
+| Không đọc được Drive | Nhắn: "Kết nối lại Google Drive giúp mình" |
 | Draft không thấy trên Facebook | Vào Drafts, tải lại trang; vẫn không thấy thì copy caption thủ công |
-| Token Facebook hết hạn | Nhờ người triển khai + admin Page đăng nhập lại 1 lần |
+| Token Facebook hết hạn | Nhắn: "Kết nối lại Fanpage giúp mình" (cần admin Page đăng nhập) |
 
 ## Bạn không cần làm
 

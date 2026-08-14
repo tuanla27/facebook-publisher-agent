@@ -8,6 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { googleDriveTokenPath } from "../backend/sources/google-drive-oauth-store.mjs";
+import { loadGoogleDriveConfig, resolvePlansSheetId, resolveSharedFolderId } from "../backend/sources/google-drive-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -27,6 +28,7 @@ function filled(name, env = process.env) {
 }
 
 export async function collectB1Status({ env = process.env, baseRoot = root } = {}) {
+  const config = await loadGoogleDriveConfig();
   const checks = [];
   const push = (id, ok, label, hint) => {
     checks.push({ id, ok, label, hint: ok ? null : hint });
@@ -39,7 +41,10 @@ export async function collectB1Status({ env = process.env, baseRoot = root } = {
   push("google_auth_mode", (env.GOOGLE_DRIVE_AUTH_MODE || "oauth").toLowerCase() === "oauth", "GOOGLE_DRIVE_AUTH_MODE=oauth", "Đặt GOOGLE_DRIVE_AUTH_MODE=oauth");
   push("google_oauth_client", filled("GOOGLE_OAUTH_CLIENT_ID", env) && filled("GOOGLE_OAUTH_CLIENT_SECRET", env), "Đã điền Google OAuth Client", "Deployer tạo OAuth app rồi điền CLIENT_ID/SECRET vào .env — không gửi qua chat");
   push("google_connected", existsSync(googleDriveTokenPath()), "Đã đăng nhập Google Drive", "Chạy npm run google:connect, khách đăng nhập Google");
-  push("sheet_id", filled("GOOGLE_DRIVE_PLANS_SHEET_ID", env), "Đã cấu hình ID sheet kế hoạch", "Điền GOOGLE_DRIVE_PLANS_SHEET_ID");
+  const sheetId = resolvePlansSheetId(env, config);
+  push("sheet_id", Boolean(sheetId), "Đã chọn sheet kế hoạch", "Chạy npm run google:connect để tự chọn, hoặc đặt GOOGLE_DRIVE_PLANS_SHEET_ID");
+  const folderId = resolveSharedFolderId(env, config);
+  push("shared_folder", Boolean(folderId), "Đã chọn thư mục ảnh cha", "Chạy npm run google:connect để tự chọn, hoặc đặt GOOGLE_DRIVE_SHARED_FOLDER_ID");
   push("meta_app", existsSync(resolve(baseRoot, ".local", "meta-app-credentials.enc.json")) || (filled("META_APP_ID", env) && filled("META_APP_SECRET", env)), "Có cấu hình Meta app", "Điền META_APP_ID/SECRET hoặc lưu qua npm run meta:connect");
   push("meta_connected", existsSync(resolve(baseRoot, ".local", "meta-page-connections.enc.json")), "Đã kết nối Facebook Page", "Chạy npm run meta:connect, admin Page đăng nhập 1 lần");
   push("draft_mode", /^(1|true|yes)$/i.test(env.FB_DRAFT_MODE || ""), "FB_DRAFT_MODE=true (bài chờ duyệt)", "Đặt FB_DRAFT_MODE=true");

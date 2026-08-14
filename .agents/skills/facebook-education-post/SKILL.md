@@ -136,6 +136,20 @@ Before approval handoff, confirm:
     Never create or rewrite the profile at the approval click, and never publish
     live without that decision.
 
+When the operator is new or asks to connect ("Mình mới dùng", "Bắt đầu sử dụng",
+"Kết nối Google Drive", "Kết nối Fanpage", `/bat-dau-su-dung`,
+`/connect-google-drive`, `/connect-facebook-page`):
+
+1. Run `npm run setup:status`. Speak Vietnamese; do not show IDs or commands.
+2. If Google Drive is not connected, run `npm run google:connect` and tell the
+   user a Google window will open — they sign in and click Allow. If stdout is
+   `NEEDS_PICK`, use one `AskQuestion` for the sheet name, then one for the
+   photo folder name; apply with `npm run google:connect -- --pick-sheet <n>`
+   and `--pick-folder <n>`.
+3. If the Facebook Page is not connected, run `npm run meta:connect` and tell
+   the user to sign in and choose the Page by name.
+4. When both are connected, the next prompt is "Hôm nay có bài nào sẵn sàng không?"
+
 When the operator asks "Hôm nay có bài nào sẵn sàng không?", run
 `npm run setup:status` if Drive/Meta is not connected, otherwise
 `npm run drive:intake` / `npm run plan:due`. List ready rows in Vietnamese.

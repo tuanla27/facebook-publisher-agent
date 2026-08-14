@@ -13,6 +13,7 @@ import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDriveClient } from "../backend/sources/google-drive-reader.mjs";
+import { loadGoogleDriveConfig, resolveSharedFolderId } from "../backend/sources/google-drive-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -78,9 +79,10 @@ function describeFile(file) {
 
 export async function runCli(args = process.argv.slice(2)) {
   const opts = parseArgs(args);
-  const folderId = extractFolderId(opts.folderId) || process.env.GOOGLE_DRIVE_SHARED_FOLDER_ID;
+  const config = await loadGoogleDriveConfig();
+  const folderId = extractFolderId(opts.folderId) || resolveSharedFolderId(process.env, config);
   if (!folderId) {
-    fail("DRIVE_FOLDER_ID_MISSING", "Truyền --folder <id-hoac-url> hoặc đặt GOOGLE_DRIVE_SHARED_FOLDER_ID trong .env.");
+    fail("DRIVE_FOLDER_ID_MISSING", "Chạy `npm run google:connect` để chọn thư mục, hoặc truyền --folder <id/url>.");
   }
   const client = await buildDriveClient(process.env);
   const files = await listFolder({ folderId, drive: client.drive });
