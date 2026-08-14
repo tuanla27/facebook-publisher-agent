@@ -15,6 +15,7 @@ The project is intentionally tool-agnostic. Claude Code, Cursor, Codex, and Open
 ## Handoff Documents
 
 - Runbook bàn giao + demo end-to-end: `docs/transfer-and-demo.md`.
+- Playbook tổng hợp (trạng thái hiện tại + quyết định Drive): `docs/pipeline-playbook.md`.
 - Tổng quan pipeline (kiến trúc + cách dùng): `docs/pipeline-overview.md`.
 - Brand Khoa Kinh tế HVNH: `docs/brand/` + `config/brand-guidelines.yml`.
 - Hướng dẫn bài demo giống chính thức: `docs/brand/huong-dan-bai-demo-chinh-thuc.md`.
