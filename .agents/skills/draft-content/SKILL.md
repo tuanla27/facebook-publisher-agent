@@ -14,6 +14,34 @@ This skill is the **caption distill**. Do not invent visual/graphic assets here;
 the current pipeline writes text and selects among supplied photos. Reel and
 carousel may appear only as format hints.
 
+## Story-first generation
+
+Build the caption from the supplied material in this order:
+
+1. verified facts from the plan row or an approved source;
+2. concrete visual observations from image analysis;
+3. one brand-relevant interpretation that does not add a new event fact;
+4. one takeaway and a soft invitation.
+
+For event recaps, write a small story rather than a report. Start with a
+specific scene, object, gesture, spatial contrast, or human detail visible in
+the image. Then connect that detail to the supplied event context and move the
+reader toward one meaningful takeaway. Do not open with a date, a generic
+announcement, or a list of what each photo contains unless the date is the
+story's necessary anchor.
+
+Use two or three concrete image details naturally; do not enumerate visual
+observations. An observation such as "nhiều người trước sân khấu" can support
+an atmosphere or scene, but cannot prove a result, emotion, role, identity,
+sponsor, skill, or impact. Keep verification language in claims metadata, not
+in the reader-facing caption.
+
+When source material is sparse, make the story smaller, not louder: preserve
+the exact event name and supported context, use the image for the scene, and
+omit outcomes or invented backstory. A generic motivational sentence is not a
+practical takeaway unless it is clearly tied to the event's visible moment or
+verified learning context.
+
 Always load `config/program-promotion-footer.yml` and append the selected footer
 after the main body and before hashtags. Treat it as a separate promotional
 block. Do not let it replace the post's Learn/Meet/Experience/Discover value.
@@ -41,8 +69,10 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 
 - Open with a feeling, not a fact.
 - Each paragraph: 1–2 sentences. Short, scannable, like a letter.
-- Use 3–5 emoji as emotional anchors (💙🎉🎀💗✨🌟), not spam. One
-  emoji per key emotional beat, not every line.
+- Emoji are optional, not a brand requirement. For `event_recap`, use 0–2 only
+  when they add a genuine visual or celebratory beat; never place one on every
+  paragraph or use a string of trophy/fire/sparkle icons. A clean editorial
+  caption with no emoji is preferred to decorative AI-looking punctuation.
 - End soft: a warm promise or invitation, not always a question.
   "Hẹn gặp bạn" > "Bạn muốn thử gì?"
 - Speak to "bạn" directly, like writing a letter to one person.
@@ -79,6 +109,8 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 - 3–5 emoji as emotional anchors (💙🎉🎀💗✨🌟), one per key beat.
 - Specific insight from the moment/topic (what students practiced, what skill
   formed, who readers meet, what opportunity opened).
+- A story arc grounded in at least one supplied fact and two concrete visual
+  details; never use a generic arc as a substitute for missing event facts.
 - Real people and real experience language.
 - One clear takeaway, person, experience, or opportunity a reader can reuse.
 - Soft endings: "Hẹn gặp bạn", "Welcome", "Chào mừng bạn đến" — warm,
@@ -112,6 +144,10 @@ Discover and obey `config/brand-guidelines.yml#avoid` and `forbidden_words`.
 - Image = observation only.
 - OCR = lead for review, not proof.
 - Unsupported facts → `needs_verification`.
+- Direct field observations may be used as `observation` claims with a
+  `field://` reference, but they do not prove official dates, results, awards,
+  sponsors, identities, or outcomes. Keep those claims as
+  `needs_verification` without a separate source.
 - Do not claim PMC/EC outcomes, rankings, admissions numbers, sponsor lists, or
   career offers unless verified in input.
 

@@ -8,6 +8,7 @@ import { google } from "googleapis";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { loadGoogleDriveTokens, saveGoogleDriveTokens } from "./google-drive-oauth-store.mjs";
+import { isPreferredSheetName } from "./google-drive-config.mjs";
 
 const VI_TZ_OFFSET_MS = 7 * 60 * 60 * 1000;
 
@@ -123,7 +124,7 @@ const HEADER_ALIASES = {
   keywords: ["keywords", "từ khoá", "tu khoa"],
   notes: ["notes", "ghi chú", "ghi chu", "nội dung", "noi dung", "nội dung cần hỗ trợ", "noi dung can ho tro"],
   content: ["content", "nội dung chi tiết", "noi dung chi tiet"],
-  image_folder_or_urls: ["image_folder_or_urls", "ảnh", "anh", "hình ảnh", "hinhr anh", "link minh chứng", "link minh chung", "link minh chứngkết quả thực hiện"],
+  image_folder_or_urls: ["image_folder_or_urls", "ảnh", "anh", "hình ảnh", "hinhr anh", "link minh chứng", "link minh chung", "link minh chứng kết quả thực hiện"],
   channels: ["channels", "kênh", "kenh"],
   status: ["status", "trạng thái", "trang thai", "tiến độ thực hiện", "tien do thuc hien"],
   event_date: ["event_date", "ngày sự kiện", "ngay su kien", "ngày/tháng/năm", "ngay/thang/nam", "ngày", "ngay"],
@@ -137,7 +138,7 @@ const HEADER_ALIASES = {
 };
 
 function normalizeHeader(raw) {
-  const lower = String(raw || "").trim().toLowerCase();
+  const lower = String(raw || "").replace(/\s+/g, " ").trim().toLowerCase();
   for (const [canonical, aliases] of Object.entries(HEADER_ALIASES)) {
     if (aliases.includes(lower)) return canonical;
   }
@@ -215,11 +216,23 @@ export async function readPlanSheet({ sheetId, sheetRange = "A1:Z1000", env = pr
   if (!sheetId) fail("DRIVE_SHEET_ID_MISSING", "GOOGLE_DRIVE_PLANS_SHEET_ID is required");
   const { sheets } = client || await buildDriveClient(env);
   const response = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range: sheetRange });
-  const rows = response.data.values || [];
+  return parsePlanSheetValues(response.data.values || []);
+}
+
+function detectHeaderRow(rows) {
+  for (let index = 0; index < Math.min(rows.length, 30); index += 1) {
+    const headers = rows[index].map(normalizeHeader).filter(Boolean);
+    if (headers.length >= 3 && (headers.includes("title") || headers.includes("plan_id"))) return index;
+  }
+  return 0;
+}
+
+export function parsePlanSheetValues(rows, { headerRowIndex = null } = {}) {
   if (rows.length < 2) return { rows: [], headers: [] };
-  const headerRow = rows[0].map(normalizeHeader);
+  const start = Number.isInteger(headerRowIndex) ? headerRowIndex : detectHeaderRow(rows);
+  const headerRow = rows[start].map(normalizeHeader);
   const records = [];
-  for (let r = 1; r < rows.length; r += 1) {
+  for (let r = start + 1; r < rows.length; r += 1) {
     const cells = rows[r];
     if (!cells || cells.every((cell) => !String(cell || "").trim())) continue;
     const record = { _row: r + 1 };
@@ -232,7 +245,8 @@ export async function readPlanSheet({ sheetId, sheetRange = "A1:Z1000", env = pr
         case "image_folder_or_urls": record.image_folder_or_urls = parseImageList(value); break;
         case "keywords": record.keywords = parseKeywords(value); break;
         case "event_date": case "event_month": case "event_year": record[`_${canonical}`] = String(value).trim(); break;
-        default: record[canonical] = String(value).trim();
+        default:
+          if (record[canonical] === undefined || !record[canonical]) record[canonical] = String(value).trim();
       }
     }
     // Compose event_date from Ngày/Tháng/Năm columns if not already a full date.
@@ -255,6 +269,137 @@ export async function readPlanSheet({ sheetId, sheetRange = "A1:Z1000", env = pr
     records.push(record);
   }
   return { rows: records, headers: headerRow.filter(Boolean) };
+}
+
+export async function listDrivePlanSheets({ drive, query = null }) {
+  const files = [];
+  let pageToken = null;
+  do {
+    const response = await drive.files.list({
+      q: ["mimeType='application/vnd.google-apps.spreadsheet'", "trashed=false"].join(" and "),
+      fields: "nextPageToken,files(id,name,mimeType)",
+      pageSize: 100,
+      pageToken
+    });
+    files.push(...(response.data.files || []));
+    pageToken = response.data.nextPageToken || null;
+  } while (pageToken);
+  const queryTokens = String(query || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, "d")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+  const selected = files.filter((file) => {
+    const name = String(file.name || "");
+    const normalized = name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .toLowerCase();
+    return isPreferredSheetName(name) || (queryTokens.length && queryTokens.every((token) => normalized.includes(token)));
+  });
+  return selected.length ? selected : files;
+}
+
+export async function listDriveXlsxFiles({ drive, query = null }) {
+  const files = [];
+  let pageToken = null;
+  do {
+    const response = await drive.files.list({
+      q: [
+        "trashed=false",
+        "(mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' or mimeType='application/vnd.ms-excel')"
+      ].join(" and "),
+      fields: "nextPageToken,files(id,name,mimeType,size,modifiedTime)",
+      pageSize: 100,
+      pageToken
+    });
+    files.push(...(response.data.files || []));
+    pageToken = response.data.nextPageToken || null;
+  } while (pageToken);
+  const queryTokens = String(query || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, "d")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+  const selected = files.filter((file) => {
+    const normalized = String(file.name || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .toLowerCase();
+    return /timeline|\bkh\b|raci|ke hoach/i.test(normalized)
+      || (queryTokens.length && queryTokens.every((token) => normalized.includes(token)));
+  });
+  return selected.length ? selected : files;
+}
+
+export async function readAvailablePlanSheets({ sheetId = null, query = null, sheetRange = "A1:Z1000", env = process.env, client }) {
+  const driveClient = client || await buildDriveClient(env);
+  const googleSources = sheetId
+    ? [{ id: sheetId, name: null }]
+    : await listDrivePlanSheets({ drive: driveClient.drive, query });
+  const xlsxSources = sheetId ? [] : await listDriveXlsxFiles({ drive: driveClient.drive, query });
+  const sources = [
+    ...googleSources.map((source) => ({ ...source, kind: "google_sheet" })),
+    ...xlsxSources.map((source) => ({ ...source, kind: "xlsx" }))
+  ];
+  const rows = [];
+  for (const source of sources) {
+    const result = source.kind === "xlsx"
+      ? await (await import("./xlsx-reader.mjs")).readXlsxPlanFile({ source, env, drive: driveClient.drive })
+      : await readPlanSheet({ sheetId: source.id, sheetRange, env, client: driveClient });
+    rows.push(...result.rows.map((row) => ({
+      ...row,
+      _sheet_id: source.id,
+      _sheet_name: source.kind === "xlsx"
+        ? [source.name, row._workbook_sheet_name].filter(Boolean).join(" / ")
+        : source.name || null,
+      _sheet_kind: source.kind
+    })));
+  }
+  return { rows, sources };
+}
+
+function normalizeLookupText(value) {
+  return String(value || "")
+    .replace(/[đĐ]/g, "d")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+export function findPlanRows(rows, { planId = null, query = null } = {}) {
+  if (planId) {
+    const exact = (rows || []).filter((row) => String(row.plan_id || "").trim() === String(planId).trim());
+    if (exact.length) return exact;
+    const requested = normalizeLookupText(planId);
+    return (rows || []).filter((row) => {
+      const current = normalizeLookupText(row.plan_id);
+      return current === requested || current === normalizeLookupText(`plan-${planId}`);
+    });
+  }
+  if (query) {
+    const needle = normalizeLookupText(query);
+    const tokens = needle.split(/\s+/).filter(Boolean);
+    return (rows || []).filter((row) => [
+      row.plan_id,
+      row.title,
+      row.keywords?.join(" "),
+      row.notes,
+      row.content
+    ].some((value) => {
+      const haystack = normalizeLookupText(value);
+      return needle && (haystack.includes(needle) || tokens.every((token) => haystack.includes(token)));
+    }));
+  }
+  return rows || [];
 }
 
 // Readiness predicate per workflow/plan-triggers.md. Returns { ready, reasons, skip }.
@@ -348,20 +493,28 @@ export async function findDriveFileByName({ name, parentFolderId, drive }) {
   return response.data.files?.[0] || null;
 }
 
-// Find a subfolder by name inside a parent folder. Returns { id, name } or null.
-// Used by the "subfolder per event" workflow: customer names a subfolder by STT
-// (e.g. "143") and drops images in; reader lists images in that subfolder.
-export async function findDriveFolderByName({ name, parentFolderId, drive }) {
-  if (!name) return null;
+export async function findDriveFoldersByName({ name, parentFolderId, drive }) {
+  if (!name) return [];
   const escaped = String(name).replace(/'/g, "\\'");
   const query = [`name='${escaped}'`, "mimeType='application/vnd.google-apps.folder'", "trashed=false"];
   if (parentFolderId) query.push(`'${parentFolderId}' in parents`);
   const response = await drive.files.list({
     q: query.join(" and "),
     fields: "files(id,name)",
-    pageSize: 10
+    pageSize: 20
   });
-  return response.data.files?.[0] || null;
+  return response.data.files || [];
+}
+
+// Find a subfolder by name inside a parent folder. Returns { id, name } or null.
+// Used by the "subfolder per event" workflow: customer names a subfolder by STT
+// (e.g. "143") and drops images in; reader lists images in that subfolder.
+export async function findDriveFolderByName({ name, parentFolderId, drive }) {
+  const matches = await findDriveFoldersByName({ name, parentFolderId, drive });
+  if (matches.length > 1) {
+    fail("DRIVE_FOLDER_AMBIGUOUS", `Co nhieu thu muc Drive cung ten "${name}". Hay dung ten/ID ro hon.`);
+  }
+  return matches[0] || null;
 }
 
 // List image files (png/jpg/webp/gif/avif) inside a Drive folder.
@@ -425,30 +578,29 @@ export async function resolveImageRefs({ refs, sharedFolderId, drive, fetchImpl 
       continue;
     }
 
-    // Plain subfolder name (e.g. "143") — look up inside shared folder
-    if (sharedFolderId && !/^https?:\/\//.test(trimmed)) {
+    // Plain subfolder name (e.g. "143") — look up in the configured parent,
+    // or across the connected Drive when no parent was selected.
+    if (!/^https?:\/\//.test(trimmed)) {
       // subfolder/filename (e.g. "143/a.jpg") — find subfolder, then file in it
       const slashIdx = trimmed.indexOf("/");
       if (slashIdx > 0) {
         const subName = trimmed.slice(0, slashIdx);
         const fileName = trimmed.slice(slashIdx + 1);
         const folder = await findDriveFolderByName({ name: subName, parentFolderId: sharedFolderId, drive });
-        if (folder) {
-          const file = await findDriveFileByName({ name: fileName, parentFolderId: folder.id, drive });
-          if (file) {
-            out.push({ kind: "drive_file", drive_file_id: file.id, name: file.name, mime_type: file.mimeType });
-            continue;
-          }
+        if (!folder) fail("DRIVE_IMAGE_REF_NOT_FOUND", `Khong tim thay thu muc anh "${subName}".`);
+        const file = await findDriveFileByName({ name: fileName, parentFolderId: folder.id, drive });
+        if (file) {
+          out.push({ kind: "drive_file", drive_file_id: file.id, name: file.name, mime_type: file.mimeType });
+          continue;
         }
-        // Subfolder not found — fall through to other handlers (or url)
+        if (!file) fail("DRIVE_IMAGE_REF_NOT_FOUND", `Khong tim thay anh "${fileName}" trong thu muc "${subName}".`);
       } else {
         // Just a subfolder name (e.g. "143") — list ALL images in it
         const folder = await findDriveFolderByName({ name: trimmed, parentFolderId: sharedFolderId, drive });
-        if (folder) {
-          const images = await listDriveImagesInFolder({ folderId: folder.id, drive });
-          for (const img of images) out.push({ kind: "drive_file", drive_file_id: img.id, name: img.name, mime_type: img.mimeType });
-          continue;
-        }
+        if (!folder) fail("DRIVE_IMAGE_REF_NOT_FOUND", `Khong tim thay thu muc anh "${trimmed}".`);
+        const images = await listDriveImagesInFolder({ folderId: folder.id, drive });
+        for (const img of images) out.push({ kind: "drive_file", drive_file_id: img.id, name: img.name, mime_type: img.mimeType });
+        continue;
       }
     }
 

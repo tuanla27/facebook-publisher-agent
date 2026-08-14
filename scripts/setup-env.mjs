@@ -12,6 +12,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const B1_DEFAULTS = {
   GOOGLE_DRIVE_AUTH_MODE: "oauth",
+  GOOGLE_DRIVE_AUTO_DISCOVER: "true",
+  GOOGLE_DRIVE_XLSX_MAX_BYTES: "26214400",
   GOOGLE_OAUTH_CLIENT_ID: "",
   GOOGLE_OAUTH_CLIENT_SECRET: "",
   GOOGLE_OAUTH_REDIRECT_URI: "http://127.0.0.1:8788/oauth2callback",

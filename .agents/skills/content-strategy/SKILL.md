@@ -57,7 +57,9 @@ matching non-education intent.
 
 ## Operating procedure
 
-1. Read the user notes, verified facts, and image analysis.
+1. Read the user notes, verified facts, direct field observations, and image
+   analysis. Field observations may shape atmosphere and scene, but cannot
+   replace sources for official dates, results, awards, sponsors, or identities.
 2. Choose one `content_intent`, one `content_pillar`, one primary audience, and
    at least one brand attribute (`insightful` / `dynamic` / `connected`).
 3. Choose the brand test the post will serve.
@@ -80,7 +82,9 @@ matching non-education intent.
    - store pillar, attributes, brand tests, format, and intent in those fields and
      in `angle_excluded` / notes only when the schema cannot carry them yet.
 8. Never invent dates, awards, rankings, sponsor lists, admissions numbers,
-   job offers, or identities. Put gaps in `needs_verification`.
+   job offers, or identities. Put gaps in `needs_verification`. Field
+   observations must remain labeled as observations and must not be upgraded to
+   official claims by the writer.
 
 ## Caption angle by intent
 

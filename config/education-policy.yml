@@ -34,6 +34,16 @@ claim_policy:
     - "Nội dung phân biệt đối xử, thù ghét hoặc gây hại"
     - "Caption chỉ ceremonial/vinh danh template mà không phục vụ Learn/Meet/Experience/Discover"
     - "Bịa ngày, giải thưởng, xếp hạng, chỉ tiêu tuyển sinh, offer việc làm hoặc danh sách tài trợ"
+field_observation:
+  enabled: true
+  allowed_without_external_source:
+    - "Điều người thu thập trực tiếp nhìn thấy hoặc nghe thấy tại sự kiện"
+  must_remain_observation:
+    - "Ngày giờ chính thức"
+    - "Kết quả, giải thưởng, thứ hạng"
+    - "Danh sách đội, sponsor, đối tác hoặc danh tính"
+    - "Số liệu, trích dẫn nguyên văn, tác động hoặc kỹ năng đạt được"
+  source_ref_format: "field://<record>#observation=<number>"
 institutional_attestation:
   enabled: true
   requires_backend_verified_identity: true

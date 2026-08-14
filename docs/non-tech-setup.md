@@ -23,9 +23,8 @@ Hoặc gõ `/bat-dau-su-dung`.
 Trình duyệt sẽ mở. Bạn:
 
 1. Đăng nhập **tài khoản Google của Khoa**, bấm **Cho phép**.
-2. Nếu hiện hộp thoại chọn file: chọn file kế hoạch (thường tên có chữ Timeline / KH / RACI).
-3. Nếu hiện hộp thoại chọn thư mục: chọn thư mục ảnh (thường tên có chữ Ảnh bài Khoa Kinh tế).
-4. Khi được hỏi kết nối Fanpage: đăng nhập Facebook, chọn Page **Khoa Kinh tế**, bấm cho phép.
+2. Nếu không hiện hộp thoại chọn file/thư mục, đó là đúng: pipeline sẽ tự tìm theo yêu cầu chat.
+3. Khi được hỏi kết nối Fanpage: đăng nhập Facebook, chọn các Page cần dùng, bấm cho phép.
 
 Không gửi mật khẩu, mã xác thực, hay link Drive vào chat.
 

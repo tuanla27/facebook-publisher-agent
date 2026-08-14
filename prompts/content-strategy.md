@@ -47,6 +47,12 @@ Rules:
   default.
 - Map non-education intents onto `teaching_question` as the reader job-to-be-done, not a forced classroom quiz.
 - Prefer action cover photos; warn on posed lineups.
+- For event_recap, identify one concrete scene and two usable visual details
+  before drafting. The strategy should create a small story arc from scene to
+  supplied context to reader meaning, not a date-led announcement or an image
+  inventory.
+- When facts are sparse, narrow the angle and use the image only for atmosphere
+  and observable detail. Do not compensate with generic motivational claims.
 - If the request cannot serve Learn/Meet/Experience/Discover, put the reason in `angle_excluded` and stop before drafting.
 - Unsupported dates, awards, rankings, sponsor lists, admissions numbers, job offers, or identities go into `needs_verification`.
 

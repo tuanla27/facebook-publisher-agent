@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { resolveImageRefs } from "../backend/sources/google-drive-reader.mjs";
+import { findDriveFolderByName, resolveImageRefs } from "../backend/sources/google-drive-reader.mjs";
 
 function mockDrive({ folders = {}, files = {} } = {}) {
   return {
@@ -51,6 +51,28 @@ test("resolveImageRefs: plain subfolder name -> list images in shared folder", a
   assert.equal(resolved.length, 2);
   assert.equal(resolved[0].kind, "drive_file");
   assert.equal(resolved[0].drive_file_id, "img-1");
+});
+
+test("resolveImageRefs: plain subfolder name can be found without a parent folder", async () => {
+  const drive = mockDrive({
+    folders: { "143": { id: "folder-143", name: "143" } },
+    files: { "folder-143": [{ id: "img-1", name: "a.jpg", mimeType: "image/jpeg" }] }
+  });
+  const resolved = await resolveImageRefs({ refs: ["143"], sharedFolderId: null, drive });
+  assert.equal(resolved[0].drive_file_id, "img-1");
+});
+
+test("findDriveFolderByName: rejects ambiguous global folder names", async () => {
+  const drive = {
+    files: { list: async () => ({ data: { files: [
+      { id: "folder-a", name: "143" },
+      { id: "folder-b", name: "143" }
+    ] } }) }
+  };
+  await assert.rejects(
+    () => findDriveFolderByName({ name: "143", drive }),
+    (error) => error.code === "DRIVE_FOLDER_AMBIGUOUS"
+  );
 });
 
 test("resolveImageRefs: subfolder/filename picks specific files only", async () => {

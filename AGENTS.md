@@ -22,7 +22,7 @@ The default product is a lightweight workflow/hybrid running directly in Claude 
 1. Never publish directly from an AI writing step.
 2. Never call a publisher with arbitrary caption text. The publisher input is only `post_job_id`.
 3. Never invent prices, statistics, studies, certifications, dates, guarantees, product effects, admissions numbers, rankings, sponsor lists, or job offers.
-4. Treat facts in `inputs/*.json` and approved brand references as authoritative; label unsupported facts as missing.
+4. Treat facts in `inputs/*.json` and approved brand references as authoritative; label unsupported facts as missing. Direct field observations may be labeled as observations, but do not prove official dates, results, awards, sponsor lists, or identities.
 5. A change to body, assets, Page, CTA, or factual claims invalidates approval and requires a new review.
 6. Keep language brand-true: serve at least one of Learn / Meet / Experience / Discover an opportunity. Education posts explain a concept and give one practical takeaway; event, people, admissions, career, and community posts follow the matching intent structures in `.agents/skills/content-strategy/SKILL.md`.
 7. Do not turn a branded post into aggressive sales copy. A CTA may invite learning, meeting someone, experiencing something, discovering an opportunity, saving, commenting, or visiting a verified resource.

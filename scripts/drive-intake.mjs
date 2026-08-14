@@ -14,7 +14,7 @@ import { mkdir, writeFile, rename } from "node:fs/promises";
 import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
-import { buildDriveClient, readPlanSheet, evaluateReadiness, planRowToJobInput, resolveImageRefs, downloadResolvedImages } from "../backend/sources/google-drive-reader.mjs";
+import { buildDriveClient, readAvailablePlanSheets, findDriveFolderByName, findDriveFileByName, findPlanRows, evaluateReadiness, planRowToJobInput, resolveImageRefs, downloadResolvedImages } from "../backend/sources/google-drive-reader.mjs";
 import { loadGoogleDriveConfig, resolvePlansSheetId, resolveSharedFolderId } from "../backend/sources/google-drive-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -39,21 +39,36 @@ function fail(code, message) {
 }
 
 function parseArgs(args) {
-  const out = { planId: null, sheetId: null, sheetRange: "A1:Z1000" };
+  const out = {
+    planId: null, query: null, sheetId: null, sheetRange: "A1:Z1000",
+    recap: false, allowCompleted: false, imagesFolder: null, images: null, postJobId: null
+  };
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
     if (arg === "--plan-id") { out.planId = args[++i]; }
+    else if (arg === "--query") { out.query = args[++i]; }
     else if (arg === "--sheet-id") { out.sheetId = args[++i]; }
     else if (arg === "--range") { out.sheetRange = args[++i]; }
+    else if (arg === "--recap") { out.recap = true; }
+    else if (arg === "--allow-completed") { out.allowCompleted = true; }
+    else if (arg === "--images-folder") { out.imagesFolder = args[++i]; }
+    else if (arg === "--images") { out.images = args[++i]; }
+    else if (arg === "--post-job-id") { out.postJobId = args[++i]; }
   }
   return out;
 }
 
-function loadPageConfig(env) {
+async function loadPageConfig(env) {
   const pageId = env.META_TARGET_PAGE_ID || env.META_DEFAULT_PAGE_ID || "";
   const pageName = env.META_TARGET_PAGE_NAME || env.META_DEFAULT_PAGE_NAME || "";
-  if (!pageId || !pageName) return null;
-  return { page_id: pageId, page_name: pageName, allowlisted: true };
+  if (pageId && pageName) return { page_id: pageId, page_name: pageName, allowlisted: true };
+  const { listPageConnections } = await import("../backend/meta-oauth/token-store.mjs");
+  const pages = await listPageConnections();
+  if (!pages.length) return null;
+  const target = pageName
+    ? pages.find((page) => String(page.page_name || "").toLowerCase().includes(String(pageName).toLowerCase()))
+    : pages[0];
+  return target ? { page_id: target.page_id, page_name: target.page_name, allowlisted: true } : null;
 }
 
 async function writeJobInput(baseRoot, input) {
@@ -69,22 +84,60 @@ async function writeJobInput(baseRoot, input) {
 export async function runCli(args = process.argv.slice(2)) {
   const opts = parseArgs(args);
   const config = await loadGoogleDriveConfig();
-  const sheetId = opts.sheetId || resolvePlansSheetId(process.env, config);
-  if (!sheetId) fail("DRIVE_SHEET_ID_MISSING", "Chạy `npm run google:connect` để tự chọn sheet, hoặc đặt GOOGLE_DRIVE_PLANS_SHEET_ID trong .env.");
   const client = await buildDriveClient(process.env);
-  const { rows } = await readPlanSheet({ sheetId, sheetRange: opts.sheetRange, env: process.env, client });
+  const autoDiscover = !/^(0|false|no)$/i.test(String(process.env.GOOGLE_DRIVE_AUTO_DISCOVER || "true"));
+  const configuredSheetId = opts.sheetId || (!autoDiscover ? resolvePlansSheetId(process.env, config) : null);
+  if (!configuredSheetId && !autoDiscover) fail("DRIVE_SHEET_ID_MISSING", "Chạy `npm run google:connect` để tự chọn sheet, hoặc đặt GOOGLE_DRIVE_PLANS_SHEET_ID trong .env.");
+  const { rows, sources } = await readAvailablePlanSheets({
+    sheetId: configuredSheetId,
+    query: opts.query,
+    sheetRange: opts.sheetRange,
+    env: process.env,
+    client
+  });
 
-  if (opts.planId) {
-    const row = rows.find((record) => record.plan_id === opts.planId);
-    if (!row) fail("PLAN_NOT_FOUND", `No plan row with plan_id="${opts.planId}" in the sheet.`);
+  if (opts.planId || opts.query) {
+    const matches = findPlanRows(rows, { planId: opts.planId, query: opts.query });
+    if (!matches.length) fail("PLAN_NOT_FOUND", `Khong tim thay dong ke hoach phu hop voi "${opts.planId || opts.query}".`);
+    if (matches.length > 1) {
+      const choices = matches.map((row) => `${row.plan_id || "(trong)"}: ${row.title || "(khong ten)"} [${row._sheet_name || row._sheet_id}]`);
+      fail("PLAN_AMBIGUOUS", `Co nhieu dong phu hop. Hay chon mot dong: ${choices.join("; ")}`);
+    }
+    let row = matches[0];
+    if (opts.imagesFolder) {
+      const folder = await findDriveFolderByName({ name: opts.imagesFolder, drive: client.drive });
+      if (!folder) fail("DRIVE_FOLDER_NOT_FOUND", `Khong tim thay thu muc anh "${opts.imagesFolder}".`);
+      const names = String(opts.images || "").split(",").map((name) => name.trim()).filter(Boolean);
+      if (!names.length) {
+        row = { ...row, image_folder_or_urls: [`https://drive.google.com/drive/folders/${folder.id}`] };
+      } else {
+        const files = [];
+        for (const name of names) {
+          const file = await findDriveFileByName({ name, parentFolderId: folder.id, drive: client.drive });
+          if (!file) fail("DRIVE_IMAGE_REF_NOT_FOUND", `Khong tim thay anh "${name}" trong thu muc "${opts.imagesFolder}".`);
+          files.push(`https://drive.google.com/file/d/${file.id}/view`);
+        }
+        row = { ...row, image_folder_or_urls: files };
+      }
+    }
+    if (opts.recap) {
+      row = {
+        ...row,
+        notes: row.notes || "Recap gioi han: chi mo ta nhung gi nhin thay trong anh; khong khang dinh ket qua, giai thuong hoac thanh tich.",
+        plan_id: opts.postJobId || row.plan_id
+      };
+    } else if (opts.postJobId) {
+      fail("POST_JOB_ID_REQUIRES_RECAP", "--post-job-id chi dung cung --recap de tao job recap rieng.");
+    }
     const { ready, skip, reasons } = evaluateReadiness(row);
-    if (skip) { console.error(JSON.stringify({ status: "SKIPPED", plan_id: opts.planId, reasons }, null, 2)); process.exitCode = 0; return; }
-    if (!ready) {
+    const recapCompleted = opts.recap && opts.allowCompleted && skip;
+    if (skip && !recapCompleted) { console.error(JSON.stringify({ status: "SKIPPED", plan_id: opts.planId, reasons }, null, 2)); process.exitCode = 0; return; }
+    if (!ready && !recapCompleted) {
       console.error(JSON.stringify({ status: "NEEDS_ATTENTION", plan_id: opts.planId, reasons }, null, 2));
       process.exitCode = 1;
       return;
     }
-    const page = loadPageConfig(process.env);
+    const page = await loadPageConfig(process.env);
     if (!page) fail("PAGE_CONFIG_MISSING", "Set META_TARGET_PAGE_ID and META_TARGET_PAGE_NAME in .env to map a plan row to a job.");
 
     // Resolve images from Drive (subfolder name / folder URL / file URL) or FB link.
@@ -129,9 +182,10 @@ export async function runCli(args = process.argv.slice(2)) {
     const inputPath = await writeJobInput(root, input);
     console.log(JSON.stringify({
       status: "INPUT_RECEIVED",
-      plan_id: input.post_job_id,
+       plan_id: input.post_job_id,
       input_path: isAbsolute(inputPath) ? inputPath : resolve(inputPath),
       channels: row.channels,
+      source_sheet: { id: row._sheet_id, name: row._sheet_name },
       images_resolved: {
         drive_downloaded: downloaded.length,
         url_only: urlOnly.length,
@@ -159,7 +213,8 @@ export async function runCli(args = process.argv.slice(2)) {
     };
   });
   console.log(JSON.stringify({
-    sheet_id: sheetId,
+    sheet_id: configuredSheetId || null,
+    sheets_scanned: sources.length,
     auth_mode: client.auth_mode,
     rows: summary
   }, null, 2));

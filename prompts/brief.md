@@ -52,7 +52,9 @@ Rules:
 - List which brand attributes (insightful / dynamic / connected) the angle will show.
 - Suggest a format hint such as Real Event Photostory, People Story, or Econ
   Explainer. Reel/carousel may be mentioned as future format hints only.
-- Use only supplied facts and approved references.
+- Use only supplied facts, approved references, or direct field observations.
+  Field observations may describe a witnessed scene, but cannot verify an
+  official date, result, award, sponsor, identity, or outcome without a source.
 - Separate direct image observations from factual claims.
 - Add missing information to `needs_verification`; never fill gaps with plausible details.
 - If the image fails the selection checklist as a cover, say so in

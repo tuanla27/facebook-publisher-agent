@@ -29,6 +29,7 @@ function checkServer() {
     });
     req.on("error", () => resolveCheck(false));
     req.on("timeout", () => { req.destroy(); resolveCheck(false); });
+    req.end();
   });
 }
 

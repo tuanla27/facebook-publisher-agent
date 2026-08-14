@@ -93,6 +93,11 @@ must state, using the existing brief fields:
 - facts and source references;
 - missing facts that must not be invented.
 
+Direct field observations may be recorded as observations with a `field://`
+reference and used to shape atmosphere or scene. They do not prove official
+dates, results, awards, sponsors, identities, or outcomes; those claims remain
+`needs_verification` without a source.
+
 Use the image for two separate purposes: analyze it for context and include the exact approved image asset in the eventual Facebook post. Do not treat the image as evidence for effects or claims.
 
 ### 5. Confirm the required promotion footer

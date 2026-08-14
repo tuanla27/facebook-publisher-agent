@@ -39,12 +39,13 @@ export async function collectB1Status({ env = process.env, baseRoot = root } = {
   push("env_file", existsSync(resolve(baseRoot, ".env")), "Có file .env", "Chạy npm run setup:env rồi điền secret trên máy khách");
   push("encryption_key", /^[a-fA-F0-9]{64}$/.test(env.META_TOKEN_ENCRYPTION_KEY || ""), "Có khóa mã hóa local", "Tạo bằng openssl rand -hex 32, ghi META_TOKEN_ENCRYPTION_KEY");
   push("google_auth_mode", (env.GOOGLE_DRIVE_AUTH_MODE || "oauth").toLowerCase() === "oauth", "GOOGLE_DRIVE_AUTH_MODE=oauth", "Đặt GOOGLE_DRIVE_AUTH_MODE=oauth");
+  const autoDiscover = !/^(0|false|no)$/i.test(String(env.GOOGLE_DRIVE_AUTO_DISCOVER || "true"));
   push("google_oauth_client", filled("GOOGLE_OAUTH_CLIENT_ID", env) && filled("GOOGLE_OAUTH_CLIENT_SECRET", env), "Đã điền Google OAuth Client", "Deployer tạo OAuth app rồi điền CLIENT_ID/SECRET vào .env — không gửi qua chat");
   push("google_connected", existsSync(googleDriveTokenPath()), "Đã đăng nhập Google Drive", "Chạy npm run google:connect, khách đăng nhập Google");
   const sheetId = resolvePlansSheetId(env, config);
-  push("sheet_id", Boolean(sheetId), "Đã chọn sheet kế hoạch", "Chạy npm run google:connect để tự chọn, hoặc đặt GOOGLE_DRIVE_PLANS_SHEET_ID");
+  push("sheet_id", autoDiscover || Boolean(sheetId), autoDiscover ? "Tự tìm sheet theo yêu cầu" : "Đã chọn sheet kế hoạch", "Chạy npm run google:connect để tự chọn, hoặc đặt GOOGLE_DRIVE_PLANS_SHEET_ID");
   const folderId = resolveSharedFolderId(env, config);
-  push("shared_folder", Boolean(folderId), "Đã chọn thư mục ảnh cha", "Chạy npm run google:connect để tự chọn, hoặc đặt GOOGLE_DRIVE_SHARED_FOLDER_ID");
+  push("shared_folder", autoDiscover || Boolean(folderId), autoDiscover ? "Tự tìm thư mục ảnh theo STT/tên" : "Đã chọn thư mục ảnh cha", "Chạy npm run google:connect để tự chọn, hoặc đặt GOOGLE_DRIVE_SHARED_FOLDER_ID");
   push("meta_app", existsSync(resolve(baseRoot, ".local", "meta-app-credentials.enc.json")) || (filled("META_APP_ID", env) && filled("META_APP_SECRET", env)), "Có cấu hình Meta app", "Điền META_APP_ID/SECRET hoặc lưu qua npm run meta:connect");
   push("meta_connected", existsSync(resolve(baseRoot, ".local", "meta-page-connections.enc.json")), "Đã kết nối Facebook Page", "Chạy npm run meta:connect, admin Page đăng nhập 1 lần");
   push("draft_mode", /^(1|true|yes)$/i.test(env.FB_DRAFT_MODE || ""), "FB_DRAFT_MODE=true (bài chờ duyệt)", "Đặt FB_DRAFT_MODE=true");

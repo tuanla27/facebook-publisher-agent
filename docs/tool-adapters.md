@@ -73,6 +73,11 @@ links and admissions claims require either an approved source or a
 backend-verified admin institutional attestation with the
 `official_program_information` scope.
 
+Direct field observations may be recorded with a `field://` reference and used
+for scene or atmosphere. They do not replace sources for official dates,
+results, awards, sponsors, identities, or outcomes. Chat assertions and OCR
+remain insufficient for those claims.
+
 For official school notices, an adapter may use the institutional-attestation
 path when source files are unavailable. It must provide a backend-verified
 faculty, staff, or admin role, collect the per-post `AskQuestion` confirmation,

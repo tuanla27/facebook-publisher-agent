@@ -209,6 +209,15 @@ async function autoDiscoverAndPick(tokens, { sheetIndex = null, folderIndex = nu
   const sheets = await listAll({ drive, mimeType: "application/vnd.google-apps.spreadsheet", pageSize: 50 });
   const folders = await listAll({ drive, mimeType: "application/vnd.google-apps.folder", pageSize: 50 });
   await saveGoogleDriveCandidates({ sheets, folders });
+  if (!/^(0|false|no)$/i.test(String(process.env.GOOGLE_DRIVE_AUTO_DISCOVER || "true"))) {
+    console.log(JSON.stringify({
+      status: "CONNECTED_AUTO_DISCOVERY",
+      sheets_found: sheets.length,
+      folders_found: folders.length,
+      note: "Pipeline se tu tim sheet va thu muc theo yeu cau; khong can pick thu cong."
+    }));
+    return { sheets, folders };
+  }
   const picked = pickFromCandidates({ sheets, folders }, { sheetIndex, folderIndex });
 
   if ((picked.needs_sheet_pick || picked.needs_folder_pick) && process.stdin.isTTY) {

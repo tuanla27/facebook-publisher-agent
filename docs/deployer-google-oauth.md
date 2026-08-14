@@ -51,12 +51,21 @@ Trong `.env`, điền các giá trị do Google cấp:
 
 ```text
 GOOGLE_DRIVE_AUTH_MODE=oauth
+GOOGLE_DRIVE_AUTO_DISCOVER=true
 GOOGLE_OAUTH_CLIENT_ID=<client-id>
 GOOGLE_OAUTH_CLIENT_SECRET=<client-secret>
 GOOGLE_OAUTH_REDIRECT_URI=http://127.0.0.1:8788/oauth2callback
 GOOGLE_DRIVE_PLANS_SHEET_ID=1mGqRhfNwjRnEalZ3SGcSmFcZPw_MgLCEaSZE0PABMsc
 GOOGLE_DRIVE_SHARED_FOLDER_ID=<id-thu-muc-anh>
 ```
+
+Khi `GOOGLE_DRIVE_AUTO_DISCOVER=true`, hai ID sheet và thư mục là tùy chọn.
+Pipeline sẽ đọc Google Sheets và file `.xlsx` có quyền truy cập, ưu tiên workbook
+có tên Timeline/KH/RACI, tìm dòng theo `plan_id`, tên hoặc từ khóa từ yêu cầu
+chat, rồi tìm thư mục ảnh theo STT/tên. Với XLSX, adapter chỉ đọc giá trị ô,
+không chạy macro/công thức, tự nhận diện header sau phần preamble và giới hạn
+kích thước theo `GOOGLE_DRIVE_XLSX_MAX_BYTES`. Nếu có nhiều kết quả trùng,
+pipeline dừng và hỏi lại thay vì tự chọn.
 
 `META_TOKEN_ENCRYPTION_KEY` cũng phải có trong `.env`; khóa này dùng để mã hóa
 token Google trên máy. Không gửi Client secret hoặc khóa mã hóa qua chat.
@@ -88,6 +97,9 @@ npm run drive:intake
 Nếu thành công, pipeline đọc được Sheet mà không cần share file cho service
 account. Nếu cần tải ảnh theo tên thư mục con, tài khoản khách hàng phải có
 quyền đọc thư mục ảnh đó theo cấu trúc Drive hiện tại.
+
+Để tìm theo một yêu cầu cụ thể, dùng `npm run drive:intake -- --query "tên sự kiện"`;
+không cần pick Sheet hoặc thư mục sau mỗi lần kết nối.
 
 ## Thu hồi kết nối
 

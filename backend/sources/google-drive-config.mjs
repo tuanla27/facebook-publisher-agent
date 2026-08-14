@@ -30,6 +30,10 @@ export function preferredSheets(items) {
   return preferredItems(items, SHEET_HINT);
 }
 
+export function isPreferredSheetName(name) {
+  return SHEET_HINT.test(String(name || ""));
+}
+
 export function preferredFolders(items) {
   return preferredItems(items, FOLDER_HINT);
 }

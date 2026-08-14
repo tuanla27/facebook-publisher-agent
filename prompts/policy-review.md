@@ -53,7 +53,10 @@ Use `pass_with_warnings` for non-blocking style issues, including:
 
 Always review:
 
-- every factual claim has a source reference or `needs_verification`;
+- every factual claim has a source reference or `needs_verification`. A direct
+  field observation may use `support_status: observation` with a `field://`
+  reference, but it cannot replace a source for official dates, results,
+  awards, sponsors, identities, or outcomes;
 - needs-verification claims declare an allowed attestation scope when the
   reviewer attestation path is used;
 - a reviewer attestation code is consumed only by the bound reviewer and only

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { evaluateReadiness, planRowToJobInput, todayInVietnam } from "../backend/sources/google-drive-reader.mjs";
+import { evaluateReadiness, findPlanRows, planRowToJobInput, todayInVietnam } from "../backend/sources/google-drive-reader.mjs";
 
 test("evaluateReadiness: row with all fields and 2 images is ready", () => {
   const today = "2026-08-13";
@@ -64,6 +64,23 @@ test("planRowToJobInput: throws when page missing", () => {
 test("todayInVietnam: returns YYYY-MM-DD in Vietnam tz", () => {
   const today = todayInVietnam(new Date("2026-08-13T20:00:00Z"));
   assert.equal(today, "2026-08-14");
+});
+
+test("findPlanRows: finds a plan by id or accented title query", () => {
+  const rows = [
+    { plan_id: "plan-143", title: "Tổ chức tọa đàm môn KTĐT2", keywords: ["sự kiện"] },
+    { plan_id: "plan-144", title: "Một bài khác", keywords: [] }
+  ];
+  assert.equal(findPlanRows(rows, { planId: "143" }).length, 1);
+  assert.equal(findPlanRows(rows, { query: "toa dam KTDT2" })[0].plan_id, "plan-143");
+});
+
+test("findPlanRows: keeps ambiguous matches for the caller to reject", () => {
+  const rows = [
+    { plan_id: "plan-143", title: "Tọa đàm" },
+    { plan_id: "plan-243", title: "Tọa đàm" }
+  ];
+  assert.equal(findPlanRows(rows, { query: "tọa đàm" }).length, 2);
 });
 
 test("evaluateReadiness: timeline mode — 'Đã xong' is skip, not error", () => {
