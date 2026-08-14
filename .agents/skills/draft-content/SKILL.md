@@ -97,6 +97,16 @@ to excitement, from "chưa biết" to "đã bắt đầu".
   when needed.
 - More than 8 hashtags; emoji spam (3–5 tasteful emoji are OK, more is spam).
 
+## Website & official voice
+
+For website articles (hvnh.edu.vn/eco) and official Facebook notices
+(tuyển sinh, thông báo học viện), load `config/professional-voice.yml` and
+follow its voice/structure instead of the young-academic caption voice above:
+no emoji on website, structured H2/H3, verified facts or "đang xác minh",
+longer body. The young-academic voice above remains the default for regular
+Facebook posts. Both voices must still serve Learn / Meet / Experience /
+Discover and obey `config/brand-guidelines.yml#avoid` and `forbidden_words`.
+
 ## Claims discipline
 
 - Image = observation only.

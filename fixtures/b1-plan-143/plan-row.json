@@ -1,0 +1,10 @@
+{
+  "plan_id": "plan-143",
+  "title": "Tổ chức toạ đàm môn KTĐT2",
+  "notes": "Toạ đàm học thuật cho sinh viên Khoa Kinh tế. Nội dung lấy từ sheet kế hoạch; số liệu chưa xác minh thì giữ needs_verification.",
+  "image_folder_or_urls": ["143/a.png", "143/b.png"],
+  "channels": ["facebook", "website"],
+  "status": "sẵn sàng",
+  "event_date": "2026-08-13",
+  "trigger_mode": "when_ready"
+}

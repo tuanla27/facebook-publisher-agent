@@ -78,4 +78,39 @@ export class MetaApiAdapter {
     form.append("access_token", accessToken);
     return this.request("create_page_post", `${pageId}/feed`, form);
   }
+
+  // ponytail: Meta single-image draft bug — drafts with one photo often do not
+  // appear in Meta Business Suite Drafts. Multi-photo / video / text-only are
+  // stable. Upgrade path: wait for Meta to fix, or use video. Caller enforces
+  // >=2 images (or text-only fallback) before calling this.
+  async createPageDraftPost({ pageId, accessToken, message, mediaIds }) {
+    const form = new FormData();
+    form.append("message", message);
+    for (const [index, mediaId] of mediaIds.entries()) {
+      form.append(`attached_media[${index}]`, JSON.stringify({ media_fbid: mediaId }));
+    }
+    form.append("published", "false");
+    form.append("unpublished_content_type", "DRAFT");
+    form.append("access_token", accessToken);
+    return this.request("create_page_draft_post", `${pageId}/feed`, form);
+  }
+
+  async isDraftVisible({ postId, accessToken }) {
+    const url = `${this.url(postId)}?fields=is_published&access_token=${encodeURIComponent(accessToken)}`;
+    let response;
+    try {
+      response = await this.fetchImpl(url);
+    } catch {
+      throw new MetaApiError("Meta API network request failed", { operation: "is_draft_visible", retryable: true });
+    }
+    let data;
+    try { data = await response.json(); } catch { data = {}; }
+    if (!response.ok || data.error) {
+      const classification = classifyMetaFailure(response.status, data);
+      throw new MetaApiError(data.error?.message || `Meta API request failed (${response.status})`, {
+        ...classification, status: response.status, operation: "is_draft_visible"
+      });
+    }
+    return { exists: Boolean(data.id), is_published: data.is_published === true, raw: data };
+  }
 }

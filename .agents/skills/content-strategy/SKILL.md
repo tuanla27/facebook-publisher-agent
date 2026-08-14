@@ -90,6 +90,15 @@ matching non-education intent.
 - **admissions / career**: Clear opportunity → verified facts only → who it is for → next step CTA without fear or false urgency.
 - **community**: Before → Now → What's ahead → Belonging → Soft promise. Write with emotional narrative arc, short paragraphs (1–2 sentences), emoji as anchors, and a warm ending.
 
+## Website & official voice
+
+When the target channel is the school website (hvnh.edu.vn/eco) or an official
+Facebook notice, also load `config/professional-voice.yml` and choose the
+matching `intent_templates.website` structure. The strategy still picks one
+intent, one pillar, one audience, and brand attributes; the professional
+config only changes voice and article structure (H2/H3, no emoji, verified
+facts). The young-academic voice remains default for regular Facebook posts.
+
 ## Reduce / avoid
 
 - Ceremonial congratulate templates with no Learn/Meet/Experience/Discover.

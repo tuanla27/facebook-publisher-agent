@@ -3,6 +3,9 @@
 Tài liệu thao tác đầy đủ từ cài đặt, cấu hình, kết nối Meta, demo đến vận hành:
 `docs/transfer-and-demo.md`.
 
+Triển khai Khoa Kinh tế (B1, deployer setup 1 lần, khách chỉ chat):
+`docs/deployer-b1-runbook.md` và `docs/non-tech-setup.md`.
+
 ## Gói Cần Bàn Giao
 
 Gói source nên bao gồm:

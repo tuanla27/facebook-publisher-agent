@@ -149,7 +149,8 @@
       ]
     },
     "content_hash": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
-    "status": { "type": "string", "enum": ["DRAFT_GENERATED", "POLICY_REVIEWED", "NEEDS_HUMAN_APPROVAL", "APPROVED", "CHANGES_REQUESTED", "REJECTED"] },
+    "status": { "type": "string", "enum": ["DRAFT_GENERATED", "POLICY_REVIEWED", "NEEDS_HUMAN_APPROVAL", "APPROVED", "CHANGES_REQUESTED", "REJECTED", "DRAFT_CREATED"] },
+    "meta_draft_post_id": { "type": "string", "minLength": 1 },
     "created_at": { "type": "string", "format": "date-time" }
   }
 }

@@ -37,7 +37,7 @@ The conversation follows the five-step script in `prompts/conversational-intake.
 1. Tiếp nhận   -> acknowledge request and attachments
 2. Xác nhận    -> short summary, blocking questions only
 3. Tạo bản nháp -> content strategy, planner, writer, policy reviewer, then materialize review profile
-4. Chờ duyệt   -> preview from the materialized profile + AskQuestion approval choice (workflow/chat-approval.md)
+4. Chờ duyệt   -> preview from the materialized profile + local review page button click (workflow/chat-approval.md)
 5. Hoàn tất    -> post link on success, Error Map on failure
 ```
 
@@ -114,7 +114,7 @@ External UX:
 
 ```text
 short chat messages, image previews, one clarification dialog, draft preview,
-AskQuestion approval choice, post link or plain-language error with next step
+local review page decision, post link or plain-language error with next step
 ```
 
 Internal workflow:

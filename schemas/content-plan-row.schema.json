@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/facebook-education-post/content-plan-row.schema.json",
+  "title": "Content Plan Row (Google Drive sheet row)",
+  "description": "Intermediate row from the planning Google Sheet. The google-drive-reader maps a ready row into schemas/post-job.schema.json. This is not a post job; it is a plan entry that may trigger one.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plan_id", "title", "notes", "channels", "status"],
+  "properties": {
+    "plan_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{2,99}$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 160 },
+      "maxItems": 20
+    },
+    "notes": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "content": { "type": "string", "maxLength": 4000 },
+    "image_folder_or_urls": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 500 },
+      "maxItems": 10
+    },
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": { "enum": ["facebook", "website"] },
+      "uniqueItems": true
+    },
+    "status": { "enum": ["nháp", "sẵn sàng", "đã tạo draft", "đã đăng", "cần bổ sung"] },
+    "event_date": { "type": "string", "format": "date" },
+    "trigger_mode": { "enum": ["chat", "when_ready", "on_event_date"] },
+    "page_id_hint": { "type": "string", "maxLength": 100 },
+    "objective_hint": { "type": "string", "maxLength": 100 },
+    "audience_hint": { "type": "string", "maxLength": 500 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

@@ -9,7 +9,13 @@ Follow `AGENTS.md`, `workflow/scope.md`, and `workflow/education-facebook-post.m
 Before setup or implementation, also follow `workflow/technical-requirement-gate.md`
 when the request adds a dependency, service, permission, hosting need, scale
 requirement, data-retention change, provider, channel, scheduler, dashboard, or
-approval/publisher change.
+approval/publisher change. Also follow `workflow/plan-triggers.md` for how a
+job is triggered (chat default; `when_ready` / `on_event_date` are
+semi-automatic and require explicit chat confirmation before any Meta draft
+or website export). Deployer setup for this faculty is B1: local machine,
+Google OAuth (`npm run google:connect`), Meta Page OAuth
+(`npm run meta:connect`). After setup the operator only chats; see
+`docs/non-tech-setup.md`.
 
 This workflow serves the Fanpage as a branded channel for knowledge, people,
 experiences, and opportunities — not education-only posts. Education remains a
@@ -115,15 +121,39 @@ Before approval handoff, confirm:
     scan checks mandatory even when an override is present.
 13. Write status `NEEDS_HUMAN_APPROVAL` and materialize the review profile
     from that same source.
-14. Open the local review page in the browser with `npm run review:open` and the
-    exact materialized preview. The owner decides on that page by clicking
-    **Duyệt và đăng / Yêu cầu sửa / Hủy bài này**. The page writes and signs
-    `approval.json`; a chat message is never a decision and the agent never
-    writes approval itself.
-15. Read the signed decision returned by the review page. Only after an explicit
-    browser approval does publishing proceed through `publish_approved_post(post_job_id)`.
+14. If this is a Google Drive plan job and `FB_DRAFT_MODE=true`, skip the local
+    review page. After policy review and explicit chat confirmation to run
+    this one post, create a Meta draft with
+    `npm run meta:publish -- --draft <post_job_id>`. The Page admin publishes
+    from Meta Business Suite. Also export the website article via
+    `backend/publisher/website-export.mjs`. Do not call the live publisher.
+15. Otherwise open the local review page with `npm run review:open`. The owner
+    decides on that page by clicking **Duyệt và đăng / Yêu cầu sửa / Hủy bài
+    này**. The page writes and signs `approval.json`; a chat message is never
+    a decision and the agent never writes approval itself.
+16. For the local-review path only: read the signed decision returned by the
+    review page. Publishing proceeds through `publish_approved_post(post_job_id)`.
     Never create or rewrite the profile at the approval click, and never publish
-    without that decision.
+    live without that decision.
+
+When the operator is new or asks to connect ("Mình mới dùng", "Bắt đầu sử dụng",
+"Kết nối Google Drive", "Kết nối Fanpage", `/bat-dau-su-dung`,
+`/connect-google-drive`, `/connect-facebook-page`):
+
+1. Run `npm run setup:status`. Speak Vietnamese; do not show IDs or commands.
+2. If Google Drive is not connected, run `npm run google:connect` and tell the
+   user a Google window will open — they sign in and click Allow. If stdout is
+   `NEEDS_PICK`, use one `AskQuestion` for the sheet name, then one for the
+   photo folder name; apply with `npm run google:connect -- --pick-sheet <n>`
+   and `--pick-folder <n>`.
+3. If the Facebook Page is not connected, run `npm run meta:connect` and tell
+   the user to sign in and choose the Page by name.
+4. When both are connected, the next prompt is "Hôm nay có bài nào sẵn sàng không?"
+
+When the operator asks "Hôm nay có bài nào sẵn sàng không?", run
+`npm run setup:status` if Drive/Meta is not connected, otherwise
+`npm run drive:intake` / `npm run plan:due`. List ready rows in Vietnamese.
+Ask one `AskQuestion` per post before creating any Meta draft.
 
 All user-facing messages use `workflow/user-language.md`: plain Vietnamese, no
 IDs/hashes/states/commands, always a clear next step.
