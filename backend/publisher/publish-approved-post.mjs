@@ -364,18 +364,173 @@ export async function publishApprovedPost(jobId, options = {}) {
   }
 }
 
+// Draft mode: create a Meta Page draft (published=false, unpublished_content_type=
+// DRAFT) that an admin approves manually in Meta Business Suite. Skips the local
+// signed approval.json gate (decision moves to Facebook-side), but keeps hash,
+// asset manifest, Page allowlist, asset scan, and idempotency. The admin still
+// has to click "Publish" on Facebook; the draft is not public.
+//
+// ponytail: Meta single-image draft bug — caller must enforce >=2 images or
+// use text-only. See createPageDraftPost in meta-api.mjs.
+export async function createDraftPost(jobId, options = {}) {
+  const baseRoot = options.root || root;
+  const env = options.env || process.env;
+  const now = options.now || (() => Date.now());
+  const artifactDir = resolve(baseRoot, "artifacts", jobId);
+  const postPath = resolve(artifactDir, "generated-post.json");
+  const inputPath = resolve(artifactDir, "input.json");
+  const resultPath = resolve(artifactDir, "draft-result.json");
+
+  await access(postPath).catch(() => fail("JOB_NOT_FOUND", `Missing generated-post.json for ${jobId}`));
+  const post = await readJson(postPath);
+  const input = await readJson(inputPath).catch(() => null);
+  const pageConnection = await (options.loadPageConnection || loadPageConnection)(post.page_id);
+  if (!pageConnection?.page_access_token) fail("AUTHENTICATION_FAILED", `No encrypted connection for page_id ${post.page_id}`);
+  if (pageConnection.page_id !== post.page_id) fail("PAGE_NOT_ALLOWED", "Connected Page ID mismatch");
+  if (input?.page?.page_id !== post.page_id) fail("PAGE_NOT_ALLOWED", "Input Page ID does not match generated post");
+  if (input?.page?.allowlisted !== true) fail("PAGE_NOT_ALLOWED", "Page is not allowlisted");
+  const pageIds = allowedPageIds(env, options.allowedPageIds, pageConnection);
+  if (!pageIds.has(post.page_id)) fail("PAGE_NOT_ALLOWED", "Page is not in the server-side allowlist");
+
+  const selected = (post.variants ?? []).find((variant) => variant.variant_id === post.selected_variant_id);
+  if (!selected) fail("APPROVAL_INVALIDATED", "selected_variant_id missing from variants");
+  const recomputedContentHash = contentHashOf(post, selected);
+  const recomputedAssetHash = assetManifestHashOf(post.asset_manifest);
+  if (recomputedContentHash !== post.content_hash) fail("APPROVAL_INVALIDATED", "Content hash mismatch");
+  if (recomputedAssetHash !== post.asset_manifest_hash) fail("MEDIA_APPROVAL_INVALIDATED", "Asset manifest hash mismatch");
+  validateManifest(post, { reviewed_asset_ids: post.asset_ids });
+
+  const minImages = Number(env.FB_DRAFT_MIN_IMAGES || 2);
+  const imageCount = (post.asset_manifest ?? []).length;
+  const allowTextOnlyFallback = env.FB_DRAFT_ALLOW_TEXT_ONLY === "true";
+  if (imageCount < minImages && !(imageCount === 0 && allowTextOnlyFallback)) {
+    fail("DRAFT_NEEDS_MORE_IMAGES", `Facebook draft needs at least ${minImages} images (has ${imageCount}). Add images or enable text-only fallback.`);
+  }
+
+  const idempotencyKey = `draft:${jobId}+${recomputedContentHash}`;
+  try {
+    const previous = await readJson(resultPath);
+    if ((previous.status === "DRAFT_CREATED" || previous.status === "DRAFT_VERIFIED") && previous.idempotency_key === idempotencyKey) return previous;
+  } catch { /* no previous draft */ }
+
+  const lockPath = await acquirePublishLock(baseRoot, jobId, idempotencyKey);
+  const attemptNumber = await nextAttemptNumber(baseRoot, jobId);
+  const { path: attemptPath } = await createAttempt(baseRoot, jobId, {
+    post_job_id: jobId, version: post.version, status: "IN_PROGRESS",
+    attempt_number: attemptNumber, idempotency_key: idempotencyKey,
+    content_hash: recomputedContentHash, asset_manifest_hash: recomputedAssetHash
+  });
+  await appendAudit(baseRoot, jobId, { event: "DRAFT_ATTEMPT_STARTED", attempt_id: `${jobId}-${attemptNumber}`, idempotency_key: idempotencyKey });
+
+  try {
+    const graphVersion = pageConnection.graph_api_version || env.META_GRAPH_API_VERSION;
+    const api = options.metaApi || new MetaApiAdapter({ graphVersion, fetchImpl: options.fetchImpl || globalThis.fetch });
+    const maxBytes = Number(env.ASSET_MAX_BYTES || 10 * 1024 * 1024);
+    const assetScanner = options.scanAsset || createConfiguredAssetScanner(env);
+    const uploadedMediaIds = [];
+    const sortedManifest = [...post.asset_manifest].sort((a, b) => a.publish_order - b.publish_order);
+
+    for (const manifest of sortedManifest) {
+      const inputAsset = input?.assets?.find((asset) => asset.asset_id === manifest.asset_id);
+      if (!inputAsset?.uri) fail("MEDIA_APPROVAL_INVALIDATED", `Missing uri for ${manifest.asset_id}`);
+      if (inputAsset.publish !== true || inputAsset.original_or_preview !== "original" || !["local_file", "host_original"].includes(inputAsset.source_type)) {
+        fail("MEDIA_APPROVAL_INVALIDATED", `Asset ${manifest.asset_id} is not a confirmed original attachment`);
+      }
+      const bytes = options.loadAsset
+        ? await options.loadAsset({ asset: inputAsset, manifest, root: baseRoot })
+        : await readFile(resolve(baseRoot, inputAsset.uri));
+      const inspected = validateImageAsset({
+        bytes, asset: inputAsset, manifest, maxBytes,
+        minWidth: Number(env.ASSET_MIN_WIDTH ?? 1080),
+        minHeight: Number(env.ASSET_MIN_HEIGHT ?? 0)
+      });
+      const scan = await assetScanner({ asset: inputAsset, manifest, bytes, mimeType: inspected.mimeType });
+      if (env.ASSET_SCAN_REQUIRED === "true" && scan?.status !== "clean") {
+        fail("ASSET_SCAN_REQUIRED", `Asset ${manifest.asset_id} has not passed malware/content scanning`);
+      }
+      const uploaded = await api.uploadImage({
+        pageId: pageConnection.page_id, accessToken: pageConnection.page_access_token,
+        bytes, fileName: basename(inputAsset.uri.split("?")[0]) || `${manifest.asset_id}.${inspected.mimeType.split("/")[1]}`,
+        mimeType: inspected.mimeType
+      });
+      if (!uploaded.id) fail("MEDIA_UPLOAD_FAILED", `Meta returned no media ID for ${manifest.asset_id}`);
+      uploadedMediaIds.push(String(uploaded.id));
+    }
+
+    const message = [selected.body, (selected.hashtags ?? []).join(" ")].filter(Boolean).join("\n\n");
+    const draft = await api.createPageDraftPost({
+      pageId: pageConnection.page_id, accessToken: pageConnection.page_access_token,
+      message, mediaIds: uploadedMediaIds
+    });
+    if (!draft.id) fail("DRAFT_CREATE_FAILED", "Meta returned no draft post ID");
+
+    let visibility = null;
+    try {
+      const check = await api.isDraftVisible({ postId: String(draft.id), accessToken: pageConnection.page_access_token });
+      visibility = { exists: check.exists, is_published: check.is_published };
+    } catch (error) {
+      visibility = { check_failed: true, error_code: error.code || "META_PERMANENT_ERROR" };
+    }
+
+    const result = {
+      post_job_id: jobId,
+      status: "DRAFT_CREATED",
+      meta_draft_post_id: String(draft.id),
+      draft_url: `https://www.facebook.com/${draft.id}`,
+      page_id: pageConnection.page_id,
+      page_name: pageConnection.page_name,
+      uploaded_media_ids: uploadedMediaIds,
+      idempotency_key: idempotencyKey,
+      visibility,
+      warning: visibility?.check_failed
+        ? "Không kiểm tra được draft trên Facebook. Hãy vào Meta Business Suite mục Drafts để xác nhận."
+        : (!visibility?.is_published ? "Draft đã tạo. Vào Meta Business Suite → Drafts để duyệt và đăng." : null),
+      created_at: new Date(now()).toISOString()
+    };
+    await updateAttempt(attemptPath, { status: "SUCCEEDED", completed_at: result.created_at, uploaded_media_ids: uploadedMediaIds, meta_draft_post_id: result.meta_draft_post_id });
+    await removeRetry(baseRoot, jobId, idempotencyKey);
+    await writeFile(resultPath, `${JSON.stringify(result, null, 2)}\n`);
+    if (input) await writeFile(inputPath, `${JSON.stringify({ ...input, status: "DRAFT_CREATED" }, null, 2)}\n`);
+    await appendAudit(baseRoot, jobId, { event: "DRAFT_CREATED", attempt_id: `${jobId}-${attemptNumber}`, meta_draft_post_id: result.meta_draft_post_id });
+    return result;
+  } catch (error) {
+    const retryable = error.retryable === true;
+    const nextRetryAt = retryable ? new Date(now() + retryDelayMs(attemptNumber, error, env)).toISOString() : null;
+    await updateAttempt(attemptPath, {
+      status: retryable ? "RETRY_SCHEDULED" : "FAILED",
+      error_code: error.code || "FAILED", error_message: error.message,
+      retryable, next_retry_at: nextRetryAt
+    });
+    await appendAudit(baseRoot, jobId, {
+      event: retryable ? "DRAFT_RETRY_SCHEDULED" : "DRAFT_FAILED",
+      attempt_id: `${jobId}-${attemptNumber}`, error_code: error.code || "FAILED", retryable, next_retry_at: nextRetryAt
+    });
+    if (retryable) {
+      await scheduleRetry(baseRoot, jobId, {
+        post_job_id: jobId, idempotency_key: idempotencyKey,
+        attempt_number: attemptNumber, next_retry_at: nextRetryAt, error_code: error.code || "FAILED"
+      });
+    }
+    throw error;
+  } finally {
+    await releasePublishLock(lockPath);
+  }
+}
+
 export async function runCli(args = process.argv.slice(2)) {
-  if (args.length !== 1) {
-    console.error("Usage: npm run meta:publish -- <post_job_id>");
+  const mode = args[0] === "--draft" ? "draft" : "live";
+  const jobId = mode === "draft" ? args[1] : args[0];
+  if (!jobId) {
+    console.error("Usage: npm run meta:publish -- <post_job_id>  |  npm run meta:publish -- --draft <post_job_id>");
     process.exitCode = 2;
     return;
   }
   try {
-    const result = await publishApprovedPost(args[0]);
+    const result = mode === "draft" ? await createDraftPost(jobId) : await publishApprovedPost(jobId);
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error(JSON.stringify({
-      post_job_id: args[0],
+      post_job_id: jobId,
       status: "FAILED",
       error_code: error.code || "FAILED",
       message: error.message,

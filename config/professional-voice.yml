@@ -1,0 +1,98 @@
+# Professional Voice — Khoa Kinh tế, Học viện Ngân hàng
+
+# Văn phong chuyên nghiệp cho bài website trường (hvnh.edu.vn/eco) và,
+# tuỳ chọn, cho bài Facebook khi cần giọng trang trọng hơn brand-guidelines
+# mặc định. Nguồn sự thật vận hành: config/brand-guidelines.yml (brand DNA,
+# pillars, hashtag, visual). File này chỉ định GIỌNG và CẤU TRÚC, không ghi
+# đè brand essence / forbidden_words / footer.
+#
+# Quy tắc dùng:
+# - Website: LUÔN áp dụng professional-voice.
+# - Facebook draft: áp dụng brand-guidelines.yml (young academic) mặc định;
+#   chỉ chuyển sang professional-voice khi bài là thông báo chính thức /
+#   thông báo tuyển sinh / văn bản học viện.
+
+voice:
+  register: "chuyên nghiệp, biên tập, chuẩn mực"
+  tone: "trang trọng nhưng dễ tiếp cận; không hành chính khô, không nghi lễ sáo"
+  person: "viết như một biên tập viên khoa đang thông tin cho cộng đồng"
+  rules:
+    - "Mỗi đoạn một ý chính; câu chủ đề mở đoạn, câu tiếp theo triển khai."
+    - "Câu ngắn–dài đan xen; tránh câu lồng quá 2 mệnh đề."
+    - "Giải thích thuật ngữ chuyên ngành trong ngoặc hoặc 1 câu ngắn khi lần đầu xuất hiện."
+    - "Dùng số liệu/ngày/thông tin xác minh được; không được thì ghi 'đang xác minh'."
+    - "Không emoji trong bài website. Facebook thông báo chính thức: tối đa 1 emoji nếu cần, thường là 0."
+    - "Xưng 'Khoa' / 'Học viện'; gọi độc giả 'bạn' hoặc 'sinh viên/thí sinh/phụ huynh' theo ngữ cảnh."
+
+structure:
+  # Bài website dài hơn FB, có cấu trúc heading rõ ràng để ban web copy-paste.
+  website_article:
+    title_max_chars: 90
+    lead_max_chars: 280
+    body_target_chars: 600
+    body_max_chars: 1200
+    sections:
+      - "Tiêu đề (H1): rõ sự việc, không giật tít, không viết hoa toàn bộ."
+      - "Sapo (lead): 1–2 câu tóm sự việc + giá trị cho độc giả."
+      - "Thân bài (H2/H3): theo intent — sự kiện, người, cơ hội, kiến thức."
+      - "Thông tin liên hệ / nguồn xác minh ở cuối nếu liên quan tuyển sinh hoặc sự kiện."
+    image_rules:
+      - "Ảnh minh hoạ đặt dưới H2 liên quan; có chú thích (caption) ngắn."
+      - "Ảnh action ưu tiên; ảnh tập thể chỉ dùng khi không có ảnh hành động."
+      - "Tối thiểu 1 ảnh, khuyến nghị 2–4 ảnh cho bài sự kiện."
+  facebook_official:
+    body_max_chars: 1500
+    paragraphs: "2–3 câu mỗi đoạn, tối đa 5 đoạn"
+    emoji: "0–1, chỉ khi thực sự cần nhấn cảm xúc"
+
+intent_templates:
+  # Mở rộng cấu trúc intent trong content-strategy cho dạng bài dài website.
+  education:
+    website: "Sapo khái niệm → H2 Giải thích → H2 Ví dụ/phân biệt → H2 Một điều mang về → nguồn đọc thêm"
+    facebook_official: "Hook khái niệm → Giải thích ngắn → Một ví dụ → Một điều mang về → CTA đọc bài đầy đủ trên website"
+  event_recap:
+    website: "Sapo khoảnh khắc → H2 Diễn biến → H2 Sinh viên thực hành/trải nghiệm gì → H2 Ý nghĩa → nguồn ảnh"
+    facebook_official: "Khoảnh khắc → Sự việc đã xảy ra → Sinh viên làm/trải nghiệm gì → Một ý nghĩa → CTA xem album/bài đầy đủ"
+  people_story:
+    website: "Sapo người + bối cảnh → H2 Định nghĩa khoảnh khắc/trích dẫn → H2 Độc giả học được gì → CTA"
+    facebook_official: "Người + vai trò → Trích dẫn/khoảnh khắc → Độc giả gặp được ai → CTA"
+  admissions:
+    website: "Sapo cơ hội → H2 Thông tin xác minh (ngành, tổ hợp, link) → H2 Đối tượng → H2 Bước tiếp theo → liên hệ"
+    facebook_official: "Cơ hội → Thông tin xác minh → Đối tượng → Bước tiếp theo → link nguồn"
+  career:
+    website: "Sapo cơ hội → H2 Yêu cầu xác minh → H2 Đối tượng → H2 Cách ứng tuyển → hạn chót"
+    facebook_official: "Cơ hội → Yêu cầu → Đối tượng → Cách ứng tuyển → hạn chót"
+  community:
+    website: "Sapo không khí → H2 Khoảnh khắc cụ thể → H2 Ý nghĩa cộng đồng → CTA tham gia"
+    facebook_official: "Không khí → Khoảnh khắc cụ thể → Lời mời thuộc về → CTA"
+
+claims_discipline:
+  - "Mọi số liệu/ngày/thông tin tuyển sinh phải có nguồn xác minh hoặc 'đang xác minh'."
+  - "Ảnh = quan sát, không phải bằng chứng kết quả."
+  - "OCR = manh mối để核对, không phải sự thật."
+  - "Không erfund xếp hạng, số lượng trúng tuyển, danh sách nhà tài trợ, offer việc làm."
+
+cta_examples:
+  website:
+    - "Xem chi tiết và đăng ký tại: [link xác minh]"
+    - "Đọc bài đầy đủ tại trang Khoa Kinh tế – Học viện Ngân hàng."
+    - "Liên hệ: khoakinhte@hvnh.edu.vn"
+  facebook_official:
+    - "Chi tiết xem tại bài đầy đủ trên website Khoa."
+    - "Thông tin chính thức từ Học viện Ngân hàng."
+    - "Lưu lại nếu bạn đang quan tâm."
+
+forbidden:
+  inherit_from: "config/brand-guidelines.yml#avoid"
+  extra:
+    - "giật tít gây sợ hãi"
+    - "cam kết tuyệt đối ('chắc chắn trúng tuyển', '100% có việc làm')"
+    - "văn phong rao bán ép buộc"
+    - "emoji spam trên website"
+
+reference_sources:
+  - id: "hvnh-brand-guideline-2026"
+    title: "Fanpage Brand DNA & Content Guideline — Khoa Kinh tế HVNH 2026–2027"
+    url: "docs/brand/hvnh-khoa-kinh-te-brand-guideline.md"
+    allowed_claims:
+      - "Định hướng brand essence, personality, pillars, hashtag, visual DNA của Khoa"

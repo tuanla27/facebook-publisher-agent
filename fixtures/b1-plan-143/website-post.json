@@ -1,0 +1,22 @@
+{
+  "post_job_id": "plan-143",
+  "version": 1,
+  "title": "Toạ đàm môn Kinh tế đầu tư 2",
+  "lead": "Sinh viên Khoa Kinh tế tham gia toạ đàm học thuật để nối kiến thức trên lớp với tình huống thực tế.",
+  "body": [
+    { "type": "p", "text": "Buổi toạ đàm giúp sinh viên nhìn lại các khái niệm cốt lõi của môn Kinh tế đầu tư 2 qua trao đổi với giảng viên và khách mời." },
+    { "type": "h2", "text": "Diễn biến" },
+    { "type": "p", "text": "Người tham dự nghe phần dẫn dắt, thảo luận tình huống và đặt câu hỏi. Ảnh minh hoạ là quan sát buổi làm việc, không phải minh chứng kết quả." },
+    { "type": "h2", "text": "Gợi ý cho sinh viên" },
+    { "type": "p", "text": "Ghi lại một câu hỏi còn mở sau buổi toạ đàm và đối chiếu với bài giảng tuần tới." }
+  ],
+  "assets": [
+    { "asset_id": "asset-1", "uri": "artifacts/plan-143/staging/a.png", "caption": "Khoảnh khắc thảo luận tại toạ đàm", "placement": "featured" }
+  ],
+  "channels": ["website"],
+  "intent": "event_recap",
+  "source_refs": ["fixtures/b1-plan-143/plan-row.json"],
+  "needs_verification": ["Thời gian, địa điểm và danh sách khách mời chính thức chưa có trong fixture."],
+  "content_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "status": "DRAFT_GENERATED"
+}
