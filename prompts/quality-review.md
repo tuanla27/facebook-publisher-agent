@@ -9,20 +9,26 @@ Required reads: `config/brand-guidelines.yml`,
 
 Check every variant for:
 
-- a specific hook that matches the image and content intent;
-- a story-first opening grounded in a concrete supplied scene, not a generic
-  announcement or date-only lead;
-- a clear explanation, story, opportunity, or experience — not a generic announcement or ceremonial template;
-- at least one concrete observation, learning moment, skill, person, experience, or useful distinction;
-- two or three visual observations are woven into natural prose rather than
-  listed, and no observation is inflated into an unsupported emotion, outcome,
-  identity, role, sponsor, skill, or impact;
+- the selected `narrative_mode` is respected:
+  - `fact_led_announcement`: opens from the communication job and supplied
+    facts or results; does not open from a photo; may omit visual detail;
+  - `image_led_photostory`: opens from a concrete supplied scene, not a
+    date-only lead, and weaves two or three visual observations into prose;
+- a specific hook that matches the content intent (and the image only when
+  the mode is image-led);
+- a clear explanation, story, opportunity, or experience — not a ceremonial
+  template with no Learn/Meet/Experience/Discover;
+- at least one concrete supplied fact, learning moment, skill, person,
+  experience, or useful distinction;
+- no observation is inflated into an unsupported emotion, outcome, identity,
+  role, sponsor, skill, or impact;
 - evidence of at least one brand attribute (insightful / dynamic / connected);
 - service of at least one brand test (Learn / Meet / Experience / Discover);
 - exactly one practical takeaway that appears naturally in the body (insight, person, experience, or opportunity);
-- the takeaway is tied to the specific moment or verified context, not generic
+- the takeaway is tied to a supplied fact or verified context, not generic
   motivational filler added because the source material is thin;
 - a gentle CTA that does not repeat the takeaway and matches the intent;
+- one narrator throughout; official notices stay in the Khoa Kinh tế – HVNH voice;
 - short readable paragraphs and natural Vietnamese (young academic tone);
 - no internal labels such as `Hook:`, `Explanation:`, or `Practical takeaway:` in the final body;
 - no repeated disclaimer that makes the post sound like an audit report;
@@ -35,6 +41,8 @@ Check every variant for:
   and matches the per-post selected text exactly;
 - event photostories stay concise rather than 400–700-word recaps;
 - admissions/career copy uses only verified opportunity facts.
+- posed-lineup / action-shot notes belong in policy warnings, not as a reason
+  to rewrite a fact-led announcement into a photostory.
 
 Keep unsupported claims in `claims[]` and policy review metadata. Do not fill
 the caption with technical verification language unless the verification

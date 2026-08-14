@@ -402,6 +402,47 @@ export function findPlanRows(rows, { planId = null, query = null } = {}) {
   return rows || [];
 }
 
+const EVENT_RECAP_MARKERS = [
+  "cuoc thi", "su kien", "chung ket", "tong ket", "recap", "hoi thao",
+  "toa dam", "workshop", "ngay hoi", "welcome", "hoat dong"
+];
+const RECAP_DETAIL_MARKERS = [
+  "doi", "sinh vien", "khach moi", "giam khao", "ban co van", "mc",
+  "vong", "quan quan", "a quan", "quy quan", "giai", "binh chon",
+  "khoanh khac", "chia se", "trai nghiem", "thuc hanh", "so luong"
+];
+const GENERIC_RECAP_NOTE = /recap\s+gioi\s+han|chi\s+mo\s+ta\s+nhung\s+gi\s+nhin\s+thay/i;
+
+export const EVENT_RECAP_CLARIFICATION_QUESTIONS = [
+  "Khoảnh khắc hoặc hoạt động chính muốn nhấn là gì?",
+  "Có bao nhiêu đội/người tham gia và bao nhiêu vòng?",
+  "Điểm nổi bật của phần thi hoặc đội đạt giải là gì?",
+  "Tên giám khảo, cố vấn, MC hoặc đơn vị đồng hành (nếu có)?",
+  "Giải được yêu thích nhất được bình chọn theo cách nào?",
+  "Có album, video hoặc liên kết chính thức muốn dẫn không?"
+];
+
+export function assessEventRecapMaterial(row = {}) {
+  const lookup = normalizeLookupText([
+    row.title,
+    ...(row.keywords || []),
+    row.notes,
+    row.content
+  ].filter(Boolean).join(" "));
+  const eventRecap = EVENT_RECAP_MARKERS.some((marker) => lookup.includes(marker));
+  if (!eventRecap) return { event_recap: false, needs_clarification: false, questions: [] };
+
+  const supplied = [row.notes, row.content].filter(Boolean).join(" ").trim();
+  const hasSpecificDetail = supplied.length >= 20
+    && !GENERIC_RECAP_NOTE.test(supplied)
+    && RECAP_DETAIL_MARKERS.some((marker) => normalizeLookupText(supplied).includes(marker));
+  return {
+    event_recap: true,
+    needs_clarification: !hasSpecificDetail,
+    questions: hasSpecificDetail ? [] : EVENT_RECAP_CLARIFICATION_QUESTIONS
+  };
+}
+
 // Readiness predicate per workflow/plan-triggers.md. Returns { ready, reasons, skip }.
 // In timeline mode, "Đã xong" means already published -> skip (not an error).
 // Loose dates ("Trong năm học", "Hàng kỳ") -> not ready, reason "chưa có ngày cụ thể".
@@ -409,11 +450,24 @@ export function evaluateReadiness(row, { today = todayInVietnam(), requireMinIma
   const reasons = [];
   const status = String(row.status || "").trim().toLowerCase();
   const skip = ["đã xong", "đã đăng", "da xong", "da dang"].includes(status);
-  if (skip) return { ready: false, skip: true, reasons: ["Đã xong / đã đăng — bỏ qua."] };
+  const recapMaterial = assessEventRecapMaterial(row);
+  if (skip) {
+    return {
+      ready: false,
+      skip: true,
+      reasons: [
+        "Đã xong / đã đăng — bỏ qua.",
+        ...(recapMaterial.needs_clarification ? ["Bài recap cần hỏi thêm chất liệu sự kiện trước khi viết."] : [])
+      ]
+    };
+  }
 
   if (!row.plan_id || !/^[A-Za-z0-9][A-Za-z0-9_-]{2,99}$/.test(row.plan_id)) reasons.push("Thiếu mã bài (plan_id) hợp lệ.");
   if (!row.title) reasons.push("Thiếu tiêu đề (Nội dung công việc).");
   if (!row.notes && !row.content) reasons.push("Thiếu nội dung / ghi chú.");
+  if (recapMaterial.needs_clarification) {
+    reasons.push("Bài recap cần hỏi thêm chất liệu sự kiện trước khi viết.");
+  }
   const images = row.image_folder_or_urls || [];
   if (images.length < requireMinImages) {
     reasons.push(`Cần ít nhất ${requireMinImages} ảnh (hiện có ${images.length}) để draft Facebook ổn định.`);

@@ -24,6 +24,7 @@ Return JSON only with this shape (strategy handoff; not a schema-validated artif
   "brand_attributes": ["insightful"],
   "brand_tests_served": ["Learn something"],
   "format_hint": "Econ Data/Econ Explainer",
+  "narrative_mode": "fact_led_announcement",
   "footer_gate": "required",
   "teaching_question": "",
   "concept": "",
@@ -46,13 +47,25 @@ Rules:
   footer for the current post, but may not omit it; never mutate the global
   default.
 - Map non-education intents onto `teaching_question` as the reader job-to-be-done, not a forced classroom quiz.
-- Prefer action cover photos; warn on posed lineups.
-- For event_recap, identify one concrete scene and two usable visual details
-  before drafting. The strategy should create a small story arc from scene to
-  supplied context to reader meaning, not a date-led announcement or an image
-  inventory.
-- When facts are sparse, narrow the angle and use the image only for atmosphere
-  and observable detail. Do not compensate with generic motivational claims.
+- Prefer action cover photos; warn on posed lineups. Image quality warnings
+  affect media choice only. They do not force the caption to open from the
+  photo.
+- Set `narrative_mode` to exactly one of:
+  - `fact_led_announcement` — thông báo kết quả, công bố, tổng kết, tuyển sinh,
+    career, education, or any post whose job is to deliver supplied facts.
+    Facts and the communication job are the spine. Photos illustrate; they
+    are optional in the caption and must not become the hook.
+  - `image_led_photostory` — only when the user asks for atmosphere, a visible
+    moment, or an observation-only recap. Then identify one concrete scene and
+    two usable visual details before drafting.
+- For a sparse event_recap row (event name/images but no concrete event detail),
+  return `angle_excluded` with `needs_clarification` and do not call the
+  copywriter yet. Ask one consolidated follow-up for the moment, participant
+  or round count, result highlight, named people/partners, voting method, and
+  official media link. These are optional inputs; never fill them with
+  plausible event details.
+- When facts are sparse, narrow the angle. Do not compensate with generic
+  motivational claims or by inventing a story from the photo.
 - If the request cannot serve Learn/Meet/Experience/Discover, put the reason in `angle_excluded` and stop before drafting.
 - Unsupported dates, awards, rankings, sponsor lists, admissions numbers, job offers, or identities go into `needs_verification`.
 

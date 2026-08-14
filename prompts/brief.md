@@ -40,9 +40,10 @@ Field mapping for non-education intents (do not invent schema keys):
 - `concept` = core message / theme for the chosen intent and pillar;
 - `why_it_matters` = value for audience + brand;
 - `practical_takeaway` = one insight, person to remember, experience, or opportunity;
-- encode intent, pillar, attributes, brand tests, and format hint inside
-  `concept` / `why_it_matters` / `audience` prose when needed, e.g.
-  `concept: "[event_recap | econ_experiences_community | Experience] ..."`.
+- encode intent, pillar, attributes, brand tests, format hint, and
+  `narrative_mode` inside `concept` / `why_it_matters` / `audience` prose
+  when needed, e.g.
+  `concept: "[event_recap | econ_experiences_community | Experience | fact_led_announcement] ..."`.
 
 Rules:
 
@@ -59,8 +60,14 @@ Rules:
 - Add missing information to `needs_verification`; never fill gaps with plausible details.
 - If the image fails the selection checklist as a cover, say so in
   `angle_excluded` and recommend an action alternative when available.
+  For `fact_led_announcement`, that warning stays on media choice; do not
+  rebuild the brief around the photo.
 - If the image is unrelated or unsafe, say so in `angle_excluded` and stop the workflow.
 - Avoid ceremonial-only angles that only congratulate without
   Learn/Meet/Experience/Discover.
-- For event recaps, plan a short Facebook caption, not a 400–700-word report.
+- For `fact_led_announcement`, plan the caption from the communication job and
+  supplied facts. Observations are optional illustration, not the hook.
+- For `image_led_photostory`, plan a short Facebook caption from a visible
+  moment, not a 400–700-word report.
+- For event recaps that announce results, prefer `fact_led_announcement`.
 - For admissions/career, require verified facts before promotional claims.

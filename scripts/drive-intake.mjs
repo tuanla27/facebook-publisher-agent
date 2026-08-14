@@ -14,7 +14,7 @@ import { mkdir, writeFile, rename } from "node:fs/promises";
 import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
-import { buildDriveClient, readAvailablePlanSheets, findDriveFolderByName, findDriveFileByName, findPlanRows, evaluateReadiness, planRowToJobInput, resolveImageRefs, downloadResolvedImages } from "../backend/sources/google-drive-reader.mjs";
+import { buildDriveClient, readAvailablePlanSheets, findDriveFolderByName, findDriveFileByName, findPlanRows, evaluateReadiness, assessEventRecapMaterial, planRowToJobInput, resolveImageRefs, downloadResolvedImages } from "../backend/sources/google-drive-reader.mjs";
 import { loadGoogleDriveConfig, resolvePlansSheetId, resolveSharedFolderId } from "../backend/sources/google-drive-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -41,7 +41,7 @@ function fail(code, message) {
 function parseArgs(args) {
   const out = {
     planId: null, query: null, sheetId: null, sheetRange: "A1:Z1000",
-    recap: false, allowCompleted: false, imagesFolder: null, images: null, postJobId: null
+    recap: false, allowCompleted: false, recapDetails: null, imagesFolder: null, images: null, postJobId: null
   };
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
@@ -51,6 +51,7 @@ function parseArgs(args) {
     else if (arg === "--range") { out.sheetRange = args[++i]; }
     else if (arg === "--recap") { out.recap = true; }
     else if (arg === "--allow-completed") { out.allowCompleted = true; }
+    else if (arg === "--recap-details") { out.recapDetails = args[++i]; }
     else if (arg === "--images-folder") { out.imagesFolder = args[++i]; }
     else if (arg === "--images") { out.images = args[++i]; }
     else if (arg === "--post-job-id") { out.postJobId = args[++i]; }
@@ -123,7 +124,8 @@ export async function runCli(args = process.argv.slice(2)) {
     if (opts.recap) {
       row = {
         ...row,
-        notes: row.notes || "Recap gioi han: chi mo ta nhung gi nhin thay trong anh; khong khang dinh ket qua, giai thuong hoac thanh tich.",
+        notes: [row.notes, opts.recapDetails].filter(Boolean).join("\n\n")
+          || "Recap gioi han: chi mo ta nhung gi nhin thay trong anh; khong khang dinh ket qua, giai thuong hoac thanh tich.",
         plan_id: opts.postJobId || row.plan_id
       };
     } else if (opts.postJobId) {
@@ -131,9 +133,15 @@ export async function runCli(args = process.argv.slice(2)) {
     }
     const { ready, skip, reasons } = evaluateReadiness(row);
     const recapCompleted = opts.recap && opts.allowCompleted && skip;
+    const recapMaterial = assessEventRecapMaterial(row);
     if (skip && !recapCompleted) { console.error(JSON.stringify({ status: "SKIPPED", plan_id: opts.planId, reasons }, null, 2)); process.exitCode = 0; return; }
-    if (!ready && !recapCompleted) {
-      console.error(JSON.stringify({ status: "NEEDS_ATTENTION", plan_id: opts.planId, reasons }, null, 2));
+    if (!ready && (!recapCompleted || recapMaterial.needs_clarification)) {
+      console.error(JSON.stringify({
+        status: recapMaterial.needs_clarification ? "NEEDS_CLARIFICATION" : "NEEDS_ATTENTION",
+        plan_id: opts.planId,
+        reasons,
+        questions: recapMaterial.needs_clarification ? recapMaterial.questions : undefined
+      }, null, 2));
       process.exitCode = 1;
       return;
     }

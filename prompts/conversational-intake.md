@@ -88,6 +88,29 @@ Ask only for information that blocks safe generation. Ask in one concise batch, 
 4. Is a high-risk claim intended, such as health, safety, finance, legal, efficacy, certification, admissions numbers, rankings, or statistics?
 5. Is there a required source, program fact, or disclosure missing?
 
+### Event-recap material gate
+
+For an event recap, a sheet row marked `sẵn sàng` is not by itself enough
+material to draft. When the row has only an event name, images, or a generic
+instruction such as "chỉ mô tả ảnh", pause before writing and ask one
+consolidated follow-up. Show these optional prompts in the dialog's `Other`
+field:
+
+- khoảnh khắc hoặc hoạt động chính muốn nhấn;
+- số đội/người tham gia và số vòng (nếu có);
+- điểm nổi bật của phần thi hoặc đội đạt giải;
+- tên giám khảo, cố vấn, MC, đơn vị đồng hành (nếu có);
+- cách bình chọn giải được yêu thích (nếu có);
+- album, video hoặc liên kết chính thức (nếu có).
+
+The user may leave any item blank. Continue only after the user supplies at
+least one concrete event detail or explicitly chooses a smaller
+observation-only photostory. If the user supplies results, classify
+`narrative_mode` as `fact_led_announcement` and write from those facts; photos
+illustrate and must not become the hook. Never invent a reason for a result, a
+participant count, a judging panel, a vote, a sponsor, or an event process to
+make the recap feel fuller.
+
 For these blocking questions, open one `AskQuestion` dialog when available.
 Use one question per decision point, keep the options short, and do not ask the
 user to type `1/2/3` in the chat. If the adapter has no dialog support, use its
