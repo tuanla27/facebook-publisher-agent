@@ -66,8 +66,11 @@ Rules:
 - Avoid ceremonial-only angles that only congratulate without
   Learn/Meet/Experience/Discover.
 - For `fact_led_announcement`, plan the caption from the communication job and
-  supplied facts. Observations are optional illustration, not the hook.
+  supplied facts. Use the default social-editorial treatment: a specific lead,
+  brief context, one or two concrete supplied details, one takeaway, and a
+  specific CTA. Observations are optional illustration, not the hook.
 - For `image_led_photostory`, plan a short Facebook caption from a visible
-  moment, not a 400–700-word report.
+  moment with brief context and concrete observations, not a 400–700-word
+  report.
 - For event recaps that announce results, prefer `fact_led_announcement`.
 - For admissions/career, require verified facts before promotional claims.

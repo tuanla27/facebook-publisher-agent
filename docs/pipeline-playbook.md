@@ -442,16 +442,18 @@ Cấu trúc theo intent và `narrative_mode` (rút gọn):
 
 ```text
 education:     Hook → Giải thích → Ví dụ → Takeaway → CTA nhẹ
-fact_led:      Việc cần nói → Fact/kết quả → Điểm nổi bật có nguồn → CTA
-image_led:     Moment → Việc xảy ra → Cảm/nhận → Takeaway → CTA
+fact_led:      Lead biên tập → Fact/kết quả → Ngữ cảnh/chi tiết cụ thể → Takeaway → CTA
+image_led:     Moment → Ngữ cảnh → Chi tiết quan sát → Cảm/nhận → Takeaway → CTA
 people_story:  Người + ngữ cảnh → Câu/moment → Giá trị đọc → CTA
 admissions/career: Cơ hội → Fact đã xác minh → Đối tượng → Bước tiếp
 community:     Không khí → Moment cụ thể → Lời mời thuộc về
 ```
 
-Tiếng Việt rõ, không clickbait, không siêu lấp. Ưu tiên ảnh đang làm việc hơn
-ảnh xếp hàng khi chọn cover. OCR là gợi ý review. Cảnh báo ảnh posed không
-được kéo bài thông báo kết quả về photostory.
+Tiếng Việt rõ, theo kiểu social-editorial ngắn: dẫn bằng điều đáng chú ý,
+thêm bối cảnh và chi tiết thật, rồi chốt bằng takeaway/CTA. Không clickbait,
+không siêu lấp, không biến thành danh sách kết quả khô. Ưu tiên ảnh đang làm
+việc hơn ảnh xếp hàng khi chọn cover. OCR là gợi ý review. Cảnh báo ảnh posed
+không được kéo bài thông báo kết quả về photostory.
 
 `narrative_mode` mặc định là `fact_led_announcement` khi bài thông báo kết quả,
 công bố, tổng kết, tuyển sinh hoặc giáo dục. `image_led_photostory` chỉ dùng

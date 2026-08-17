@@ -1,0 +1,42 @@
+{
+  "post_job_id": "k59-pmc-welcome-20260812",
+  "page": {
+    "page_id": "582504975766356",
+    "page_name": "Tuan Le Anh Portfolio",
+    "allowlisted": true
+  },
+  "keywords": [
+    "K59",
+    "PMC",
+    "Project Management Challenge",
+    "hoạt động sinh viên",
+    "chào đón tân sinh viên",
+    "cộng đồng Khoa Kinh tế"
+  ],
+  "assets": [
+    {
+      "asset_id": "asset-1",
+      "kind": "image",
+      "uri": "artifacts/k59-pmc-welcome-20260812/assets/asset-1.jpg",
+      "publish": true,
+      "sha256": "481c8ec8caa184f7636fcc5f107d803ea76e72886d9430cbb73726f289f7d289",
+      "mime_type": "image/jpeg",
+      "byte_size": 225650,
+      "width": 1024,
+      "height": 682,
+      "scan_status": "not_configured",
+      "source_type": "local_file",
+      "original_or_preview": "original"
+    }
+  ],
+  "objective": "awareness",
+  "audience": "sinh viên mới K59",
+  "language": "vi",
+  "tone": "young-academic",
+  "notes": [
+    "User kept default program-promotion footer for this post.",
+    "User confirmed one-post quality override for low resolution (image reported ~1024px wide, below 1080 min-width). quality_status expected too_low; parent should materialize publish_media.quality_override in generated-post with reason and confirmation timestamp."
+  ],
+  "status": "ASSETS_MATERIALIZED",
+  "created_at": "2026-08-12T10:57:45.068Z"
+}

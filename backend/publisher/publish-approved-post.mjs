@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** Guarded publisher: publish_approved_post(post_job_id). */
 import { readFileSync } from "node:fs";
-import { access, readFile, writeFile } from "node:fs/promises";
+import { access, readFile, realpath, writeFile } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadPageConnection } from "../meta-oauth/token-store.mjs";
@@ -16,6 +16,7 @@ import {
   requiredReviewerAttestationScopes
 } from "../approval/validation.mjs";
 import { assertApprovalSignature } from "../approval/approval-signer.mjs";
+import { assertMaterializedAsset } from "../assets/attachment-contract.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -352,6 +353,7 @@ export async function publishApprovedPost(jobId, options = {}) {
     if (retryable) {
       await scheduleRetry(baseRoot, jobId, {
         post_job_id: jobId,
+        operation: "live",
         idempotency_key: idempotencyKey,
         attempt_number: attemptNumber,
         next_retry_at: nextRetryAt,
@@ -407,6 +409,79 @@ export async function createDraftPost(jobId, options = {}) {
     fail("DRAFT_NEEDS_MORE_IMAGES", `Facebook draft needs at least ${minImages} images (has ${imageCount}). Add images or enable text-only fallback.`);
   }
 
+  const maxBytes = Number(env.ASSET_MAX_BYTES || 10 * 1024 * 1024);
+  const assetScanner = options.scanAsset || createConfiguredAssetScanner(env);
+  const preparedAssets = [];
+  const sortedManifest = [...post.asset_manifest].sort((a, b) => a.publish_order - b.publish_order);
+  const artifactRealPath = await realpath(artifactDir).catch(() => {
+    fail("MEDIA_PREFLIGHT_FAILED", `Artifact directory is missing for ${jobId}`);
+  });
+  for (const manifest of sortedManifest) {
+    const inputAsset = input?.assets?.find((asset) => asset.asset_id === manifest.asset_id);
+    if (!inputAsset?.uri) fail("MEDIA_PREFLIGHT_FAILED", `Missing materialized uri for ${manifest.asset_id}`);
+    if (
+      inputAsset.publish !== true
+      || inputAsset.original_or_preview !== "original"
+      || !["local_file", "host_original"].includes(inputAsset.source_type)
+    ) {
+      fail("MEDIA_PREFLIGHT_FAILED", `Asset ${manifest.asset_id} is not a materialized original`);
+    }
+    try {
+      assertMaterializedAsset(inputAsset);
+    } catch (error) {
+      fail("MEDIA_PREFLIGHT_FAILED", error.message);
+    }
+    if (inputAsset.sha256 !== manifest.sha256) {
+      fail("MEDIA_PREFLIGHT_FAILED", `Materialized hash mismatch for ${manifest.asset_id}`);
+    }
+
+    const artifactPrefix = `${artifactDir}/`;
+    const candidatePath = resolve(baseRoot, inputAsset.uri);
+    if (!candidatePath.startsWith(artifactPrefix)) {
+      fail("MEDIA_PREFLIGHT_FAILED", `Asset ${manifest.asset_id} uri must resolve inside its artifact`);
+    }
+    const assetPath = await realpath(candidatePath).catch(() => {
+      fail("MEDIA_PREFLIGHT_FAILED", `Materialized asset file is missing for ${manifest.asset_id}`);
+    });
+    if (!assetPath.startsWith(`${artifactRealPath}/`)) {
+      fail("MEDIA_PREFLIGHT_FAILED", `Asset ${manifest.asset_id} resolves outside its artifact`);
+    }
+    const materializedBytes = await readFile(assetPath);
+    const bytes = options.loadAsset
+      ? await options.loadAsset({ asset: inputAsset, manifest, root: baseRoot })
+      : materializedBytes;
+    if (!Buffer.isBuffer(bytes) || !bytes.equals(materializedBytes)) {
+      fail("MEDIA_PREFLIGHT_FAILED", `Loaded bytes do not match materialized asset ${manifest.asset_id}`);
+    }
+    let inspected;
+    try {
+      inspected = validateImageAsset({
+        bytes,
+        asset: inputAsset,
+        manifest,
+        maxBytes,
+        minWidth: Number(env.ASSET_MIN_WIDTH ?? 1080),
+        minHeight: Number(env.ASSET_MIN_HEIGHT ?? 0)
+      });
+    } catch (error) {
+      if (!error.code) error.code = "MEDIA_PREFLIGHT_FAILED";
+      throw error;
+    }
+    if (
+      inputAsset.byte_size !== inspected.size
+      || !inspected.dimensions
+      || inputAsset.width !== inspected.dimensions.width
+      || inputAsset.height !== inspected.dimensions.height
+    ) {
+      fail("MEDIA_PREFLIGHT_FAILED", `Materialized metadata mismatch for ${manifest.asset_id}`);
+    }
+    const scan = await assetScanner({ asset: inputAsset, manifest, bytes, mimeType: inspected.mimeType });
+    if (env.ASSET_SCAN_REQUIRED === "true" && scan?.status !== "clean") {
+      fail("ASSET_SCAN_REQUIRED", `Asset ${manifest.asset_id} has not passed malware/content scanning`);
+    }
+    preparedAssets.push({ manifest, inputAsset, bytes, inspected });
+  }
+
   const idempotencyKey = `draft:${jobId}+${recomputedContentHash}`;
   try {
     const previous = await readJson(resultPath);
@@ -425,29 +500,9 @@ export async function createDraftPost(jobId, options = {}) {
   try {
     const graphVersion = pageConnection.graph_api_version || env.META_GRAPH_API_VERSION;
     const api = options.metaApi || new MetaApiAdapter({ graphVersion, fetchImpl: options.fetchImpl || globalThis.fetch });
-    const maxBytes = Number(env.ASSET_MAX_BYTES || 10 * 1024 * 1024);
-    const assetScanner = options.scanAsset || createConfiguredAssetScanner(env);
     const uploadedMediaIds = [];
-    const sortedManifest = [...post.asset_manifest].sort((a, b) => a.publish_order - b.publish_order);
 
-    for (const manifest of sortedManifest) {
-      const inputAsset = input?.assets?.find((asset) => asset.asset_id === manifest.asset_id);
-      if (!inputAsset?.uri) fail("MEDIA_APPROVAL_INVALIDATED", `Missing uri for ${manifest.asset_id}`);
-      if (inputAsset.publish !== true || inputAsset.original_or_preview !== "original" || !["local_file", "host_original"].includes(inputAsset.source_type)) {
-        fail("MEDIA_APPROVAL_INVALIDATED", `Asset ${manifest.asset_id} is not a confirmed original attachment`);
-      }
-      const bytes = options.loadAsset
-        ? await options.loadAsset({ asset: inputAsset, manifest, root: baseRoot })
-        : await readFile(resolve(baseRoot, inputAsset.uri));
-      const inspected = validateImageAsset({
-        bytes, asset: inputAsset, manifest, maxBytes,
-        minWidth: Number(env.ASSET_MIN_WIDTH ?? 1080),
-        minHeight: Number(env.ASSET_MIN_HEIGHT ?? 0)
-      });
-      const scan = await assetScanner({ asset: inputAsset, manifest, bytes, mimeType: inspected.mimeType });
-      if (env.ASSET_SCAN_REQUIRED === "true" && scan?.status !== "clean") {
-        fail("ASSET_SCAN_REQUIRED", `Asset ${manifest.asset_id} has not passed malware/content scanning`);
-      }
+    for (const { manifest, inputAsset, bytes, inspected } of preparedAssets) {
       const uploaded = await api.uploadImage({
         pageId: pageConnection.page_id, accessToken: pageConnection.page_access_token,
         bytes, fileName: basename(inputAsset.uri.split("?")[0]) || `${manifest.asset_id}.${inspected.mimeType.split("/")[1]}`,
@@ -507,7 +562,7 @@ export async function createDraftPost(jobId, options = {}) {
     });
     if (retryable) {
       await scheduleRetry(baseRoot, jobId, {
-        post_job_id: jobId, idempotency_key: idempotencyKey,
+        post_job_id: jobId, operation: "draft", idempotency_key: idempotencyKey,
         attempt_number: attemptNumber, next_retry_at: nextRetryAt, error_code: error.code || "FAILED"
       });
     }
