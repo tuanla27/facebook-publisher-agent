@@ -24,7 +24,7 @@ The default product is a lightweight workflow/hybrid running directly in Claude 
 3. Never invent prices, statistics, studies, certifications, dates, guarantees, product effects, admissions numbers, rankings, sponsor lists, or job offers.
 4. Treat facts in `inputs/*.json` and approved brand references as authoritative; label unsupported facts as missing. Direct field observations may be labeled as observations, but do not prove official dates, results, awards, sponsor lists, or identities.
 5. A change to body, assets, Page, CTA, or factual claims invalidates approval and requires a new review.
-6. Keep language brand-true: serve at least one of Learn / Meet / Experience / Discover an opportunity. Education posts explain a concept and give one practical takeaway; event, people, admissions, career, and community posts follow the matching intent structures in `.agents/skills/content-strategy/SKILL.md`.
+6. Keep language brand-true: serve at least one of Learn / Meet / Experience / Discover an opportunity. Education posts explain a concept and give one practical takeaway; event, people, admissions, career, and community posts follow the matching intent structures and `narrative_mode` in `.agents/skills/content-strategy/SKILL.md`. Result notices are fact-led; photos illustrate and must not become the hook.
 7. Do not turn a branded post into aggressive sales copy. A CTA may invite learning, meeting someone, experiencing something, discovering an opportunity, saving, commenting, or visiting a verified resource.
 8. Separate observations from claims. An image can show an object or moment; it cannot prove a product effect, ranking, admissions outcome, or event result.
 9. If the image contains text, use OCR output as a lead for review, not as proof of truth.
@@ -86,6 +86,17 @@ also invalidates approval. If reviewer attestation is used, include its
 consumed code reference, reviewer, scopes, exact confirmation, and timestamp
 in the approval record; changing it invalidates approval.
 
+For event recaps, a planning row marked “sẵn sàng” is not proof that the row
+contains enough story material. If it has only an event name, images, or a
+generic observation-only note, ask one consolidated follow-up for the concrete
+moment, participant/round count, result highlight, named people or partners,
+voting method, and official media link. The user may leave items blank, but
+must provide at least one concrete event detail or explicitly choose an
+observation-only photostory. If the user supplies results, write
+`fact_led_announcement` — do not rebuild the caption around the photos.
+Never invent why a team won, participant counts, judges, voting methods,
+sponsors, or process details.
+
 The technical consultation gate is an outer gate. When it opens, the agent
 must stop before setup or implementation, show the user the impact and three
 options, and wait for an explicit choice. The technical advisor is read-only:
@@ -119,17 +130,22 @@ Every proposed post should help the reader do at least one of these:
 - Experience something
 - Discover an opportunity
 
-Prefer an intent-appropriate structure:
+Prefer an intent-appropriate structure, then apply `narrative_mode`:
 
 ```text
 education: Hook -> Explanation -> Example or distinction -> Practical takeaway -> Gentle CTA
-event_recap: Moment hook -> What happened -> What was practiced/felt -> Short takeaway -> Soft CTA
+fact_led_announcement: Job -> Facts/results -> Sourced highlight -> Specific CTA
+image_led_photostory: Moment hook -> What happened -> What was practiced/felt -> Short takeaway -> Soft CTA
 people_story: Person + context -> Quote/moment -> Reader value -> Soft CTA
 admissions/career: Opportunity -> Verified facts -> Who it is for -> Clear next step
 community: Atmosphere -> Specific moment -> Belonging invite
 ```
 
-Use plain Vietnamese by default. Avoid clickbait, fear, false urgency, absolute superlatives, ceremonial filler, and unexplained jargon. If a technical term is necessary, define it briefly. Prefer action photos over posed lineups for cover images.
+Result notices, announcements, and totals are fact-led. Photos illustrate;
+they must not become the hook. Image-led is only for atmosphere or
+observation-only recaps.
+
+Use plain Vietnamese by default. Avoid clickbait, fear, false urgency, absolute superlatives, ceremonial filler, and unexplained jargon. If a technical term is necessary, define it briefly. Prefer action photos over posed lineups for cover images. A posed-cover warning does not rewrite a fact-led announcement into a photostory.
 
 ## Output Contract
 
@@ -140,7 +156,11 @@ Before handing off for review, confirm:
 - all required fields exist;
 - every factual claim has a source reference or is marked `needs_verification`;
 - the body matches the image and supplied topic;
-- the policy review has no blocking errors;
+- the policy review has no blocking errors, or only source-verification
+  blocking errors when the post will be published as a Meta draft
+  (`FB_DRAFT_MODE=true` and job from a Google Drive plan); in that draft
+  path, the Page admin's review on Meta Business Suite is the final
+  attestation and the agent may proceed after explicit chat confirmation;
 - the selected Page is in the configured allowlist;
 - any quality override is explicitly confirmed for this post and shown as a warning;
 - any institutional attestation is backend-verified, scoped, and shown in review metadata;

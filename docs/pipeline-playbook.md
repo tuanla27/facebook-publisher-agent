@@ -283,6 +283,13 @@ Agent không gọi `meta:publish` sau đó; chỉ `meta:retry` khi lỗi tạm.
 này” → policy review → `npm run meta:publish -- --draft <id>` → admin duyệt
 trên Meta Business Suite. Không ghi `approval.json` local cho đường này.
 
+**Thông báo chính thức (không có nguồn ngoài admin) trên đường Draft:**
+claim đánh `needs_verification` + `attestation_scope: official_program_information`,
+hiện warning trong chat. Policy blocking chỉ source-verification thì **không
+chặn** đường draft — agent tiếp tục sau chat confirm, tạo draft. Admin duyệt
+trên Facebook chính là xác nhận cuối. Hard block (safety, brand, image, Page)
+vẫn dừng bất kể đường nào.
+
 ---
 
 ## 7. Thủ tục vận hành
@@ -431,18 +438,33 @@ fail.
 Sáu intent: education, event_recap, people_story, admissions, career,
 community. Mỗi bài phục vụ Learn / Meet / Experience / Discover.
 
-Cấu trúc theo intent (rút gọn):
+Cấu trúc theo intent và `narrative_mode` (rút gọn):
 
 ```text
 education:     Hook → Giải thích → Ví dụ → Takeaway → CTA nhẹ
-event_recap:   Moment → Việc xảy ra → Cảm/nhận → Takeaway → CTA
+fact_led:      Việc cần nói → Fact/kết quả → Điểm nổi bật có nguồn → CTA
+image_led:     Moment → Việc xảy ra → Cảm/nhận → Takeaway → CTA
 people_story:  Người + ngữ cảnh → Câu/moment → Giá trị đọc → CTA
 admissions/career: Cơ hội → Fact đã xác minh → Đối tượng → Bước tiếp
 community:     Không khí → Moment cụ thể → Lời mời thuộc về
 ```
 
 Tiếng Việt rõ, không clickbait, không siêu lấp. Ưu tiên ảnh đang làm việc hơn
-ảnh xếp hàng. OCR là gợi ý review.
+ảnh xếp hàng khi chọn cover. OCR là gợi ý review. Cảnh báo ảnh posed không
+được kéo bài thông báo kết quả về photostory.
+
+`narrative_mode` mặc định là `fact_led_announcement` khi bài thông báo kết quả,
+công bố, tổng kết, tuyển sinh hoặc giáo dục. `image_led_photostory` chỉ dùng
+khi người dùng muốn kể không khí hoặc recap chỉ quan sát. Ảnh minh họa; không
+phải xương sống caption.
+
+Với `event_recap`, trạng thái “sẵn sàng” không đồng nghĩa với đủ chất liệu.
+Nếu dòng kế hoạch chỉ có tên sự kiện, ảnh hoặc ghi chú chung chung, pipeline
+dừng trước copywriter và hỏi một gói thông tin bổ sung: khoảnh khắc chính,
+quy mô/số vòng, điểm nổi bật của kết quả, người/đơn vị liên quan, cách bình
+chọn và link media chính thức. Người dùng có thể bỏ trống từng mục, nhưng
+phải cung cấp ít nhất một chi tiết thật hoặc chọn photostory chỉ quan sát.
+Không tự điền lý do thắng, số liệu, giám khảo, cách bình chọn hay đối tác.
 
 ---
 

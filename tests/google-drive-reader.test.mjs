@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { evaluateReadiness, findPlanRows, planRowToJobInput, todayInVietnam } from "../backend/sources/google-drive-reader.mjs";
+import { assessEventRecapMaterial, evaluateReadiness, findPlanRows, planRowToJobInput, todayInVietnam } from "../backend/sources/google-drive-reader.mjs";
 
 test("evaluateReadiness: row with all fields and 2 images is ready", () => {
   const today = "2026-08-13";
@@ -42,6 +42,36 @@ test("evaluateReadiness: 1 image fails the 2-image minimum for FB draft", () => 
   }, { today: "2026-08-13" });
   assert.equal(result.ready, false);
   assert.ok(result.reasons.some((r) => r.includes("2 ảnh")));
+});
+
+test("assessEventRecapMaterial: sparse event row requires one consolidated follow-up", () => {
+  const result = assessEventRecapMaterial({
+    title: "Cuộc thi PMC",
+    notes: "Recap giới hạn: chỉ mô tả những gì nhìn thấy trong ảnh."
+  });
+  assert.equal(result.event_recap, true);
+  assert.equal(result.needs_clarification, true);
+  assert.ok(result.questions.length >= 5);
+});
+
+test("assessEventRecapMaterial: supplied result/detail is enough to continue", () => {
+  const result = assessEventRecapMaterial({
+    title: "Cuộc thi PMC",
+    notes: "ECO PM giành Quán quân; AURA được bình chọn là Đội thi được yêu thích nhất."
+  });
+  assert.equal(result.event_recap, true);
+  assert.equal(result.needs_clarification, false);
+});
+
+test("evaluateReadiness: sparse completed recap still requires clarification", () => {
+  const result = evaluateReadiness({
+    plan_id: "plan-015", title: "Cuộc thi PMC",
+    notes: "Recap giới hạn: chỉ mô tả những gì nhìn thấy trong ảnh.",
+    image_folder_or_urls: ["a.jpg", "b.jpg"], channels: ["facebook"], status: "Đã xong"
+  }, { today: "2026-08-13" });
+  assert.equal(result.skip, true);
+  assert.equal(result.ready, false);
+  assert.ok(result.reasons.some((reason) => reason.includes("chất liệu sự kiện")));
 });
 
 test("planRowToJobInput: maps row to post-job-shaped input", () => {

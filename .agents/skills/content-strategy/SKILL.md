@@ -60,36 +60,55 @@ matching non-education intent.
 1. Read the user notes, verified facts, direct field observations, and image
    analysis. Field observations may shape atmosphere and scene, but cannot
    replace sources for official dates, results, awards, sponsors, or identities.
+   Photos illustrate a fact-led post; they do not prove or supply its spine.
 2. Choose one `content_intent`, one `content_pillar`, one primary audience, and
    at least one brand attribute (`insightful` / `dynamic` / `connected`).
 3. Choose the brand test the post will serve.
-4. Suggest a `format_hint`:
+4. Choose one `narrative_mode`:
+   - `fact_led_announcement` for thông báo kết quả, công bố, tổng kết, tuyển
+     sinh, career, education, or any job whose spine is supplied facts.
+   - `image_led_photostory` only for atmosphere, a visible moment, or an
+     observation-only recap.
+5. Suggest a `format_hint`:
    - Real Event Photostory
    - People Story
    - Econ Data/Econ Explainer
    - Short-form Video/Reel *(hint only; do not require video assets)*
    - Editorial Carousel *(hint only; do not require carousel assets)*
-5. Prefer action photos and real moments for cover; warn on posed lineups.
-6. Always load `config/program-promotion-footer.yml` and run its per-post
+6. Prefer action photos and real moments for cover; warn on posed lineups.
+   Posed-cover warnings stay on media choice. They do not rewrite a fact-led
+   announcement into a photostory.
+7. Always load `config/program-promotion-footer.yml` and run its per-post
    footer confirmation gate. The configured footer is required for every post;
    the user may keep it or provide an edited version for this post, but may not
    omit it. Never mutate the global default when a user edits one post.
-7. Map the strategy onto the existing brief fields without inventing schema keys:
+8. Map the strategy onto the existing brief fields without inventing schema keys:
    - `teaching_question` = reader question or communication job-to-be-done;
-   - `concept` = core message / theme;
+   - `concept` = core message / theme, including `narrative_mode` in the
+     bracket prefix, e.g. `[event_recap | econ_experiences_community | Experience | fact_led_announcement]`;
    - `why_it_matters` = value for the audience and brand;
    - `practical_takeaway` = one memorable action, insight, person, experience, or opportunity;
-   - store pillar, attributes, brand tests, format, and intent in those fields and
-     in `angle_excluded` / notes only when the schema cannot carry them yet.
-8. Never invent dates, awards, rankings, sponsor lists, admissions numbers,
+   - store pillar, attributes, brand tests, format, intent, and narrative_mode
+     in those fields and in `angle_excluded` / notes only when the schema
+     cannot carry them yet.
+9. Never invent dates, awards, rankings, sponsor lists, admissions numbers,
    job offers, or identities. Put gaps in `needs_verification`. Field
    observations must remain labeled as observations and must not be upgraded to
    official claims by the writer.
 
-## Caption angle by intent
+## Caption angle by intent and narrative mode
 
+- **fact_led_announcement** (default for education, admissions, career, and
+  result/official notices): Communication job → supplied facts or results →
+  one sourced highlight if present → locked narrator voice → specific CTA.
+  Do not open from the photo. Mention the image later or not at all.
+- **image_led_photostory** (atmosphere / observation-only recap only):
+  Visible moment → supplied context → what was practiced or felt → takeaway →
+  soft CTA.
 - **education**: Hook → Explanation → Example/distinction → Takeaway → Gentle CTA.
-- **event_recap**: Hook from the real moment → what happened → what students practiced or felt → short takeaway → soft CTA. Keep Facebook captions concise; do not dump 400–700-word recaps.
+- **event_recap**: use `fact_led_announcement` when announcing results or
+  totals; use `image_led_photostory` only for atmosphere. Keep Facebook
+  captions concise; do not dump 400–700-word recaps.
 - **people_story**: Person + role context → quote or defining moment → what readers can learn/meet → soft CTA.
 - **admissions / career**: Clear opportunity → verified facts only → who it is for → next step CTA without fear or false urgency.
 - **community**: Before → Now → What's ahead → Belonging → Soft promise. Write with emotional narrative arc, short paragraphs (1–2 sentences), emoji as anchors, and a warm ending.
@@ -117,8 +136,8 @@ Hand off a strategy summary the brief/copywriter can use:
 
 ```text
 intent, pillar, audience, attributes, brand_test, format_hint,
-  footer_gate (required), teaching_question, concept, why_it_matters,
-practical_takeaway, needs_verification, cover guidance
+  narrative_mode, footer_gate (required), teaching_question, concept,
+  why_it_matters, practical_takeaway, needs_verification, cover guidance
 ```
 
 Then continue with `prompts/brief.md` and `.agents/skills/draft-content/SKILL.md`.

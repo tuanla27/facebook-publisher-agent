@@ -14,33 +14,44 @@ This skill is the **caption distill**. Do not invent visual/graphic assets here;
 the current pipeline writes text and selects among supplied photos. Reel and
 carousel may appear only as format hints.
 
-## Story-first generation
+## Narrative modes
 
-Build the caption from the supplied material in this order:
+Choose the mode from content strategy. Image-led is one mode, not the default.
 
-1. verified facts from the plan row or an approved source;
-2. concrete visual observations from image analysis;
+### fact_led_announcement
+
+Build the caption from supplied material in this order:
+
+1. the communication job (announce a result, publish a notice, explain a fact);
+2. verified facts from the plan row, user notes, or an approved source;
+3. one sourced highlight only if it was supplied;
+4. one takeaway that follows from those facts, then a specific CTA.
+
+Do not open from the photo. Mention the image later, once, or not at all.
+Photos illustrate; they do not supply the hook, the takeaway, or missing
+event process. Keep one narrator — for official Fanpage notices, the voice of
+Khoa Kinh tế – HVNH — for the whole caption.
+
+### image_led_photostory
+
+Use only for atmosphere, a visible moment, or an observation-only recap.
+
+1. a specific scene, object, gesture, or human detail visible in the image;
+2. supplied event context;
 3. one brand-relevant interpretation that does not add a new event fact;
 4. one takeaway and a soft invitation.
-
-For event recaps, write a small story rather than a report. Start with a
-specific scene, object, gesture, spatial contrast, or human detail visible in
-the image. Then connect that detail to the supplied event context and move the
-reader toward one meaningful takeaway. Do not open with a date, a generic
-announcement, or a list of what each photo contains unless the date is the
-story's necessary anchor.
 
 Use two or three concrete image details naturally; do not enumerate visual
 observations. An observation such as "nhiều người trước sân khấu" can support
 an atmosphere or scene, but cannot prove a result, emotion, role, identity,
-sponsor, skill, or impact. Keep verification language in claims metadata, not
-in the reader-facing caption.
+sponsor, skill, or impact.
 
-When source material is sparse, make the story smaller, not louder: preserve
-the exact event name and supported context, use the image for the scene, and
-omit outcomes or invented backstory. A generic motivational sentence is not a
-practical takeaway unless it is clearly tied to the event's visible moment or
-verified learning context.
+When source material is sparse, make the caption smaller, not louder: preserve
+the exact event name and supported context, and omit outcomes or invented
+backstory. A generic motivational sentence is not a practical takeaway unless
+it is clearly tied to a supplied event detail or verified learning context.
+
+Keep verification language in claims metadata, not in the reader-facing caption.
 
 Always load `config/program-promotion-footer.yml` and append the selected footer
 after the main body and before hashtags. Treat it as a separate promotional
@@ -67,7 +78,9 @@ Write with a narrative arc, not a template. Move the reader from one
 emotional state to another — from outsider to belonging, from uncertainty
 to excitement, from "chưa biết" to "đã bắt đầu".
 
-- Open with a feeling, not a fact.
+- For `image_led_photostory`, open with a visible moment. For
+  `fact_led_announcement`, open with the communication job and the supplied
+  fact; do not invent a feeling from the photo.
 - Each paragraph: 1–2 sentences. Short, scannable, like a letter.
 - Emoji are optional, not a brand requirement. For `event_recap`, use 0–2 only
   when they add a genuine visual or celebratory beat; never place one on every
@@ -91,7 +104,8 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 7. Use an intent-appropriate structure internally, but never print drafting
    labels in the body. Write with a narrative arc, not a template:
    - education: Hook → Explanation → Example/distinction → Takeaway → Gentle CTA
-   - event_recap: Moment hook → What happened → What was practiced/felt → Short takeaway → Soft CTA
+   - fact_led_announcement: Job → Facts/results → Sourced highlight → Specific CTA
+   - image_led_photostory / atmosphere recap: Moment hook → What happened → What was practiced/felt → Short takeaway → Soft CTA
    - people_story: Person + context → Quote/moment → What readers gain → Soft CTA
    - admissions/career: Opportunity → Verified facts → Who it is for → Clear next step
    - community: Before → Now → What's ahead → Belonging → Soft promise
@@ -109,8 +123,9 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 - 3–5 emoji as emotional anchors (💙🎉🎀💗✨🌟), one per key beat.
 - Specific insight from the moment/topic (what students practiced, what skill
   formed, who readers meet, what opportunity opened).
-- A story arc grounded in at least one supplied fact and two concrete visual
-  details; never use a generic arc as a substitute for missing event facts.
+- A story arc grounded in at least one supplied fact. Image-led captions may
+  add two concrete visual details; fact-led captions must not invent those
+  details to replace missing event facts.
 - Real people and real experience language.
 - One clear takeaway, person, experience, or opportunity a reader can reuse.
 - Soft endings: "Hẹn gặp bạn", "Welcome", "Chào mừng bạn đến" — warm,

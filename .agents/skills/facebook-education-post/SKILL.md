@@ -71,7 +71,8 @@ Before approval handoff, confirm:
 5. Voice is young-academic (not childish, not dry-ceremonial).
 6. Hashtags ≤8 and include `#KhoaKinhTeHVNH` for this brand.
 7. Cover image was scored against the image-selection checklist; posed lineups
-   are warned and not preferred as cover.
+   are warned and not preferred as cover. That warning does not rewrite a
+   fact-led announcement into a photostory.
 8. No invented awards, dates, sponsor lists, rankings, admissions numbers, or
    job offers.
 9. The configured program-promotion footer is present on every post. The
@@ -89,8 +90,18 @@ Before approval handoff, confirm:
    only, and unconfirmed attachments stop at the local-original fallback.
    Agents and subagents never handle bytes or hashes.
 4. Run content strategy (`.agents/skills/content-strategy/SKILL.md` +
-   `prompts/content-strategy.md`) to choose intent, pillar, audience, attributes,
-   brand test, format hint, and the required footer selection.
+   `prompts/content-strategy.md`) to choose intent, `narrative_mode`, pillar,
+   audience, attributes, brand test, format hint, and the required footer
+   selection. Result notices, announcements, and totals use
+   `fact_led_announcement`: photos illustrate and must not become the hook.
+   `image_led_photostory` is only for atmosphere or observation-only recaps.
+   For a sparse `event_recap` row, a “sẵn sàng” status is not enough: ask one
+   consolidated `AskQuestion` for the concrete moment, participant/round
+   count, result highlight, named people/partners, voting method, and official
+   media link. Continue only after at least one concrete event detail is
+   supplied or the user explicitly chooses an observation-only photostory.
+   Never invent why a team won, counts, judges, voting methods, sponsors, or
+   event-process details.
 5. Always run the per-post `AskQuestion` gate for the default program-promotion
    footer: keep the default or edit it for this post. Omission is not an
    option. Record the selected text and decision in internal audit metadata.
@@ -118,15 +129,22 @@ Before approval handoff, confirm:
     warning/override, any institutional or reviewer attestation, and hashes.
 12. Run policy, brand, source, accessibility, image-relevance, and content-
     quality checks against the materialized profile. Keep MIME, size, hash, and
-    scan checks mandatory even when an override is present.
+    scan checks mandatory even when an override is present. If policy review is
+    blocked, distinguish: hard blocks (safety, brand, image, Page) stop the
+    job; source-verification-only blocks may proceed differently by publish
+    mode — see step 14 for the draft path and step 15 for the live path.
 13. Write status `NEEDS_HUMAN_APPROVAL` and materialize the review profile
     from that same source.
 14. If this is a Google Drive plan job and `FB_DRAFT_MODE=true`, skip the local
-    review page. After policy review and explicit chat confirmation to run
-    this one post, create a Meta draft with
-    `npm run meta:publish -- --draft <post_job_id>`. The Page admin publishes
-    from Meta Business Suite. Also export the website article via
+    review page. Source-verification-only blocking errors do not stop the draft
+    path: keep affected claims as `needs_verification`, show the warning in chat,
+    get explicit chat confirmation to run this one post, then create a Meta draft
+    with `npm run meta:publish -- --draft <post_job_id>`. The Page admin reviews
+    and publishes from Meta Business Suite — that decision is the final
+    attestation. Also export the website article via
     `backend/publisher/website-export.mjs`. Do not call the live publisher.
+    Hard blocks (safety, brand, image, Page allowlist) still stop the job
+    regardless of publish mode.
 15. Otherwise open the local review page with `npm run review:open`. The owner
     decides on that page by clicking **Duyệt và đăng / Yêu cầu sửa / Hủy bài
     này**. The page writes and signs `approval.json`; a chat message is never

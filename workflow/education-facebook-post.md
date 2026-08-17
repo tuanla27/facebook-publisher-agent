@@ -75,11 +75,13 @@ Run `.agents/skills/content-strategy/SKILL.md` and `prompts/content-strategy.md`
 Choose:
 
 - one content intent: education, event_recap, people_story, admissions, career, or community;
+- one `narrative_mode`: `fact_led_announcement` or `image_led_photostory`;
 - one primary content pillar from the brand config;
 - audience, brand attributes, brand test, and format hint;
 - the required program-promotion footer, with a keep-or-edit per-post choice.
 
-Prefer action covers. Do not invent facts. Reel/carousel remain format hints only.
+Prefer action covers for media choice. Do not invent facts. Reel/carousel remain format hints only.
+A posed-cover warning does not rewrite a fact-led announcement into a photostory.
 
 ### 4. Build the content brief
 
@@ -93,12 +95,21 @@ must state, using the existing brief fields:
 - facts and source references;
 - missing facts that must not be invented.
 
+For `event_recap`, run a material check before drafting. A row marked
+`sẵn sàng` is not sufficient when it contains only an event name, images, or a
+generic observation-only instruction. Ask one consolidated clarification for
+the concrete moment, participant/round count, result highlight, named
+people/partners, voting method, and official media link. The user may leave
+items blank, but must provide at least one concrete event detail or explicitly
+choose an observation-only photostory. Do not call the copywriter while this
+clarification is pending.
+
 Direct field observations may be recorded as observations with a `field://`
 reference and used to shape atmosphere or scene. They do not prove official
 dates, results, awards, sponsors, identities, or outcomes; those claims remain
 `needs_verification` without a source.
 
-Use the image for two separate purposes: analyze it for context and include the exact approved image asset in the eventual Facebook post. Do not treat the image as evidence for effects or claims.
+Use the image for two separate purposes: analyze it for context and include the exact approved image asset in the eventual Facebook post. Do not treat the image as evidence for effects or claims. In `fact_led_announcement`, the image is illustration only and must not become the caption hook.
 
 ### 5. Confirm the required promotion footer
 
@@ -138,18 +149,38 @@ before approval and request a source or an authenticated operator.
 
 ### 7. Generate drafts
 
-Generate up to three variants. Each variant follows the intent structure from
-`.agents/skills/draft-content/SKILL.md`. Education posts use:
+Generate up to three variants. Each variant follows the intent structure and
+the selected `narrative_mode` from `.agents/skills/draft-content/SKILL.md`.
+Education posts use:
 
 ```text
 Hook -> Explanation -> Example or distinction -> Practical takeaway -> Gentle CTA
 ```
 
-Event, people, admissions, career, and community posts use their matching
+Fact-led announcements and result notices use:
+
+```text
+Communication job -> Supplied facts/results -> Sourced highlight -> Specific CTA
+```
+
+Image-led photostories use:
+
+```text
+Moment hook -> What happened -> What was practiced/felt -> Short takeaway -> Soft CTA
+```
+
+People, admissions, career, and community posts use their matching
 structures. The body should be plain Vietnamese by default, use short
 paragraphs, explain jargon, and avoid aggressive sales language or ceremonial
 filler. A product or admissions claim may appear only when the input contains
 verified facts.
+
+For event recaps, lock the narrator to the selected institutional voice for
+the whole caption. Results may be listed clearly when supplied, but
+explanations of why a team won, how voting worked, who judged, or what was
+practiced require corresponding supplied facts. Remove any generic
+philosophical sentence that does not connect to a concrete event detail.
+Do not open a result notice from the photo.
 
 ### 8. Materialize the review profile
 
@@ -188,11 +219,18 @@ Check:
 - alt text describes the image without pretending to know invisible context;
 - the practical takeaway is actionable but not risky;
 - the final body contains natural prose rather than internal drafting labels;
-- the hook, example, and takeaway are specific to the supplied image/topic;
+- the hook, example, and takeaway are specific to the supplied topic (and to
+  the image only when `narrative_mode` is `image_led_photostory`);
 - verification notes do not overwhelm the reader-facing caption;
-- posed lineup covers are warned when an action alternative exists.
+- posed lineup covers are warned when an action alternative exists; that
+  warning does not force a fact-led caption to open from the photo.
 
-If there is a blocking error, stop at `POLICY_REVIEWED` with `status: blocked` and do not create a review task.
+If there is a blocking error, distinguish two cases:
+
+- **Hard block** (safety, brand, image, Page allowlist, medical, legal, financial): stop at `POLICY_REVIEWED` with `status: blocked`. Do not create a review task or a Meta draft.
+- **Source-verification block only** (all blocking errors match `isReviewerAttestablePolicy`): the post may still proceed, but the path depends on the publish mode:
+  - **Live path** (`FB_DRAFT_MODE` not set): stop at `NEEDS_HUMAN_APPROVAL` and require the reviewer to attest on the local review page (admin key gate) before approval. The signed `approval.json` must contain the institutional attestation.
+  - **Draft path** (`FB_DRAFT_MODE=true` and job from a Google Drive plan): the draft is not public. Keep affected claims as `needs_verification`, show the warning in chat, get explicit chat confirmation to run this post, then create a Meta draft. The Page admin reviews and publishes from Meta Business Suite — that decision is the final attestation. Do not require a local attestation code or signed `approval.json` for this path.
 
 ### 10. Human approval gate
 
