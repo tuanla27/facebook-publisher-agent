@@ -30,28 +30,37 @@ For every variant:
 - follow the content intent (education, event_recap, people_story, admissions, career, community);
 - follow the selected `narrative_mode` from content strategy. Image-led is not
   the default.
-  - `fact_led_announcement`: communication job → supplied facts or results →
-    one sourced highlight if present → locked narrator → specific CTA.
+- use the short **social-editorial treatment** for regular Facebook variants:
+  a specific lead, brief context, one or two supplied concrete details, one
+  takeaway, and a soft CTA. Do not copy a website article's headings,
+  metadata, or length.
+  - `fact_led_announcement`: editorial lead from the communication job →
+    supplied facts or results → brief context or one sourced concrete detail →
+    takeaway → locked narrator → specific CTA.
     Do not open from the photo. Mention the image later, once, or not at all.
-    Result notices must read as a professional announcement, not a photostory.
-  - `image_led_photostory`: visible moment → supplied context → what was
-    practiced or felt → takeaway → soft CTA. Use this only for atmosphere or
-    observation-only recaps.
+    Result notices must read as a concise reported social story, not a dry
+    result list or a photo-led photostory.
+  - `image_led_photostory`: visible moment → supplied context → one or two
+    concrete observations → what was practiced or felt → takeaway → soft CTA.
+    Use this only for atmosphere or observation-only recaps.
 - use an intent-appropriate internal structure, and write the final body as natural prose with no labels such as `Hook:` or `Practical takeaway:`;
   - education: Hook → Explanation → Example/distinction → Takeaway → Gentle CTA
-  - event_recap (fact-led): Job → Results/facts → Sourced highlight → CTA
-  - event_recap (image-led): Moment hook → What happened → What was practiced/felt → Short takeaway → Soft CTA
+  - event_recap (fact-led): Editorial lead → Results/facts → Context/concrete detail → Takeaway → CTA
+  - event_recap (image-led): Moment hook → Context → Concrete observation → What was practiced/felt → Short takeaway → Soft CTA
   - people_story: Person + context → Quote/moment → Reader value → Soft CTA
   - admissions/career: Opportunity → Verified facts → Who it is for → Clear next step
   - community: Before → Now → What's ahead → Belonging → Soft promise
 - sound like a young academic 25–30: clear, warm, professional — not childish, not ceremonial;
-- write with emotional narrative arc — move the reader from one feeling to another;
+- write with a short reported narrative arc: lead with what matters, add
+  context, show a concrete detail, and return to one takeaway;
 - use short paragraphs: 1–2 sentences each, like a letter to one person;
 - use emoji sparingly: 0–2 for an `event_recap`, and none when the sentence is
   already vivid. Never decorate every paragraph with trophy/fire/sparkle icons
   or use emoji as a substitute for a concrete detail;
 - end soft: a warm promise or invitation ("Hẹn gặp bạn", "Welcome"), not always a question;
 - for event photostories prefer concise captions over 400–700 word recaps;
+- keep regular Facebook main bodies around 120–300 words before the required
+  footer unless the supplied facts genuinely require more;
 - define technical terms briefly;
 - include exactly one practical takeaway (insight, person, experience, or opportunity) in `practical_takeaway` and naturally in the body;
 - prefer a supplied result, learning moment, skill formed, person, or opportunity over generic congratulations;
@@ -63,6 +72,8 @@ For every variant:
 - for `fact_led_announcement`, do not require visual observations in the body.
   Photos illustrate. A posed lineup warning belongs in policy/media notes, not
   in the caption spine.
+- do not use generic “hành trình”, “khát vọng”, or “đam mê” language as a
+  substitute for context; connect any such phrase to a supplied fact.
 - keep verification limits in claims/policy metadata unless the limitation is the teaching point;
 - use the image only for observations, not proof of product effects, quality, rankings, outcomes, or identities;
 - put unsupported facts in `claims[].support_status: needs_verification` with a verification note;

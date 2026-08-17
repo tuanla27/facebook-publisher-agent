@@ -49,7 +49,7 @@ matching non-education intent.
 | Intent | Typical goal | Brand test bias |
 |---|---|---|
 | `education` | Explain a concept or useful distinction | Learn |
-| `event_recap` | Cover a faculty activity with short photostory caption | Experience |
+| `event_recap` | Cover a faculty activity with a short social-editorial recap | Experience |
 | `people_story` | Introduce a person or quote-led story | Meet |
 | `admissions` | Inform or invite about programs/admissions | Discover |
 | `career` | Share career, internship, employer, or skill opportunity | Discover |
@@ -69,6 +69,11 @@ matching non-education intent.
      sinh, career, education, or any job whose spine is supplied facts.
    - `image_led_photostory` only for atmosphere, a visible moment, or an
      observation-only recap.
+   All regular Facebook posts use the **social-editorial treatment** by
+   default: a specific lead, brief context, one or two concrete supplied
+   details, a clear takeaway, and a soft CTA. The narrative mode controls the
+   factual spine; it does not turn the caption into a dry list or a
+   400–700-word website report.
 5. Suggest a `format_hint`:
    - Real Event Photostory
    - People Story
@@ -99,16 +104,19 @@ matching non-education intent.
 ## Caption angle by intent and narrative mode
 
 - **fact_led_announcement** (default for education, admissions, career, and
-  result/official notices): Communication job → supplied facts or results →
-  one sourced highlight if present → locked narrator voice → specific CTA.
-  Do not open from the photo. Mention the image later or not at all.
+  result/official notices): Editorial lead from the communication job or
+  supplied fact → supplied facts/results → brief context or one concrete
+  sourced detail → one takeaway → specific CTA. Do not open from the photo.
+  Mention the image later or not at all.
 - **image_led_photostory** (atmosphere / observation-only recap only):
-  Visible moment → supplied context → what was practiced or felt → takeaway →
-  soft CTA.
+  Visible moment → supplied context → one or two concrete observations →
+  what was practiced or felt → takeaway → soft CTA.
 - **education**: Hook → Explanation → Example/distinction → Takeaway → Gentle CTA.
 - **event_recap**: use `fact_led_announcement` when announcing results or
-  totals; use `image_led_photostory` only for atmosphere. Keep Facebook
-  captions concise; do not dump 400–700-word recaps.
+  totals; use `image_led_photostory` only for atmosphere. Write like a short
+  reported story for social media: lead with what matters, add verified
+  context, then return to the people, result, or experience. Keep the main
+  body concise; do not dump a 400–700-word recap.
 - **people_story**: Person + role context → quote or defining moment → what readers can learn/meet → soft CTA.
 - **admissions / career**: Clear opportunity → verified facts only → who it is for → next step CTA without fear or false urgency.
 - **community**: Before → Now → What's ahead → Belonging → Soft promise. Write with emotional narrative arc, short paragraphs (1–2 sentences), emoji as anchors, and a warm ending.
@@ -125,6 +133,8 @@ facts). The young-academic voice remains default for regular Facebook posts.
 ## Reduce / avoid
 
 - Ceremonial congratulate templates with no Learn/Meet/Experience/Discover.
+- Dry result lists with no context, concrete detail, or reader takeaway.
+- Generic philosophical openings that are not grounded in supplied facts.
 - Forced trends unrelated to Economics BAV.
 - Aggressive sales copy.
 - Using posed group lineups as cover when an action frame exists.

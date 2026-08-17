@@ -14,6 +14,33 @@ This skill is the **caption distill**. Do not invent visual/graphic assets here;
 the current pipeline writes text and selects among supplied photos. Reel and
 carousel may appear only as format hints.
 
+## Default Facebook writing treatment
+
+Unless the request explicitly calls for a different channel or voice, write
+regular Facebook posts as **short social-editorial stories**: young, clear,
+reported, and easy to scan. This is a writing treatment, not a new schema
+enum; the selected `narrative_mode` still controls the factual spine.
+
+Use this compact arc:
+
+1. **Lead** — begin with the news, result, question, person, or visible moment
+   that matters. Avoid generic congratulations and photo-only hooks for
+   fact-led posts.
+2. **Context** — explain in one or two sentences what the activity is and why
+   it matters to this community.
+3. **Concrete detail** — include one or two supplied facts about the task,
+   decision, participant, learning moment, or result. Never manufacture
+   dialogue, emotion, process, or impact.
+4. **Takeaway** — return to one useful insight, experience, person, or
+   opportunity that follows from the supplied material.
+5. **CTA** — close with a specific, warm invitation or next step.
+
+Use natural editorial transitions such as “phía sau kết quả ấy”, “trên hành
+trình này”, or “khi…” only when the following sentence contains a real supplied
+detail. Do not imitate a newspaper article's metadata, section headings, or
+administrative length. As a default, keep the main Facebook body around
+120–300 words before the required footer.
+
 ## Narrative modes
 
 Choose the mode from content strategy. Image-led is one mode, not the default.
@@ -22,9 +49,10 @@ Choose the mode from content strategy. Image-led is one mode, not the default.
 
 Build the caption from supplied material in this order:
 
-1. the communication job (announce a result, publish a notice, explain a fact);
-2. verified facts from the plan row, user notes, or an approved source;
-3. one sourced highlight only if it was supplied;
+1. an editorial lead for the communication job (announce a result, publish a
+   notice, explain a fact);
+2. supplied facts from the plan row, user notes, or an approved source;
+3. brief supplied context plus one concrete sourced highlight when available;
 4. one takeaway that follows from those facts, then a specific CTA.
 
 Do not open from the photo. Mention the image later, once, or not at all.
@@ -38,7 +66,8 @@ Use only for atmosphere, a visible moment, or an observation-only recap.
 
 1. a specific scene, object, gesture, or human detail visible in the image;
 2. supplied event context;
-3. one brand-relevant interpretation that does not add a new event fact;
+3. one or two concrete observations and one brand-relevant interpretation
+   that does not add a new event fact;
 4. one takeaway and a soft invitation.
 
 Use two or three concrete image details naturally; do not enumerate visual
@@ -81,6 +110,9 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 - For `image_led_photostory`, open with a visible moment. For
   `fact_led_announcement`, open with the communication job and the supplied
   fact; do not invent a feeling from the photo.
+- For either mode, add brief context and a concrete detail before the
+  takeaway. The caption should feel like a reported social story, not a
+  result spreadsheet or a generic motivational paragraph.
 - Each paragraph: 1–2 sentences. Short, scannable, like a letter.
 - Emoji are optional, not a brand requirement. For `event_recap`, use 0–2 only
   when they add a genuine visual or celebratory beat; never place one on every
@@ -104,8 +136,8 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 7. Use an intent-appropriate structure internally, but never print drafting
    labels in the body. Write with a narrative arc, not a template:
    - education: Hook → Explanation → Example/distinction → Takeaway → Gentle CTA
-   - fact_led_announcement: Job → Facts/results → Sourced highlight → Specific CTA
-   - image_led_photostory / atmosphere recap: Moment hook → What happened → What was practiced/felt → Short takeaway → Soft CTA
+   - fact_led_announcement: Editorial lead → Facts/results → Context/concrete detail → Takeaway → Specific CTA
+   - image_led_photostory / atmosphere recap: Moment hook → Context → Concrete observation → What was practiced/felt → Short takeaway → Soft CTA
    - people_story: Person + context → Quote/moment → What readers gain → Soft CTA
    - admissions/career: Opportunity → Verified facts → Who it is for → Clear next step
    - community: Before → Now → What's ahead → Belonging → Soft promise
@@ -119,6 +151,8 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 ## Prefer
 
 - Emotional narrative arc — move the reader from one feeling to another.
+- Reported social storytelling: lead with what matters, add context, show a
+  concrete detail, and end with a takeaway rather than stacking praise.
 - Short paragraphs: 1–2 sentences each, like a letter.
 - 3–5 emoji as emotional anchors (💙🎉🎀💗✨🌟), one per key beat.
 - Specific insight from the moment/topic (what students practiced, what skill
@@ -136,6 +170,9 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 ## Avoid / reduce
 
 - Ceremonial congratulate templates and repeated “vinh danh” wording.
+- Dry lists of results or activities with no context or concrete detail.
+- Generic “hành trình/khát vọng/đam mê” language unless it is tied to supplied
+  facts.
 - Forced trends unrelated to Economics BAV.
 - Fear, false urgency, absolute superlatives, sales pressure.
 - Invented stats, dates, awards, sponsor claims, job offers, or identities not

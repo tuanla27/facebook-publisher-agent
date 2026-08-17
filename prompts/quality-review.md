@@ -11,9 +11,15 @@ Check every variant for:
 
 - the selected `narrative_mode` is respected:
   - `fact_led_announcement`: opens from the communication job and supplied
-    facts or results; does not open from a photo; may omit visual detail;
+    facts or results, then adds brief context and a concrete supplied detail;
+    does not open from a photo; may omit visual detail;
   - `image_led_photostory`: opens from a concrete supplied scene, not a
-    date-only lead, and weaves two or three visual observations into prose;
+    date-only lead, and weaves one or two concrete visual observations into
+    prose;
+- the default social-editorial treatment is visible: specific lead, concise
+  context, concrete detail, one takeaway, and a soft CTA;
+- the caption feels like a short reported social story rather than a dry
+  result list, ceremonial template, or copied website article;
 - a specific hook that matches the content intent (and the image only when
   the mode is image-led);
 - a clear explanation, story, opportunity, or experience — not a ceremonial
@@ -30,6 +36,8 @@ Check every variant for:
 - a gentle CTA that does not repeat the takeaway and matches the intent;
 - one narrator throughout; official notices stay in the Khoa Kinh tế – HVNH voice;
 - short readable paragraphs and natural Vietnamese (young academic tone);
+- no generic “hành trình/khát vọng/đam mê” paragraph is used as a substitute
+  for supplied context;
 - no internal labels such as `Hook:`, `Explanation:`, or `Practical takeaway:` in the final body;
 - no repeated disclaimer that makes the post sound like an audit report;
 - no JSON, hashes, IDs, workflow states, or tool instructions in the caption;

@@ -5,10 +5,14 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { assetManifestHashOf, contentHashOf } from "../backend/publisher/hash.mjs";
 import { MetaApiError } from "../backend/publisher/meta-api.mjs";
-import { publishApprovedPost } from "../backend/publisher/publish-approved-post.mjs";
+import { createDraftPost, publishApprovedPost } from "../backend/publisher/publish-approved-post.mjs";
 import { signApproval } from "../backend/approval/approval-signer.mjs";
 
-const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0]);
+const png = Buffer.from([
+  137, 80, 78, 71, 13, 10, 26, 10,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 4, 0, 0, 0, 3, 0
+]);
 const TEST_SIGNING_KEY = "ab".repeat(32);
 
 async function fixture(overrides = {}) {
@@ -23,8 +27,8 @@ async function fixture(overrides = {}) {
   if (multipleAssets) await writeFile(resolve(dir, "asset-2.png"), secondBytes);
   const sha256 = (await import("node:crypto")).createHash("sha256").update(png).digest("hex");
   const sha256Second = (await import("node:crypto")).createHash("sha256").update(secondBytes).digest("hex");
-  const manifest = [{ asset_id: "asset-1", sha256, media_type: "image", publish_order: 1 }];
-  if (multipleAssets) manifest.push({ asset_id: "asset-2", sha256: sha256Second, media_type: "image", publish_order: 2 });
+  const manifest = [{ asset_id: "asset-1", sha256, media_type: "image", publish_order: 1, mime_type: "image/png" }];
+  if (multipleAssets) manifest.push({ asset_id: "asset-2", sha256: sha256Second, media_type: "image", publish_order: 2, mime_type: "image/png" });
   const variant = {
     variant_id: "v1",
     body: "Educational caption",
@@ -78,8 +82,32 @@ async function fixture(overrides = {}) {
     post_job_id: jobId,
     page: { page_id: "page-1", page_name: "Page", allowlisted: true },
     assets: [
-      { asset_id: "asset-1", uri: `artifacts/${jobId}/asset.png`, publish: true, source_type: "local_file", original_or_preview: "original" },
-      ...(multipleAssets ? [{ asset_id: "asset-2", uri: `artifacts/${jobId}/asset-2.png`, publish: true, source_type: "local_file", original_or_preview: "original" }] : [])
+      {
+        asset_id: "asset-1",
+        uri: `artifacts/${jobId}/asset.png`,
+        publish: true,
+        sha256,
+        mime_type: "image/png",
+        byte_size: png.length,
+        width: 1024,
+        height: 768,
+        scan_status: "clean",
+        source_type: "local_file",
+        original_or_preview: "original"
+      },
+      ...(multipleAssets ? [{
+        asset_id: "asset-2",
+        uri: `artifacts/${jobId}/asset-2.png`,
+        publish: true,
+        sha256: sha256Second,
+        mime_type: "image/png",
+        byte_size: secondBytes.length,
+        width: 1024,
+        height: 768,
+        scan_status: "clean",
+        source_type: "local_file",
+        original_or_preview: "original"
+      }] : [])
     ],
     status: "APPROVED"
   };
@@ -92,7 +120,9 @@ async function fixture(overrides = {}) {
     finalApproval.identity_proof.signature = signApproval(finalApproval, Buffer.from(TEST_SIGNING_KEY, "hex"));
   }
   await writeFile(resolve(dir, "generated-post.json"), `${JSON.stringify({ ...post, ...overrides.post }, null, 2)}\n`);
-  await writeFile(resolve(dir, "approval.json"), `${JSON.stringify(finalApproval, null, 2)}\n`);
+  if (overrides.writeApproval !== false) {
+    await writeFile(resolve(dir, "approval.json"), `${JSON.stringify(finalApproval, null, 2)}\n`);
+  }
   await writeFile(resolve(dir, "input.json"), `${JSON.stringify(input, null, 2)}\n`);
   return { root, jobId, dir, sha256 };
 }
@@ -344,6 +374,86 @@ test("records transient Meta errors as retry attempts without creating publish-r
   await assert.rejects(() => readFile(resolve(data.dir, "publish-result.json")));
   const queue = JSON.parse(await readFile(resolve(data.dir, "publish-retry-queue.json"), "utf8"));
   assert.equal(queue.length, 1);
+  assert.equal(queue[0].operation, "live");
+});
+
+test("marks transient draft retries without requiring local approval", async () => {
+  const data = await fixture({ multipleAssets: true, writeApproval: false });
+  const fakeApi = {
+    uploadImage: async () => { throw new MetaApiError("rate limited", { status: 429, retryable: true, retryAfterMs: 1000 }); },
+    createPageDraftPost: async () => ({ id: "never" })
+  };
+
+  await assert.rejects(
+    () => createDraftPost(data.jobId, options(fakeApi, data, {
+      env: {
+        META_GRAPH_API_VERSION: "v1.0",
+        ASSET_SCAN_REQUIRED: "true",
+        ASSET_MIN_WIDTH: "0",
+        FB_DRAFT_MIN_IMAGES: "2",
+        APPROVAL_SIGNING_KEY: TEST_SIGNING_KEY
+      }
+    })),
+    { code: "META_TRANSIENT_ERROR" }
+  );
+
+  const queue = JSON.parse(await readFile(resolve(data.dir, "publish-retry-queue.json"), "utf8"));
+  assert.equal(queue.length, 1);
+  assert.equal(queue[0].operation, "draft");
+  await assert.rejects(() => readFile(resolve(data.dir, "approval.json")));
+});
+
+test("rejects a preview asset before any draft Meta call", async () => {
+  const data = await fixture({ multipleAssets: true, writeApproval: false });
+  const inputPath = resolve(data.dir, "input.json");
+  const input = JSON.parse(await readFile(inputPath, "utf8"));
+  input.assets[1].source_type = "host_preview";
+  input.assets[1].original_or_preview = "preview";
+  await writeFile(inputPath, `${JSON.stringify(input, null, 2)}\n`);
+  const calls = { upload: 0, draft: 0 };
+  const fakeApi = {
+    uploadImage: async () => { calls.upload += 1; return { id: "media-never" }; },
+    createPageDraftPost: async () => { calls.draft += 1; return { id: "draft-never" }; }
+  };
+
+  await assert.rejects(
+    () => createDraftPost(data.jobId, options(fakeApi, data, {
+      env: {
+        META_GRAPH_API_VERSION: "v1.0",
+        ASSET_SCAN_REQUIRED: "true",
+        ASSET_MIN_WIDTH: "0",
+        FB_DRAFT_MIN_IMAGES: "2"
+      }
+    })),
+    { code: "MEDIA_PREFLIGHT_FAILED" }
+  );
+  assert.deepEqual(calls, { upload: 0, draft: 0 });
+});
+
+test("accepts valid materialized assets before creating a draft", async () => {
+  const data = await fixture({ multipleAssets: true, writeApproval: false });
+  const calls = { upload: 0, draft: 0 };
+  const fakeApi = {
+    uploadImage: async () => { calls.upload += 1; return { id: `media-${calls.upload}` }; },
+    createPageDraftPost: async ({ mediaIds }) => {
+      calls.draft += 1;
+      assert.deepEqual(mediaIds, ["media-1", "media-2"]);
+      return { id: "draft-valid" };
+    },
+    isDraftVisible: async () => ({ exists: true, is_published: false })
+  };
+
+  const result = await createDraftPost(data.jobId, options(fakeApi, data, {
+    env: {
+      META_GRAPH_API_VERSION: "v1.0",
+      ASSET_SCAN_REQUIRED: "true",
+      ASSET_MIN_WIDTH: "0",
+      FB_DRAFT_MIN_IMAGES: "2"
+    }
+  }));
+
+  assert.equal(result.meta_draft_post_id, "draft-valid");
+  assert.deepEqual(calls, { upload: 2, draft: 1 });
 });
 
 test("rejects a changed asset before upload", async () => {

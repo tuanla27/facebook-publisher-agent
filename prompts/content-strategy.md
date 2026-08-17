@@ -42,6 +42,9 @@ Rules:
 - `content_pillar` must be exactly one id from `config/brand-guidelines.yml`.
 - Serve at least one brand test: Learn / Meet / Experience / Discover an opportunity.
 - Show at least one brand attribute; prefer two.
+- Use the default **social-editorial treatment** for regular Facebook posts:
+  specific lead, brief context, one or two concrete supplied details, one
+  takeaway, and a soft CTA. This treatment is not a new schema enum.
 - Always set `footer_gate` to `required`. The configured footer is appended to
   every post after the main body and before hashtags. The user may edit the
   footer for the current post, but may not omit it; never mutate the global
@@ -53,11 +56,12 @@ Rules:
 - Set `narrative_mode` to exactly one of:
   - `fact_led_announcement` — thông báo kết quả, công bố, tổng kết, tuyển sinh,
     career, education, or any post whose job is to deliver supplied facts.
-    Facts and the communication job are the spine. Photos illustrate; they
-    are optional in the caption and must not become the hook.
+    Facts and the communication job are the spine; add brief verified context
+    and a concrete supplied detail before the takeaway. Photos illustrate;
+    they are optional in the caption and must not become the hook.
   - `image_led_photostory` — only when the user asks for atmosphere, a visible
     moment, or an observation-only recap. Then identify one concrete scene and
-    two usable visual details before drafting.
+    one or two usable visual details before drafting.
 - For a sparse event_recap row (event name/images but no concrete event detail),
   return `angle_excluded` with `needs_clarification` and do not call the
   copywriter yet. Ask one consolidated follow-up for the moment, participant

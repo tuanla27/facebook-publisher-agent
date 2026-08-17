@@ -160,20 +160,24 @@ Hook -> Explanation -> Example or distinction -> Practical takeaway -> Gentle CT
 Fact-led announcements and result notices use:
 
 ```text
-Communication job -> Supplied facts/results -> Sourced highlight -> Specific CTA
+Editorial lead -> Supplied facts/results -> Brief context/concrete detail
+-> Practical takeaway -> Specific CTA
 ```
 
 Image-led photostories use:
 
 ```text
-Moment hook -> What happened -> What was practiced/felt -> Short takeaway -> Soft CTA
+Moment hook -> Brief context -> Concrete observation
+-> What was practiced/felt -> Short takeaway -> Soft CTA
 ```
 
 People, admissions, career, and community posts use their matching
-structures. The body should be plain Vietnamese by default, use short
-paragraphs, explain jargon, and avoid aggressive sales language or ceremonial
-filler. A product or admissions claim may appear only when the input contains
-verified facts.
+structures. The default Facebook treatment is a short social-editorial story:
+lead with what matters, add verified context, include one or two concrete
+supplied details, return to one takeaway, and close with a soft CTA. The body
+should be plain Vietnamese, use short paragraphs, explain jargon, and avoid
+aggressive sales language, dry result lists, or ceremonial filler. A product
+or admissions claim may appear only when the input contains verified facts.
 
 For event recaps, lock the narrator to the selected institutional voice for
 the whole caption. Results may be listed clearly when supplied, but

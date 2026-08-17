@@ -130,12 +130,14 @@ Every proposed post should help the reader do at least one of these:
 - Experience something
 - Discover an opportunity
 
-Prefer an intent-appropriate structure, then apply `narrative_mode`:
+Prefer an intent-appropriate structure, then apply `narrative_mode` inside the
+default short social-editorial treatment: specific lead -> brief context ->
+concrete supplied detail -> practical takeaway -> soft CTA.
 
 ```text
 education: Hook -> Explanation -> Example or distinction -> Practical takeaway -> Gentle CTA
-fact_led_announcement: Job -> Facts/results -> Sourced highlight -> Specific CTA
-image_led_photostory: Moment hook -> What happened -> What was practiced/felt -> Short takeaway -> Soft CTA
+fact_led_announcement: Editorial lead -> Facts/results -> Context/concrete detail -> Takeaway -> Specific CTA
+image_led_photostory: Moment hook -> Context -> Concrete observation -> What was practiced/felt -> Short takeaway -> Soft CTA
 people_story: Person + context -> Quote/moment -> Reader value -> Soft CTA
 admissions/career: Opportunity -> Verified facts -> Who it is for -> Clear next step
 community: Atmosphere -> Specific moment -> Belonging invite
@@ -145,7 +147,12 @@ Result notices, announcements, and totals are fact-led. Photos illustrate;
 they must not become the hook. Image-led is only for atmosphere or
 observation-only recaps.
 
-Use plain Vietnamese by default. Avoid clickbait, fear, false urgency, absolute superlatives, ceremonial filler, and unexplained jargon. If a technical term is necessary, define it briefly. Prefer action photos over posed lineups for cover images. A posed-cover warning does not rewrite a fact-led announcement into a photostory.
+Use plain Vietnamese by default. Write like a short reported social story, not a
+dry result list or copied website article. Avoid clickbait, fear, false
+urgency, absolute superlatives, ceremonial filler, and unexplained jargon. If
+a technical term is necessary, define it briefly. Prefer action photos over
+posed lineups for cover images. A posed-cover warning does not rewrite a
+fact-led announcement into a photostory.
 
 ## Output Contract
 
