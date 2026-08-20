@@ -6,14 +6,6 @@
     "paths": [".opencode/skills"]
   },
   "agent": {
-    "educational-copywriter": {
-      "mode": "subagent",
-      "description": "Writes source-aware, education-first Vietnamese Facebook Page post variants.",
-      "permission": {
-        "edit": "deny",
-        "bash": "deny"
-      }
-    },
     "policy-reviewer": {
       "mode": "subagent",
       "description": "Reviews educational Facebook Page drafts for unsupported claims and policy risks.",
