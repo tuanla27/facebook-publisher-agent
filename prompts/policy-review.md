@@ -71,8 +71,14 @@ Always review:
   post, has an explicit user confirmation timestamp, and is surfaced as a
   warning; do not treat the override as evidence that the image is high quality;
 - hashtags ≤ 5 and include `#KhoaKinhTeHVNH` when posting for this brand;
-- voice is young-academic, not childish and not dry-ceremonial;
+- voice is young-academic, not childish, not dry-ceremonial, and not a
+  lecture defining the event (“Không phải X. Đó là lúc Y.”);
+- khoa_result_recap captions keep source verbs when compressing website
+  purpose clauses; flag “đưa sinh viên vào lập kế hoạch, teamwork và
+  phong thái” and “gọi Top N đội thi lên sân khấu”;
 - post serves at least one of Learn / Meet / Experience / Discover;
 - image checklist warnings are surfaced to the human reviewer;
 - no invented awards, dates, sponsor lists, rankings, admissions numbers, or job offers;
+- search hits from Drive, website, or Fanpage that the user did not select
+  for this post are treated as unused, not as sources;
 - Reel/carousel/video were not invented as publish assets by the writer.

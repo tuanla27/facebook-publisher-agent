@@ -92,6 +92,7 @@ style_policy:
     - "ảnh lineup posed làm cover"
     - "trend không liên quan Economics BAV"
     - "footer tuyển sinh dài, không liên quan hoặc không được chỉnh cho phù hợp với bài"
+    - "giọng giảng nghĩa sự kiện (Không phải X. Đó là lúc Y.)"
 accessibility:
   use_short_paragraphs: true
   explain_acronyms: true

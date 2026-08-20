@@ -150,7 +150,8 @@ Phần Facebook draft cần Meta (Mức 4).
 | Lỗi | Nguyên nhân | Sửa |
 |---|---|---|
 | `DRIVE_OAUTH_CONFIG_MISSING` | Thiếu OAuth Client ID/Secret | Điền các biến `GOOGLE_OAUTH_*` trong `.env` |
-| `DRIVE_OAUTH_NOT_CONNECTED` | Chưa đăng nhập Google | Chạy `npm run google:connect` |
+| `DRIVE_OAUTH_NOT_CONNECTED` | Chưa đăng nhập Google | `npm run connections:ensure` (tự mở trang Google) |
+| `DRIVE_OAUTH_EXPIRED` | Refresh token Google hết hạn / bị thu hồi | `npm run connections:ensure` (tự mở trang Google) |
 | Thu hồi Google | Xong hợp đồng / đổi tài khoản | `npm run google:connect -- --disconnect` |
 | Thu hồi Facebook Page | Xong hợp đồng / đổi admin | `npm run meta:disconnect` |
 | `DRIVE_AUTH_MISSING` | Đang dùng legacy service account nhưng thiếu file key | Chuyển sang OAuth hoặc đặt file service account |
@@ -158,5 +159,5 @@ Phần Facebook draft cần Meta (Mức 4).
 | Dòng `ready: false` | Thiếu ảnh / sai status / ngày không cụ thể | Đọc `reasons`, sửa sheet |
 | `ASSET_MIN_WIDTH` | Ảnh < 1080px | Dùng ảnh gốc to hơn |
 | `DRAFT_NEEDS_MORE_IMAGES` | Chỉ 1 ảnh | Thêm ≥2 ảnh (bug Meta 1 ảnh đơn) |
-| `AUTHENTICATION_FAILED` (Meta) | Chưa kết nối Page | `npm run meta:connect` |
+| `AUTHENTICATION_FAILED` (Meta) | Chưa kết nối Page hoặc token hết hạn | `npm run connections:ensure` (tự mở trang Fanpage) |
 | Draft không hiện trên FB | Bug Meta 1 ảnh / chậm | F5 Meta Business Suite, hoặc copy-paste thủ công |

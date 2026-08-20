@@ -1,4 +1,28 @@
-# Chat Approval Flow (Local Single-Owner)
+# Chat Approval Flow
+
+Default B1 (`FB_DRAFT_MODE=true`): **do not open the local review page.**
+Create a Meta unpublished draft after chat confirmation. The Page admin
+reviews and publishes on Facebook. Chat cannot make a post public. The agent
+never writes `approval.json`.
+
+The local browser page below is **only** for the live path when
+`FB_DRAFT_MODE` is unset.
+
+## Draft path (default)
+
+Preconditions: job at `NEEDS_HUMAN_APPROVAL`, hard policy blocks absent,
+profile materialized, typically at least two original images.
+
+1. Show the caption in chat. Ask one confirmation to create the Fanpage draft.
+2. If images are missing, ask for photos. Do not mention a local review page.
+3. Run `npm run meta:publish -- --draft <post_job_id>`.
+4. Tell the owner in plain Vietnamese that the unpublished post is on the
+   Fanpage and they should review it on Facebook before publishing.
+
+A chat “được” is confirmation to *create the unpublished draft*, not to make
+the post public.
+
+## Live path (local page, only if draft mode is off)
 
 Non-technical single owner (who is also the admin) approves from a local
 review page in the browser. The chat agent prepares, opens the page, and
@@ -6,7 +30,7 @@ reports the result. The owner never runs commands, edits JSON, or sees IDs.
 The decision itself is always a click on a button in the browser — never a
 chat message.
 
-## Approval Wall
+## Approval Wall (live path only)
 
 - The only way an `APPROVED` record can be created is through the local review
   server (`backend/approval/local-review-server.mjs`), which signs

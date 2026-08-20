@@ -92,9 +92,9 @@ Không có câu "tự chạy nền". Pipeline chỉ chạy khi bạn mở Cursor
 |---|---|
 | Báo thiếu ảnh | Thêm ≥2 ảnh vào thư mục STT, gõ lại tên thư mục trên sheet |
 | Báo chưa đến ngày | Chờ đúng ngày, hoặc nhờ người triển khai đổi sang chạy khi sẵn sàng |
-| Không đọc được Drive | Nhắn: "Kết nối lại Google Drive giúp mình" |
+| Không đọc được Drive | Cửa sổ Google sẽ tự mở; đăng nhập rồi quay lại chat |
 | Draft không thấy trên Facebook | Vào Drafts, tải lại trang; vẫn không thấy thì copy caption thủ công |
-| Token Facebook hết hạn | Nhắn: "Kết nối lại Fanpage giúp mình" (cần admin Page đăng nhập) |
+| Token Facebook hết hạn | Cửa sổ kết nối Fanpage sẽ tự mở; admin Page đăng nhập rồi quay lại chat |
 
 ## Bạn không cần làm
 

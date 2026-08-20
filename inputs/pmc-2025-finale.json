@@ -1,0 +1,67 @@
+{
+  "post_job_id": "pmc-2025-finale",
+  "page": {
+    "page_id": "582504975766356",
+    "page_name": "Tuan Le Anh Portfolio",
+    "allowlisted": true
+  },
+  "keywords": [
+    "PMC",
+    "chung kết",
+    "Project Management Championship 2025"
+  ],
+  "assets": [
+    {
+      "asset_id": "asset-cover",
+      "kind": "image",
+      "uri": "artifacts/pmc-2025-finale/assets/asset-cover.jpg",
+      "publish": true,
+      "sha256": "21d9d96bf3c26a0ef3b19acc9262802f3e95dc7de45f3440b7f2934af91b2b43",
+      "mime_type": "image/jpeg",
+      "byte_size": 793801,
+      "width": 2200,
+      "height": 1466,
+      "scan_status": "not_configured",
+      "source_type": "local_file",
+      "original_or_preview": "original"
+    },
+    {
+      "asset_id": "asset-banner",
+      "kind": "image",
+      "uri": "artifacts/pmc-2025-finale/assets/asset-banner.jpg",
+      "publish": true,
+      "sha256": "ceaa8fa04b9d1258988bc8059361e4bcab39fd46acf4c660ad9625d492f4a3a3",
+      "mime_type": "image/jpeg",
+      "byte_size": 1201569,
+      "width": 2200,
+      "height": 1542,
+      "scan_status": "not_configured",
+      "source_type": "local_file",
+      "original_or_preview": "original"
+    },
+    {
+      "asset_id": "asset-lineup",
+      "kind": "image",
+      "uri": "artifacts/pmc-2025-finale/assets/asset-lineup.jpg",
+      "publish": true,
+      "sha256": "2dfd5056794cfad29d4a0f2c487cc9f684125933459b5d621638bd95094829a3",
+      "mime_type": "image/jpeg",
+      "byte_size": 762589,
+      "width": 2200,
+      "height": 1466,
+      "scan_status": "not_configured",
+      "source_type": "local_file",
+      "original_or_preview": "original"
+    }
+  ],
+  "objective": "awareness",
+  "audience": "sinh viên Khoa Kinh tế và bạn quan tâm quản lý dự án",
+  "language": "vi",
+  "tone": "young-academic",
+  "notes": [
+    "writing_register=khoa_result_recap + operator Fanpage recap packaging.",
+    "Cadence from Khoa website EC/PMC/I-impACT recaps; facts from Word + Khoa PMC article.",
+    "Default CTĐT footer. Hall cover."
+  ],
+  "status": "ASSETS_MATERIALIZED"
+}

@@ -1,0 +1,34 @@
+{
+  "purpose": "Fallback cadence samples when the connected Fanpage feed cannot be read. Copywriter matches register only and must never reuse these facts in another post.",
+  "write_like": [
+    "Thông báo / lịch mỏng (official_notice): mở thời điểm + ai tổ chức + việc gì.",
+    "Tổng kết / công bố kết quả (khoa_result_recap): sapo hành trình đêm thi → thời–không thành câu đầy đủ → chặng thi viết thành đoạn → kết quả ‘gọi tên / giành ngôi / thuộc về’ → không chỉ là cuộc thi + việc đã làm có nguồn → mời nhìn ảnh / hẹn mùa sau.",
+    "Recap Fanpage khi người vận hành dán mẫu: giữ kicker [ RECAP … ] và emoji đầu đoạn, nhưng xương sống vẫn là khoa_result_recap.",
+    "Gọi tên đội / người / vai trò khi input có.",
+    "Không viết điện tín ‘Quán quân: X. Á quân: Y.’",
+    "Không copy nhiệt lượng chưa có nguồn: sĩ số khán giả, ‘nổ tung’, nhiều tháng luyện tập, tình bạn, cảm xúc thăng hoa."
+  ],
+  "avoid": [
+    "Không phải X. Đó là lúc Y.",
+    "Ba vế song song sau dấu hai chấm (kết nối / giữ nhịp / mở trải nghiệm) khi không có fact.",
+    "Câu máy móc kiểu giáo trình: 'phần việc ấy', 'nhịp sinh hoạt', 'trả lại công việc đã cầm'.",
+    "Khung tin thể thao / năm đội là nhân vật / ghi đêm khi đã có giọng tổng thuật Khoa."
+  ],
+  "excerpts": [
+    {
+      "source": "website_khoa",
+      "note": "Thông báo tọa đàm thực tập, đăng 18/8/2026 — chỉ học nhịp official_notice.",
+      "text": "Thực hiện kế hoạch năm học 2026–2027, Khoa Kinh tế – Học viện Ngân hàng tổ chức tọa đàm trực tuyến “Định hướng Thực tập và viết Khóa luận tốt nghiệp” dành cho sinh viên chuyên ngành Kinh tế đầu tư.\n\nThời gian: 13h30–15h00, thứ Tư, ngày 19/8/2026."
+    },
+    {
+      "source": "website_khoa",
+      "note": "Tổng thuật tọa đàm báo cáo viên, đăng 17/8/2026 — chỉ học nhịp câu thông báo.",
+      "text": "Chiều ngày 16/8/2026, Khoa Kinh tế – Học viện Ngân hàng đã tổ chức buổi chia sẻ chuyên đề với sự tham gia của ông Vũ Anh Đức – Giám đốc VietinBank chi nhánh 5, TP. HCM."
+    },
+    {
+      "source": "website_khoa_recap",
+      "note": "Cadence tổng kết cuộc thi trên website Khoa (EC/PMC/I-impACT). Chỉ học nhịp câu. Không copy đội thắng hay số liệu sang bài khác.",
+      "text": "Sau hành trình [thời lượng có nguồn], [tên cuộc thi] đã đi đến chặng cuối bằng một đêm chung kết [không khí có nguồn].\n\nTối ngày [ngày], tại [nơi], [sự việc] diễn ra giữa các đội xuất sắc nhất.\n\nDanh hiệu Quán quân gọi tên [đội]; vị trí Á quân thuộc về [đội].\n\nKhông chỉ là một cuộc thi, [tên] còn là nơi sinh viên [việc đã làm có nguồn].\n\nHãy cùng nhìn lại những hình ảnh đêm chung kết. Hẹn gặp lại tại mùa sau."
+    }
+  ]
+}

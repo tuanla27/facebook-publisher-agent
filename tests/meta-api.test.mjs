@@ -37,6 +37,26 @@ test("Meta adapter exposes retryable provider failures without secrets", async (
   });
 });
 
+test("Meta adapter lists recent page posts without posting", async () => {
+  const calls = [];
+  const api = new MetaApiAdapter({
+    graphVersion: "v1.0",
+    fetchImpl: async (url, options) => {
+      calls.push({ url, method: options?.method || "GET" });
+      return {
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        json: async () => ({ data: [{ message: "Chiều nay Khoa tổ chức tọa đàm.", created_time: "2026-08-16T08:00:00+0000" }] })
+      };
+    }
+  });
+  const result = await api.listPagePosts({ pageId: "page-1", accessToken: "secret", limit: 8 });
+  assert.equal(calls[0].method, "GET");
+  assert.match(calls[0].url, /page-1\/posts\?/);
+  assert.equal(result.data[0].message, "Chiều nay Khoa tổ chức tọa đàm.");
+});
+
 test("Meta adapter classifies network failures as retryable", async () => {
   const api = new MetaApiAdapter({ graphVersion: "v1.0", fetchImpl: async () => { throw new Error("offline"); } });
   await assert.rejects(() => api.createPagePost({ pageId: "page-1", accessToken: "secret", message: "x", mediaIds: ["m"] }), (error) => {

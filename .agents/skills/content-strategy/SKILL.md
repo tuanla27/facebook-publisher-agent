@@ -70,10 +70,11 @@ matching non-education intent.
    - `image_led_photostory` only for atmosphere, a visible moment, or an
      observation-only recap.
    All regular Facebook posts use the **social-editorial treatment** by
-   default: a specific lead, brief context, one or two concrete supplied
-   details, a clear takeaway, and a soft CTA. The narrative mode controls the
-   factual spine; it does not turn the caption into a dry list or a
-   400–700-word website report.
+   default. The narrative mode controls the factual spine. For result recaps
+   with enough sources, also set `writing_register` to `khoa_result_recap`
+   (`config/professional-voice.yml`): Khoa website total-thuật, nén cho
+   Fanpage — not a dry list and not a 400–700-word website dump. Sparse
+   notices stay `official_notice` (time + who + what).
 5. Suggest a `format_hint`:
    - Real Event Photostory
    - People Story
@@ -92,31 +93,36 @@ matching non-education intent.
    - `concept` = core message / theme, including `narrative_mode` in the
      bracket prefix, e.g. `[event_recap | econ_experiences_community | Experience | fact_led_announcement]`;
    - `why_it_matters` = value for the audience and brand;
-   - `practical_takeaway` = one memorable action, insight, person, experience, or opportunity;
+   - `practical_takeaway` = one supplied action, quote, person, or next step —
+     not a definition of what the event “means”;
    - store pillar, attributes, brand tests, format, intent, and narrative_mode
      in those fields and in `angle_excluded` / notes only when the schema
      cannot carry them yet.
 9. Never invent dates, awards, rankings, sponsor lists, admissions numbers,
    job offers, or identities. Put gaps in `needs_verification`. Field
    observations must remain labeled as observations and must not be upgraded to
-   official claims by the writer.
+   official claims by the writer. Search hits from plan/website/Fanpage stay
+   `needs_verification` until the user selects them for this post.
 
 ## Caption angle by intent and narrative mode
 
 - **fact_led_announcement** (default for education, admissions, career, and
-  result/official notices): Editorial lead from the communication job or
-  supplied fact → supplied facts/results → brief context or one concrete
-  sourced detail → one takeaway → specific CTA. Do not open from the photo.
-  Mention the image later or not at all.
+  result/official notices): spine is supplied facts, not the photo. Pair it
+  with a writing register:
+  - `official_notice` — lịch, tọa đàm sắp tới, thông báo mỏng.
+  - `khoa_result_recap` — công bố kết quả / tổng kết cuộc thi / sự kiện đã
+    diễn ra khi đã có ngày, nơi, diễn biến hoặc bảng giải. Học nhịp website
+    Khoa: sapo hành trình → thời–không → chặng thi → kết quả viết thành câu
+    (“gọi tên / giành ngôi / thuộc về”) → không chỉ là cuộc thi + việc đã
+    làm → mời ảnh / hẹn mùa sau.
 - **image_led_photostory** (atmosphere / observation-only recap only):
   Visible moment → supplied context → one or two concrete observations →
   what was practiced or felt → takeaway → soft CTA.
 - **education**: Hook → Explanation → Example/distinction → Takeaway → Gentle CTA.
-- **event_recap**: use `fact_led_announcement` when announcing results or
-  totals; use `image_led_photostory` only for atmosphere. Write like a short
-  reported story for social media: lead with what matters, add verified
-  context, then return to the people, result, or experience. Keep the main
-  body concise; do not dump a 400–700-word recap.
+- **event_recap**: `fact_led_announcement` + `khoa_result_recap` when announcing
+  results or a completed contest; `image_led_photostory` only for atmosphere.
+  Facebook compresses the Khoa website recap; it does not become a telegram
+  of prize names. Do not dump a 400–700-word website article onto Facebook.
 - **people_story**: Person + role context → quote or defining moment → what readers can learn/meet → soft CTA.
 - **admissions / career**: Clear opportunity → verified facts only → who it is for → next step CTA without fear or false urgency.
 - **community**: Before → Now → What's ahead → Belonging → Soft promise. Write with emotional narrative arc, short paragraphs (1–2 sentences), emoji as anchors, and a warm ending.
@@ -135,6 +141,10 @@ facts). The young-academic voice remains default for regular Facebook posts.
 - Ceremonial congratulate templates with no Learn/Meet/Experience/Discover.
 - Dry result lists with no context, concrete detail, or reader takeaway.
 - Generic philosophical openings that are not grounded in supplied facts.
+- Lecture-style event copy: “Không phải X. Đó là lúc Y.” or three abstract
+  parallel verbs after a colon.
+- Unselected source-search hits. A plan row, website article, or Fanpage
+  excerpt is only usable after the user picks it for this post.
 - Forced trends unrelated to Economics BAV.
 - Aggressive sales copy.
 - Using posed group lineups as cover when an action frame exists.

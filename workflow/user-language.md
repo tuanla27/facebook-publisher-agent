@@ -6,7 +6,7 @@ This is the canonical translation layer between internal workflow states and wha
 
 1. Every message answers two questions: "Chuyện gì vừa xảy ra?" and "Bạn cần làm gì tiếp theo?" If the user needs to do nothing, say exactly that.
 2. Never show: JSON, content hashes, asset IDs, Page IDs, post_job_id, enum state names, file paths, npm/CLI commands, error codes, stack traces, tokens, or the words "schema", "artifact", "manifest", "idempotency".
-3. Allowed vocabulary: bài đăng, bản nháp, phiên bản, ảnh, Fanpage, duyệt, chỉnh sửa, từ chối, đăng bài, link bài đăng, thử lại.
+3. Allowed vocabulary: bài đăng, bản nháp, bản nháp trên Fanpage, phiên bản, ảnh, Fanpage, duyệt trên Facebook, chỉnh sửa, từ chối, đăng bài, link bài đăng, thử lại.
 4. One message = one decision point. Do not stack multiple questions.
 5. When an error is automatic to retry, reassure the user and say the system will retry by itself.
 6. When a technical requirement is new, explain why it matters, show three choices, recommend one without choosing for the user, and wait for an explicit choice.
@@ -69,7 +69,8 @@ acknowledgement is a choice.
 | `BRIEF_READY` | "Mình đang viết các phiên bản caption." | Không cần làm gì. |
 | `DRAFT_GENERATED` | "Đã có bản nháp, đang rà soát nội dung." | Không cần làm gì. |
 | `POLICY_REVIEWED` | "Nội dung đã qua kiểm tra." | Không cần làm gì. |
-| `NEEDS_HUMAN_APPROVAL` | "Bài đã sẵn sàng. Mình đã mở trang duyệt trong trình duyệt, bạn xem ảnh và nội dung rồi bấm nút nhé." | "Mở trang duyệt và bấm một trong ba nút." |
+| `NEEDS_HUMAN_APPROVAL` | "Bài đã sẵn sàng. Khi đủ ảnh, mình tạo bản nháp trên Fanpage; bạn duyệt trên Facebook rồi mới đăng (chưa hiện công khai)." | "Gửi ảnh (nên từ 2 tấm) hoặc xác nhận tạo bản nháp trên Fanpage." |
+| `DRAFT_CREATED` | "Đã tạo bản nháp trên Fanpage, chưa hiện công khai." | "Bạn vào Facebook, xem bài chưa đăng rồi bấm đăng khi ổn." |
 | `APPROVED` | "Cảm ơn bạn! Mình đang đăng bài lên Fanpage." | Không cần làm gì. |
 | `PUBLISHING` | "Đang đăng bài, thường chỉ mất vài giây." | Không cần làm gì. |
 | `PUBLISHED` | "Bài đã được đăng thành công." | Kèm link bài đăng. |
@@ -82,13 +83,15 @@ acknowledgement is a choice.
 | Internal cause | User-facing phrase | Next step |
 |---|---|---|
 | `JOB_NOT_FOUND` | "Mình không tìm thấy bài này nữa." | "Bạn tạo lại yêu cầu giúp mình nhé." |
-| `APPROVAL_REQUIRED` / approval hết hạn | "Bài này chưa được duyệt hoặc lượt duyệt đã quá hạn." | "Bạn xem lại preview và chọn Duyệt nhé." |
-| `APPROVAL_INVALIDATED` / ảnh hoặc caption đổi sau duyệt | "Nội dung vừa thay đổi sau khi duyệt, nên cần duyệt lại cho an toàn." | Hiện lại preview và 3 lựa chọn. |
+| `APPROVAL_REQUIRED` / approval hết hạn | "Bài này chưa được duyệt trên Facebook hoặc bản nháp đã quá hạn." | "Bạn xem lại bản nháp trên Fanpage giúp mình nhé." |
+| `APPROVAL_INVALIDATED` / ảnh hoặc caption đổi sau duyệt | "Nội dung vừa thay đổi so với bản nháp, nên cần tạo lại bản nháp trên Fanpage." | "Xác nhận lại khi bạn sẵn sàng." |
 | `PAGE_NOT_ALLOWED` | "Fanpage này chưa được phép đăng." | "Nhờ người phụ trách kỹ thuật thêm Fanpage vào danh sách cho phép." |
-| `AUTHENTICATION_FAILED` (thiếu token) | "Fanpage chưa được kết nối hoặc kết nối đã hết hạn." | "Nhờ người phụ trách kỹ thuật kết nối lại Fanpage." |
+| `AUTHENTICATION_FAILED` (thiếu token) | "Fanpage chưa được kết nối hoặc kết nối đã hết hạn." | "Mình đã mở trang kết nối Fanpage. Bạn đăng nhập rồi quay lại chat nhé." |
+| `DRIVE_OAUTH_EXPIRED` | "Kết nối Google Drive đã hết hạn." | "Mình đã mở trang đăng nhập Google. Bạn cho phép rồi quay lại chat nhé." |
+| `DRIVE_OAUTH_TRANSIENT` | "Google Drive đang bận hoặc mạng tạm thời không ổn." | "Bạn thử lại giúp mình sau một lát." |
 | `META_TRANSIENT_ERROR` (retry được) | "Facebook đang bận, hệ thống sẽ tự thử lại sau vài phút." | "Bạn không cần làm gì." |
 | `MEDIA_UPLOAD_FAILED` (ảnh lỗi) | "Ảnh không đăng lên được." | "Bạn gửi lại ảnh khác giúp mình nhé." |
-| `MEDIA_QUALITY_TOO_LOW` / ảnh quá nhỏ | "Ảnh hiện tại có độ phân giải thấp nên khi đăng có thể bị mờ." | "Bạn gửi ảnh gốc hoặc ảnh rộng ít nhất khoảng 1080 pixel giúp mình nhé." |
+| `DRAFT_NEEDS_MORE_IMAGES` | "Chưa đủ ảnh để tạo bản nháp trên Fanpage." | "Bạn gửi thêm ảnh gốc giúp mình, nên từ 2 tấm." |
 | `ATTACHMENT_PREVIEW_ONLY` / chỉ có ảnh xem trước | "Mình chỉ nhận được ảnh xem trước nên chưa thể dùng đúng ảnh này để đăng." | "Bạn gửi ảnh gốc bằng nút đính kèm tệp giúp mình nhé." |
 | `ATTACHMENT_ORIGINAL_UNCONFIRMED` / chưa xác nhận ảnh gốc | "Mình chưa xác nhận được đây là ảnh gốc nên chưa thể dùng để đăng." | "Bạn gửi lại ảnh gốc bằng nút đính kèm tệp giúp mình nhé." |
 | `ASSET_SCAN_REQUIRED` | "Ảnh chưa qua kiểm tra an toàn." | "Chờ một chút hoặc gửi lại ảnh." |

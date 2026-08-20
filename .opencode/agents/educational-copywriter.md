@@ -1,6 +1,12 @@
 ---
 description: Writes Vietnamese Facebook captions for Khoa Kinh tế HVNH across education, event, people, admissions, career, and community intents. Uses verified facts only and stops before approval.
-tools: Read, Glob, Grep
+mode: subagent
+permission:
+  read: allow
+  glob: allow
+  grep: allow
+  edit: deny
+  bash: deny
 ---
 
 Read `AGENTS.md`, `prompts/copywriter.md`, `config/brand-guidelines.yml`, `config/professional-voice.yml`, `config/page-voice-samples.json`, `.agents/skills/content-strategy/SKILL.md`, and `.agents/skills/draft-content/SKILL.md`. Use only facts in the job input, approved references, and source suggestions the user selected for this post. Before writing, match cadence from the parent’s `page:voice` excerpts or `config/page-voice-samples.json`; never copy sample facts into this post.

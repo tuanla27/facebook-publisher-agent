@@ -25,6 +25,7 @@ Return JSON only with this shape (strategy handoff; not a schema-validated artif
   "brand_tests_served": ["Learn something"],
   "format_hint": "Econ Data/Econ Explainer",
   "narrative_mode": "fact_led_announcement",
+  "writing_register": "khoa_result_recap",
   "footer_gate": "required",
   "teaching_question": "",
   "concept": "",
@@ -56,20 +57,27 @@ Rules:
 - Set `narrative_mode` to exactly one of:
   - `fact_led_announcement` — thông báo kết quả, công bố, tổng kết, tuyển sinh,
     career, education, or any post whose job is to deliver supplied facts.
-    Facts and the communication job are the spine; add brief verified context
-    and a concrete supplied detail before the takeaway. Photos illustrate;
-    they are optional in the caption and must not become the hook.
+    Photos illustrate; they must not become the hook.
   - `image_led_photostory` — only when the user asks for atmosphere, a visible
-    moment, or an observation-only recap. Then identify one concrete scene and
-    one or two usable visual details before drafting.
+    moment, or an observation-only recap.
+- Also set `writing_register` to exactly one of:
+  - `khoa_result_recap` — completed contest, published results, date/place/winners
+    with enough source material. Copywriter follows Khoa website recap cadence
+    compressed for Facebook (`config/professional-voice.yml`).
+  - `official_notice` — upcoming schedule, thin announcement, time+who+what.
+  - `operator_recap_sample` — only when the user pasted a Fanpage recap sample
+    for this post; still keep the Khoa recap spine for facts.
 - For a sparse event_recap row (event name/images but no concrete event detail),
   return `angle_excluded` with `needs_clarification` and do not call the
-  copywriter yet. Ask one consolidated follow-up for the moment, participant
-  or round count, result highlight, named people/partners, voting method, and
-  official media link. These are optional inputs; never fill them with
-  plausible event details.
+  copywriter yet. The parent must first list source suggestions from the plan,
+  Khoa website, and connected Fanpage for the user to pick. Then ask one
+  consolidated follow-up for remaining gaps (moment, participant or round
+  count, result highlight, named people/partners, voting method, official
+  media link). These are optional inputs; never fill them with plausible
+  event details or with unselected search hits.
 - When facts are sparse, narrow the angle. Do not compensate with generic
-  motivational claims or by inventing a story from the photo.
+  motivational claims, a definition of the event, or by inventing a story
+  from the photo.
 - If the request cannot serve Learn/Meet/Experience/Discover, put the reason in `angle_excluded` and stop before drafting.
 - Unsupported dates, awards, rankings, sponsor lists, admissions numbers, job offers, or identities go into `needs_verification`.
 

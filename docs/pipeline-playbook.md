@@ -138,8 +138,7 @@ Kỹ thuật đóng gói: **một nguồn canonical** (`prompts/`, `workflow/`,
 - Chiến lược nội dung (6 intent × pillar)
 - Phân tích ảnh, brief, caption ≤ 3 variants, footer bắt buộc
 - Policy / brand review
-- Duyệt trên trang local (`npm run review:open`) hoặc tạo draft Meta khi
-  `FB_DRAFT_MODE=true`
+- Tạo draft Meta khi `FB_DRAFT_MODE=true` (mặc định B1, bài chat hoặc Drive); trang duyệt local chỉ khi tắt draft mode
 - Publisher có cổng: chỉ `post_job_id`
 - Xuất bài website kèm (khi job đến từ plan Drive)
 
@@ -229,8 +228,8 @@ Không phải state riêng; không ghi Drive.
 - Duyệt chỉ có hiệu với đúng content hash, asset IDs, Page ID, variant.
 - Trang local ký `approval.json` bằng `APPROVAL_SIGNING_KEY`. Chat không phải
   quyết định duyệt.
-- Khi `FB_DRAFT_MODE=true` và job đến từ Drive plan: bỏ trang local, tạo
-  **draft Meta** (`published=false`); admin Fanpage duyệt trên Business Suite.
+- Khi `FB_DRAFT_MODE=true` (mặc định B1, bài chat hoặc Drive): bỏ trang local, tạo
+  **draft Meta** (`published=false`); admin Fanpage duyệt trên Facebook.
 - Drive reader không gọi Meta và không ghi Sheet.
 
 ---
@@ -269,7 +268,11 @@ Tư vấn kỹ thuật **không** duyệt bài.
 
 ### 6.2 Content approval (cổng trong)
 
-**Luồng thường (chat + ảnh, không draft mode):** materialize hồ sơ →
+**Luồng thường khi `FB_DRAFT_MODE=true` (chat hoặc Drive):** materialize hồ sơ →
+user xác nhận trong chat “chạy bài này” → `npm run meta:publish -- --draft` →
+admin duyệt trên Facebook. Không ghi `approval.json` local. Không mở trang duyệt local.
+
+**Luồng live (`FB_DRAFT_MODE` tắt):** materialize hồ sơ →
 `npm run review:open` → ba nút trên trang:
 
 1. Duyệt và đăng
@@ -278,10 +281,6 @@ Tư vấn kỹ thuật **không** duyệt bài.
 
 Chỉ cú bấm trên trang là quyết định. Server ký rồi publish trong cùng process.
 Agent không gọi `meta:publish` sau đó; chỉ `meta:retry` khi lỗi tạm.
-
-**Luồng Drive + `FB_DRAFT_MODE=true`:** user xác nhận trong chat “chạy bài
-này” → policy review → `npm run meta:publish -- --draft <id>` → admin duyệt
-trên Meta Business Suite. Không ghi `approval.json` local cho đường này.
 
 **Thông báo chính thức (không có nguồn ngoài admin) trên đường Draft:**
 claim đánh `needs_verification` + `attestation_scope: official_program_information`,
@@ -315,8 +314,8 @@ vẫn dừng bất kể đường nào.
 
 1. User: chủ đề + kéo ảnh.
 2. Agent: technical check → intake (chỉ câu chặn) → footer gate → draft.
-3. Materialize review profile.
-4. Mở trang duyệt (trừ khi đang ở đường Drive draft).
+3. Materialize job profile.
+4. Nếu `FB_DRAFT_MODE=true`: xác nhận chat rồi tạo draft Meta. Không mở trang duyệt local.
 5. Báo kết quả tiếng Việt: đã đăng / cần sửa / đã hủy. Không lộ hash, ID,
    lệnh.
 
@@ -401,7 +400,7 @@ Reader từ chối đoán target: thiếu folder, trùng tên, Facebook chặn o
 - OAuth local HTTPS `https://localhost:8787`. Token Page mã hóa trong
   `.local/`. Publisher resolve token theo `page_id` đã duyệt.
 - Allowlist: `META_ALLOWED_PAGE_IDS`.
-- `FB_DRAFT_MODE=true` (mặc định setup B1): bài Drive vào draft Meta, không
+- `FB_DRAFT_MODE=true` (mặc định setup B1): bài chat và bài Drive vào draft Meta, không
   live ngay.
 - Ảnh: tối thiểu 2 cho draft ổn định; chiều rộng cấu hình 1080px (override
   từng bài qua AskQuestion).
@@ -487,6 +486,7 @@ Mỗi lượt chat kết bằng bước tiếp theo.
 | Lệnh | Việc |
 |---|---|
 | `npm run setup` / `setup:env` / `setup:status` | Setup máy |
+| `npm run connections:ensure` | Làm mới phiên Drive/Fanpage; hết hạn thì tự mở trang kết nối |
 | `npm run google:connect` | OAuth Drive + chọn sheet/folder |
 | `npm run google:connect -- --disconnect` | Xóa token local |
 | `npm run drive:list` | List folder (readonly) |
@@ -494,6 +494,8 @@ Mỗi lượt chat kết bằng bước tiếp theo.
 | `npm run drive:intake -- --plan-id <id>` | Tải ảnh, ghi `input.json` |
 | `npm run asset:intake -- <input.json>` | Materialize ảnh |
 | `npm run plan:due` | Dòng đến ngày sự kiện |
+| `npm run page:voice` | Bài Fanpage gần nhất để khớp giọng caption |
+| `npm run source:suggest -- --query "<chủ đề>"` | Gợi ý fact từ kế hoạch + Fanpage; user chọn trước khi viết |
 | `npm run meta:connect` / `meta:disconnect` | Fanpage |
 | `npm run review:open -- <id>` | Trang duyệt (ký + publish) |
 | `npm run meta:publish -- <id>` | Đăng bài đã APPROVED |
@@ -558,7 +560,7 @@ IMAGE → quan sát ≠ claim; materializer mới được hash
 DRAFT → ≤ 3 caption, nguồn hoặc needs_verification
 POLICY → error/warning, không tự sửa rồi duyệt
 APPROVAL
-  → trang local (ký + đăng)  HOẶC  draft Meta nếu FB_DRAFT_MODE + job Drive
+  → draft Meta nếu FB_DRAFT_MODE (chat hoặc Drive); trang local chỉ khi tắt draft mode
 PUBLISH chỉ post_job_id; retry khi lỗi tạm
 REPORT tiếng Việt; không lộ JSON/hash/secret
 ```

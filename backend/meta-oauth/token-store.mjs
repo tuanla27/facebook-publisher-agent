@@ -136,6 +136,17 @@ export async function listPageConnections() {
     .sort((a, b) => String(a.page_name).localeCompare(String(b.page_name), "vi"));
 }
 
+/** Full Page records for local health checks. Caller must not log tokens. */
+export async function listPageCredentials() {
+  const vault = await loadVault();
+  return Object.values(vault.pages).map((page) => ({
+    page_id: page.page_id,
+    page_name: page.page_name,
+    page_access_token: page.page_access_token,
+    graph_api_version: page.graph_api_version
+  }));
+}
+
 /**
  * @deprecated Single-page helper. Returns the only connection, or null if none.
  * Throws if multiple Pages are connected — use loadPageConnection(pageId).

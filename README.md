@@ -38,7 +38,7 @@ The project is intentionally tool-agnostic. Claude Code, Cursor, Codex, and Open
 
 ## Quick Start
 
-The preferred UX is conversational. The user should attach an image and write rough notes in the chat. JSON is an internal workflow artifact, not a user-facing form. The user follows five simple steps: gửi yêu cầu, xác nhận tóm tắt, chờ bản nháp, duyệt trên trang trình duyệt (`npm run review:open`), then receive the published link. See the end-to-end summary below, `workflow/user-language.md`, and `workflow/chat-approval.md`.
+The preferred UX is conversational. The user should attach an image and write rough notes in the chat. JSON is an internal workflow artifact, not a user-facing form. The user follows five simple steps: gửi yêu cầu, xác nhận tóm tắt, chờ bản nháp, tạo bản nháp trên Fanpage (`FB_DRAFT_MODE=true` mặc định), rồi duyệt trên Facebook. Local `review:open` only if draft mode is off. See `workflow/user-language.md` and `workflow/chat-approval.md`.
 
 Example chat input:
 
@@ -79,9 +79,9 @@ Các nguyên tắc quan trọng:
   Người dùng có thể chỉnh riêng cho từng bài nhưng không thể bỏ qua.
 - Nếu ảnh quá nhỏ nhưng vẫn dùng được, chỉ có thể xác nhận ngoại lệ cho riêng bài đó và phải hiển thị cảnh báo.
 - Preview phải được tạo từ đúng phiên bản caption, footer và ảnh sẽ đăng.
-- Quyết định duyệt luôn là cú bấm nút trên **trang duyệt trong trình duyệt** (`npm run review:open`): **Duyệt và đăng**, **Muốn sửa**, hoặc **Hủy bài này**. Hệ thống không suy đoán đồng ý; tin nhắn chat không được tính là quyết định duyệt.
-- Nếu sửa caption, ảnh, Fanpage, CTA hoặc thông tin chính sau review, phải tạo phiên bản mới và duyệt lại.
-- Chỉ sau cú bấm **Duyệt và đăng** trên trang duyệt, publisher mới được phép thực hiện việc đăng bài.
+- Mặc định (`FB_DRAFT_MODE=true`): tạo **bản nháp trên Fanpage** (chưa công khai). Admin duyệt và đăng trên Facebook. Không mở trang duyệt local. Chat không làm bài hiện công khai.
+- Đường live (tắt draft mode): quyết định là cú bấm trên trang duyệt local (`npm run review:open`).
+- Nếu sửa caption, ảnh, Fanpage, CTA hoặc thông tin chính sau khi đã tạo bản nháp, phải tạo phiên bản mới.
 - Pipeline hiện tại đăng caption kèm ảnh được cung cấp; chưa tạo/đăng Reel, video, carousel hay graphic mới.
 
 Người dùng chỉ cần cung cấp ý tưởng, hình ảnh và những thông tin biết chắc. Các chi tiết nội bộ như JSON, mã công việc, hash và token không phải là đầu vào của người dùng. Quy trình chuẩn được mô tả chi tiết tại `workflow/education-facebook-post.md`; hướng dẫn thao tác chat nằm ở `docs/user-guide.md`.
@@ -101,8 +101,8 @@ File mode remains available for API, batch, and automation use:
    - Cursor: invoke `create-facebook-education-post`, then provide text and attachments in chat.
    - Codex: ask the agent to follow `AGENTS.md` and describe the topic with attached images.
    - OpenCode: `/create-facebook-education-post` then provide the topic and attachments.
-5. In conversational mode, the agent opens the local review page in the browser (`npm run review:open`); the owner approves by clicking a button on that page.
-6. After that explicit browser approval, the guarded publisher records the decision and publishes using only the internal job ID. The user receives the result in plain Vietnamese.
+5. In conversational mode with `FB_DRAFT_MODE=true`, the agent creates a Meta unpublished draft after chat confirmation; the owner reviews it on Facebook. Open `npm run review:open` only when draft mode is off.
+6. The guarded publisher uses only the internal job ID. The user receives the result in plain Vietnamese.
 
 The AI adapters in this repository generate and validate artifacts. They do not contain Facebook credentials and cannot bypass the approval gate. Connect the MCP publisher only after implementing the server-side checks in `mcp/contracts/publisher-contract.md`.
 
