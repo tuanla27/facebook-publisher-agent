@@ -8,6 +8,7 @@ Required reads before drafting:
 - `.agents/skills/content-strategy/SKILL.md`
 - `.agents/skills/draft-content/SKILL.md`
 - `config/education-policy.yml`
+- `config/professional-voice.yml` (khoa_result_recap for completed contests)
 - `config/program-promotion-footer.yml`
 - the job brief and image analysis
 - content-strategy output when available
@@ -22,6 +23,14 @@ claim that needs a source reference or `needs_verification`. It may be marked
 `institutional_attested` only when a backend-verified admin attestation covers
 the `official_program_information` scope.
 
+The parent agent must pass recent Fanpage excerpts from `npm run page:voice`
+(or `config/page-voice-samples.json`). Match that cadence. Do not copy sample
+facts into this post. Do not write lecture-style event copy
+(“Không phải X. Đó là lúc Y.”; three abstract verbs after a colon;
+defining the ceremony instead of reporting the supplied moment).
+Use only user-supplied facts and source suggestions the user selected for
+this post. Ignore other search hits.
+
 For every variant:
 
 - serve at least one of Learn / Meet / Experience / Discover an opportunity;
@@ -30,22 +39,29 @@ For every variant:
 - follow the content intent (education, event_recap, people_story, admissions, career, community);
 - follow the selected `narrative_mode` from content strategy. Image-led is not
   the default.
-- use the short **social-editorial treatment** for regular Facebook variants:
-  a specific lead, brief context, one or two supplied concrete details, one
-  takeaway, and a soft CTA. Do not copy a website article's headings,
-  metadata, or length.
-  - `fact_led_announcement`: editorial lead from the communication job →
-    supplied facts or results → brief context or one sourced concrete detail →
-    takeaway → locked narrator → specific CTA.
-    Do not open from the photo. Mention the image later, once, or not at all.
-    Result notices must read as a concise reported social story, not a dry
-    result list or a photo-led photostory.
+- use the short **social-editorial treatment** for regular Facebook variants.
+  Two registers: sparse input → short notice (time + who + what). Selected
+  recap sources → campus mini-feature matching any operator sample. A pasted
+  Fanpage recap with `[ RECAP ]` and emoji beats is the house style for that
+  job: match cadence; keep sourced facts; do not copy unsourced crowd/emotion.
+  Do not invent a new conceit (sports desk, “five teams as characters”,
+  chronological night log) when the sample already shows the house style.
+  - `fact_led_announcement`: facts are the spine, not the photo.
+    Pair with `khoa_result_recap` for completed contests/results (learn Khoa
+    website total-thuật: sapo → thời–không → chặng thi → kết quả viết thành
+    câu “gọi tên/giành ngôi” → ý nghĩa bám việc đã làm → mời ảnh/hẹn mùa sau).
+    Pair with `official_notice` for upcoming schedules. Never write prize
+    names as a telegram. Do not dump website length onto Facebook.
+    Keep source verbs when compressing purpose clauses (`hướng đến việc
+    giúp`, `cọ xát`, `rèn`); never flatten to “đưa sinh viên vào lập kế
+    hoạch, teamwork và phong thái”. Prefer “gọi tên [số] đội xuất sắc nhất”
+    over “gọi Top N đội thi lên sân khấu”.
   - `image_led_photostory`: visible moment → supplied context → one or two
     concrete observations → what was practiced or felt → takeaway → soft CTA.
     Use this only for atmosphere or observation-only recaps.
 - use an intent-appropriate internal structure, and write the final body as natural prose with no labels such as `Hook:` or `Practical takeaway:`;
   - education: Hook → Explanation → Example/distinction → Takeaway → Gentle CTA
-  - event_recap (fact-led): Editorial lead → Results/facts → Context/concrete detail → Takeaway → CTA
+  - event_recap (fact-led): Khoa recap nén — sapo → thời–không → chặng thi → kết quả thành câu → ý nghĩa bám việc đã làm → CTA ảnh/mùa sau
   - event_recap (image-led): Moment hook → Context → Concrete observation → What was practiced/felt → Short takeaway → Soft CTA
   - people_story: Person + context → Quote/moment → Reader value → Soft CTA
   - admissions/career: Opportunity → Verified facts → Who it is for → Clear next step
@@ -54,13 +70,14 @@ For every variant:
 - write with a short reported narrative arc: lead with what matters, add
   context, show a concrete detail, and return to one takeaway;
 - use short paragraphs: 1–2 sentences each, like a letter to one person;
-- use emoji sparingly: 0–2 for an `event_recap`, and none when the sentence is
-  already vivid. Never decorate every paragraph with trophy/fire/sparkle icons
-  or use emoji as a substitute for a concrete detail;
+- use emoji sparingly unless the operator pasted a recap sample with
+  section-leading emoji; then one emoji per beat, still no emoji-as-filler
+  inside sentences;
 - end soft: a warm promise or invitation ("Hẹn gặp bạn", "Welcome"), not always a question;
 - for event photostories prefer concise captions over 400–700 word recaps;
-- keep regular Facebook main bodies around 120–300 words before the required
-  footer unless the supplied facts genuinely require more;
+- keep regular Facebook main bodies around 120–220 words for official notices
+  and 220–400 words for `khoa_result_recap` before the required footer.
+  Do not dump a 400–700-word website article onto Facebook;
 - define technical terms briefly;
 - include exactly one practical takeaway (insight, person, experience, or opportunity) in `practical_takeaway` and naturally in the body;
 - prefer a supplied result, learning moment, skill formed, person, or opportunity over generic congratulations;
@@ -74,6 +91,8 @@ For every variant:
   in the caption spine.
 - do not use generic “hành trình”, “khát vọng”, or “đam mê” language as a
   substitute for context; connect any such phrase to a supplied fact.
+  In `khoa_result_recap`, those words may appear only when tied to named
+  rounds, skills, or results already in the selected source;
 - keep verification limits in claims/policy metadata unless the limitation is the teaching point;
 - use the image only for observations, not proof of product effects, quality, rankings, outcomes, or identities;
 - put unsupported facts in `claims[].support_status: needs_verification` with a verification note;

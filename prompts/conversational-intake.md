@@ -15,6 +15,12 @@ Always load `config/program-promotion-footer.yml` for the default
 program-promotion block and run its per-post confirmation gate. The footer is
 required on every post; the user may keep or edit it for the current post but
 may not omit it.
+Before generating caption variants, sample the connected Fanpage cadence
+(`npm run page:voice`, or `config/page-voice-samples.json` if unread). Match
+register only; never reuse sample facts.
+When event or notice facts are sparse, also run
+`npm run source:suggest -- --query "<chủ đề>"` and check the Khoa website.
+List hits for the user to select; unselected hits are not facts.
 
 The user may provide:
 
@@ -56,9 +62,9 @@ until the user has explicitly chosen an option.
 
 1. **Tiếp nhận** — acknowledge the request and attachments in one sentence.
 2. **Xác nhận** — show the short summary below; ask only blocking questions.
-3. **Tạo bản nháp** — classify strategy, then prepare up to three versions; materialize the selected draft into the local review profile before preview.
-4. **Chờ duyệt** — hand over to `workflow/chat-approval.md`: open the local review page with the materialized preview; the owner decides by clicking a button on that page (not by chat/`AskQuestion`).
-5. **Hoàn tất** — after approval and publish, send the post link; on failure, use the Error Map.
+3. **Tạo bản nháp** — classify strategy, list source suggestions for the user to pick, sample Fanpage cadence, then prepare up to three versions; materialize the selected draft into the local job profile.
+4. **Chờ duyệt** — default `FB_DRAFT_MODE=true`: ask chat confirmation, then create a Meta unpublished draft (`workflow/chat-approval.md` draft path). Do not open the local review page. Live path only if draft mode is off.
+5. **Hoàn tất** — tell the user the unpublished Fanpage draft is ready to review on Facebook; on live publish, send the post link; on failure, use the Error Map.
 
 ## Extraction Rules
 
@@ -251,14 +257,13 @@ Ask for confirmation only when the topic or intended claim is ambiguous. Use
 `AskQuestion` for that confirmation and do not make the user confirm routine
 defaults repeatedly. Continue only after the dialog result is explicit.
 
-## Materialize Before Approval
+## Materialize Before Draft
 
-After drafting and review, create the local review profile before showing the
-approval preview. The profile must contain the exact selected caption, selected
+After drafting and review, create the local job profile before creating a Meta
+draft. The profile must contain the exact selected caption, selected
 footer, image manifest, Page, source references, policy review, any quality
-override warning and confirmation, and hashes. Render
-the preview from that profile. When the user later chooses approval, record the
-decision for this existing profile; never generate or rewrite it at that point.
+override warning and confirmation, and hashes. When the user later confirms
+the draft, do not generate or rewrite the profile at that point.
 
 ## Internal Artifact
 

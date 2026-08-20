@@ -36,9 +36,9 @@ The conversation follows the five-step script in `prompts/conversational-intake.
 ```text
 1. Tiếp nhận   -> acknowledge request and attachments
 2. Xác nhận    -> short summary, blocking questions only
-3. Tạo bản nháp -> content strategy, planner, writer, policy reviewer, then materialize review profile
-4. Chờ duyệt   -> preview from the materialized profile + local review page button click (workflow/chat-approval.md)
-5. Hoàn tất    -> post link on success, Error Map on failure
+3. Tạo bản nháp -> content strategy, source suggestions + user pick, page-voice sample, planner, writer, policy reviewer, then materialize job profile
+4. Chờ duyệt   -> FB_DRAFT_MODE=true: chat confirm then Meta unpublished draft (no local review page). Draft mode off: local review page.
+5. Hoàn tất    -> unpublished Fanpage draft to review on Facebook, or post link on live success
 ```
 
 If the outer gate opens, pause before creating the job or starting setup. Show
@@ -61,10 +61,10 @@ dialog and use `Other` for free-form input. Do not replace an available dialog
 with a numbered text prompt. If structured questions are unavailable, use the
 adapter's native equivalent or require an explicit short text answer.
 
-The approval preview must be rendered from the materialized local review
-profile, not directly from transient chat text. After the user approves, record
-the decision for that profile and pass only its job reference to the guarded
-publisher.
+The job profile must be materialized before creating a Meta draft. After the
+user confirms the draft, pass only the job reference to
+`npm run meta:publish -- --draft`. Do not open a local review page when
+`FB_DRAFT_MODE=true`. Open that page only on the live path.
 
 ## Do Not Ask the User For
 
@@ -113,8 +113,8 @@ reports its result.
 External UX:
 
 ```text
-short chat messages, image previews, one clarification dialog, draft preview,
-local review page decision, post link or plain-language error with next step
+short chat messages, image previews, one clarification dialog, Fanpage draft
+for review on Facebook (default), post link or plain-language error with next step
 ```
 
 Internal workflow:

@@ -5,6 +5,7 @@ Tài liệu này giới thiệu **toàn bộ pipeline**: mục đích, kiến tr
 | Đối tượng | Nên đọc thêm |
 |-----------|--------------|
 | Người dùng cuối (chat) | `docs/user-guide.md` |
+| Sơ đồ luồng (HTML mở trình duyệt; Markdown cho OpenCode) | `docs/pipeline-diagram.html`, `docs/pipeline-diagram.md` |
 | Người setup kỹ thuật | `docs/technical-setup.md` |
 | Cấu hình Meta có hình | `docs/meta-setup/README.md` |
 | Chất lượng ảnh | `docs/image-quality.md` |
@@ -297,16 +298,9 @@ Chi tiết Meta: `backend/meta-oauth/README.md`, `docs/meta-setup/README.md`, `d
 1. Command: `/create-facebook-education-post` (hoặc tương đương Cursor/Codex).
 2. Viết chủ đề thô + kéo ảnh.
 3. Agent hỏi **chỉ** câu hỏi chặn (blocking), tóm tắt lại bằng tiếng Việt dễ hiểu.
-4. Sinh bản nháp → materialize hồ sơ review → mở **trang duyệt trong trình duyệt** (`npm run review:open`) hiển thị ảnh đúng + caption + tên Fanpage.
-5. User bấm trên trang:
-
-   ```text
-   Duyệt và đăng
-   Yêu cầu sửa
-   Hủy bài này
-   ```
-
-6. Chỉ khi bấm **Duyệt và đăng** trên trang (approval có chữ ký), publisher mới đăng; user nhận link bài.
+4. Sinh bản nháp → materialize hồ sơ → nếu `FB_DRAFT_MODE=true` (mặc định): xác nhận trong chat rồi tạo bản nháp trên Fanpage (chưa public). Không mở trang duyệt local.
+5. User duyệt bài chưa đăng trên Facebook rồi bấm đăng.
+6. User nhận hướng dẫn tìm bài chưa đăng, hoặc link bài nếu đã public.
 
 Quyết định duyệt luôn là cú bấm nút trong trình duyệt — không phải câu chat.
 Không yêu cầu user gõ Page ID, hash, hay JSON.
@@ -380,9 +374,11 @@ Policy: `config/education-policy.yml`. Brand: `config/brand-guidelines.yml`. Ima
 | Script | Việc |
 |--------|------|
 | `npm run meta:oauth` | Chạy HTTPS OAuth connector |
+| `npm run connections:ensure` | Làm mới phiên Drive/Fanpage; hết hạn thì tự mở trang kết nối |
 | `npm run meta:connect` | Mở connector + browser (một bước) |
-| `npm run meta:publish -- <job_id>` | Đăng bài đã APPROVED (có chữ ký hợp lệ) |
-| `npm run review:open -- <job_id>` | Mở trang duyệt trong trình duyệt (quyết định duyệt) |
+| `npm run meta:publish -- --draft <job_id>` | Tạo bản nháp Fanpage (mặc định B1) |
+| `npm run meta:publish -- <job_id>` | Đăng bài đã APPROVED (chỉ khi tắt draft mode) |
+| `npm run review:open -- <job_id>` | Trang duyệt local (chỉ khi `FB_DRAFT_MODE` tắt) |
 | `npm run review:status -- <job_id>` | Đọc quyết định duyệt để báo trong chat |
 | `npm run meta:retry -- <job_id>` | Retry publish tạm thời |
 | `npm run hash:post -- <generated-post.json>` | Tính content + asset hash |

@@ -21,25 +21,41 @@ regular Facebook posts as **short social-editorial stories**: young, clear,
 reported, and easy to scan. This is a writing treatment, not a new schema
 enum; the selected `narrative_mode` still controls the factual spine.
 
-Use this compact arc:
+Two registers. Do not mix them up.
 
-1. **Lead** — begin with the news, result, question, person, or visible moment
+1. **Sparse** (`official_notice`): short notice only — time + who + what.
+2. **Enough facts for a completed contest/result** (`khoa_result_recap`):
+   follow Khoa website total-thuật compressed for Facebook
+   (`config/professional-voice.yml#khoa_result_recap`). If the operator also
+   pastes a Fanpage recap sample, keep its packaging (kicker, emoji beats)
+   on that same spine. Do not offer three isomorphic “approaches”.
+
+Never write prize telegrams (`Quán quân: X. Á quân: Y.`). Results are
+sentences: “Danh hiệu Quán quân gọi tên …; vị trí Á quân thuộc về …”
+When compressing a Khoa website purpose clause, keep its verbs
+(`hướng đến việc giúp`, `cọ xát`, `rèn`). Do not flatten into
+“đưa sinh viên vào lập kế hoạch, teamwork và phong thái”.
+
+As a default, keep official notices around 120–220 words and result recaps
+around 220–400 words before the required footer.
+
+Use this compact arc only as a checklist after the draft exists, not as the
+outline the reader should feel:
+
+1. **Lead** — the news, result, question, person, or visible moment
    that matters. Avoid generic congratulations and photo-only hooks for
    fact-led posts.
-2. **Context** — explain in one or two sentences what the activity is and why
-   it matters to this community.
-3. **Concrete detail** — include one or two supplied facts about the task,
-   decision, participant, learning moment, or result. Never manufacture
-   dialogue, emotion, process, or impact.
-4. **Takeaway** — return to one useful insight, experience, person, or
-   opportunity that follows from the supplied material.
-5. **CTA** — close with a specific, warm invitation or next step.
+2. **Context** — one or two sentences of supplied setting.
+3. **Concrete detail** — supplied task, decision, participant, or result.
+   Never manufacture dialogue, emotion, process, or impact.
+4. **Takeaway** — one useful insight that follows from those facts.
+5. **CTA** — a specific, warm invitation or next step.
 
 Use natural editorial transitions such as “phía sau kết quả ấy”, “trên hành
 trình này”, or “khi…” only when the following sentence contains a real supplied
 detail. Do not imitate a newspaper article's metadata, section headings, or
-administrative length. As a default, keep the main Facebook body around
-120–300 words before the required footer.
+administrative length. Official notices: about 120–220 words before the
+footer. Result recaps: about 220–400 words. Never dump a website article.
 
 ## Narrative modes
 
@@ -47,18 +63,33 @@ Choose the mode from content strategy. Image-led is one mode, not the default.
 
 ### fact_led_announcement
 
-Build the caption from supplied material in this order:
+Spine = supplied facts, not the photo. Choose a register:
 
-1. an editorial lead for the communication job (announce a result, publish a
-   notice, explain a fact);
-2. supplied facts from the plan row, user notes, or an approved source;
-3. brief supplied context plus one concrete sourced highlight when available;
-4. one takeaway that follows from those facts, then a specific CTA.
+**`official_notice`** (lịch / thông báo mỏng): thời điểm + ai + việc gì.
+Two or three short paragraphs. Do not inflate.
 
-Do not open from the photo. Mention the image later, once, or not at all.
-Photos illustrate; they do not supply the hook, the takeaway, or missing
-event process. Keep one narrator — for official Fanpage notices, the voice of
-Khoa Kinh tế – HVNH — for the whole caption.
+**`khoa_result_recap`** (công bố kết quả, tổng kết cuộc thi, sự kiện đã diễn
+ra, đội thắng). Learn cadence from Khoa website recaps in
+`config/professional-voice.yml#khoa_result_recap` (EC, PMC, I-impACT).
+Compress for Facebook (about 220–400 words before footer):
+
+1. Sapo — mùa thi / đêm chung kết và không khí **có trong nguồn**.
+2. Thời–không — “Tối/Sáng ngày …, tại [nơi], [sự việc] …” thành câu đầy đủ.
+3. Việc đã diễn ra — vòng thi, chặng, kỹ năng đã nêu trong nguồn, viết thành
+   đoạn chứ không thành gạch đầu dòng.
+4. Kết quả — “Danh hiệu Quán quân gọi tên …; vị trí Á quân thuộc về …” hoặc
+   “đội … đã xuất sắc giành ngôi vị … với [chi tiết có nguồn]”. Never
+   `Quán quân: X. Á quân: Y.`
+5. Một nhịp ý nghĩa — “Không chỉ là một cuộc thi” chỉ khi câu sau là việc
+   thí sinh đã làm (có nguồn). Then invite photos / next season.
+
+Do not open from the photo. Mention images at the close (“Hãy cùng nhìn lại
+những hình ảnh…”) or not at all. Keep one narrator: Khoa Kinh tế – HVNH.
+
+Khoa recap house phrases are allowed when the next sentence is sourced:
+“không chỉ là một cuộc thi”, “danh hiệu … gọi tên”, “hành trình” tied to
+named rounds. Still reject “Không phải X. Đó là lúc Y.” and unsourced crowd
+heat (“hàng trăm trái tim”, “nổ tung”) unless a selected source states them.
 
 ### image_led_photostory
 
@@ -101,6 +132,45 @@ Remember:
 - Academic ≠ dry  
 - Professional ≠ ceremonial  
 
+### Match the live Fanpage before drafting
+
+Do not invent a house style from brand adjectives alone. Before writing
+variants, the parent agent must run `npm run page:voice` and hand the
+excerpts to the copywriter. The copywriter also reads
+`config/page-voice-samples.json`.
+
+- Match **cadence**: how Khoa opens (thời điểm + ai + việc gì), sentence
+  length, and how names/roles appear.
+- Do **not** copy dates, names, quotes, or outcomes from the samples into
+  the current post. Samples are register only.
+- If live posts are unavailable, use the fallback excerpts in that config
+  file. Same rule: cadence only, never those facts.
+
+Notices and thin recaps may open like a short report:
+
+```text
+Chiều ngày 16/8/2026, Khoa Kinh tế – Học viện Ngân hàng đã tổ chức buổi
+chia sẻ chuyên đề với sự tham gia của ông [tên] – [vai trò].
+```
+
+A recap with enough selected facts must **not** default to that report frame.
+Write the mini-feature instead. Not a thesis about what the event “means.”
+
+Reject and rewrite if the draft contains:
+
+- “Không phải X. Đó là lúc Y.” unless the operator’s pasted recap sample
+  uses that device **and** the next sentence is a sourced fact;
+- a colon followed by three abstract parallel verbs
+  (kết nối / giữ nhịp / mở trải nghiệm) with no supplied fact;
+- “nghi lễ cho đủ”, “trả lại công việc đã cầm”, “phần việc ấy”;
+- a definition of the ritual instead of the supplied moment;
+- unsourced recap heat copied from a sample: crowd size, “nổ tung”,
+  “nhiều tháng chuẩn bị”, inner feelings, “tình bạn đẹp”.
+
+A takeaway is one concrete supplied detail or quote, not a moral of the story.
+Only facts the user supplied or selected from source suggestions may appear.
+Unselected search hits must be omitted.
+
 ## Emotional storytelling
 
 Write with a narrative arc, not a template. Move the reader from one
@@ -114,10 +184,10 @@ to excitement, from "chưa biết" to "đã bắt đầu".
   takeaway. The caption should feel like a reported social story, not a
   result spreadsheet or a generic motivational paragraph.
 - Each paragraph: 1–2 sentences. Short, scannable, like a letter.
-- Emoji are optional, not a brand requirement. For `event_recap`, use 0–2 only
-  when they add a genuine visual or celebratory beat; never place one on every
-  paragraph or use a string of trophy/fire/sparkle icons. A clean editorial
-  caption with no emoji is preferred to decorative AI-looking punctuation.
+- Emoji are optional, not a brand requirement. Notices: 0–2. Operator-pasted
+  **recap samples** may use one section-leading emoji per paragraph beat
+  (🔥💡🏆💫✨). Never invent heat to justify those emoji. Never place a
+  string of trophy/fire/sparkle icons inside a sentence.
 - End soft: a warm promise or invitation, not always a question.
   "Hẹn gặp bạn" > "Bạn muốn thử gì?"
 - Speak to "bạn" directly, like writing a letter to one person.
@@ -173,6 +243,9 @@ to excitement, from "chưa biết" to "đã bắt đầu".
 - Dry lists of results or activities with no context or concrete detail.
 - Generic “hành trình/khát vọng/đam mê” language unless it is tied to supplied
   facts.
+- Lecture-style event copy: “Không phải X. Đó là lúc Y.”, three parallel
+  abstractions after a colon, or a definition of the ceremony with no supplied
+  name, date, or quote.
 - Forced trends unrelated to Economics BAV.
 - Fear, false urgency, absolute superlatives, sales pressure.
 - Invented stats, dates, awards, sponsor claims, job offers, or identities not

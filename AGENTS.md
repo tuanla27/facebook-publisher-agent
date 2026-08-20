@@ -33,7 +33,7 @@ The default product is a lightweight workflow/hybrid running directly in Claude 
 12. For official institutional notices, a source requirement may be replaced by either a backend-verified per-post attestation from an allowlisted faculty, staff, or admin actor, or a separately issued reviewer-attestation code. The reviewer code must be bound to the exact post, version, selected variant, Page, reviewer, and claim scopes; claims outside the granted scope still require sources.
 13. The POC admin key is stored only as a hash (`ADMIN_KEY_HASH`), entered via dialog or the bootstrap script, and never pasted into chat. Phase 2 will add expiry, atomic consumption, and SSO. A reviewer-attestation code grants scoped responsibility to confirm review; it does not prove the facts by itself. Never accept the admin key as an approval code.
 14. When a request introduces a technical requirement outside the lightweight core, stop at the technical consultation gate. Explain the tradeoffs, offer choices, and wait for the user's explicit choice before changing architecture, dependencies, permissions, or services.
-15. In the local single-owner setup, an approval is recorded only by the local review server (`npm run review:open`), which signs `approval.json`. The agent must never write or edit `approval.json` by hand, and a chat message is never an approval decision — the decision is a button click on the local review page. The publisher rejects any approval without a valid signature from `APPROVAL_SIGNING_KEY`.
+15. Default B1 (`FB_DRAFT_MODE=true`): skip the local review page for chat and Drive jobs. After explicit chat confirmation, create a Meta unpublished draft (`npm run meta:publish -- --draft <post_job_id>`). The Page admin’s publish click on Facebook is the final decision. Chat cannot make a post public. The agent never writes `approval.json`. Open `npm run review:open` only when `FB_DRAFT_MODE` is unset; that live path still requires a signed `approval.json`.
 
 ## Required Workflow
 
@@ -54,15 +54,17 @@ TECHNICAL_REQUIREMENT_CHECK
   -> PUBLISHED | FAILED
 ```
 
-The agent may move a job forward through `POLICY_REVIEWED`, but it must stop at `NEEDS_HUMAN_APPROVAL`. Only an authenticated reviewer or backend approval endpoint can create `APPROVED`.
+The agent may move a job forward through `POLICY_REVIEWED`, but it must stop at `NEEDS_HUMAN_APPROVAL`. A chat message is never a public-publish decision.
 
-In the local single-owner setup, the `APPROVED -> PUBLISHING` transition is
-triggered server-side by the local review server inside the same Node process
-that recorded the approval. The agent must not call
-`publish_approved_post(post_job_id)` itself after the review page returns
-APPROVED; publishing has already happened (or has been scheduled as a retry).
-The agent only calls `npm run meta:retry -- <post_job_id>` when a transient
-Meta error is reported by the review page.
+When `FB_DRAFT_MODE=true`, the next step is a Meta unpublished draft after
+chat confirmation and enough images (typically at least two). Do not open the
+local review page. The Page admin reviews and publishes on Facebook.
+
+When `FB_DRAFT_MODE` is unset, `APPROVED -> PUBLISHING` is triggered
+server-side by the local review server after a button click on
+`npm run review:open`. The agent must not call
+`publish_approved_post(post_job_id)` itself after that page returns APPROVED.
+Use `npm run meta:retry -- <post_job_id>` only for a transient Meta error.
 
 Host attachments are normalized by the host adapter only. The Node.js asset
 materializer owns reading original local files or bytes, MIME and size checks,
@@ -72,19 +74,15 @@ that a preview is publishable. If the host exposes only an inline preview or an
 unconfirmed source, stop and ask for the original through the host's file
 control.
 
-Before showing the human-approval preview, materialize the chat draft into the
-existing local review artifacts. The materialized profile must contain the
-exact selected caption variant, selected footer, image manifest, Page, source
-references, policy review, and computed hashes. The preview, approval record,
-and publisher must all read that same profile. When the user selects approval,
-record approval for the existing profile; do not create or rewrite content at
-that point. If a quality override exists, include its reason, confirmation
-timestamp, and visible warning in the same profile; changing it invalidates
-approval. If institutional attestation is used, include only the covered claim
-scopes, verified role, exact confirmation, and audit timestamp; changing it
-also invalidates approval. If reviewer attestation is used, include its
-consumed code reference, reviewer, scopes, exact confirmation, and timestamp
-in the approval record; changing it invalidates approval.
+Before creating a Meta draft (or opening the live-path review page),
+materialize the chat draft into the existing local job artifacts. The
+profile must contain the exact selected caption variant, selected footer,
+image manifest, Page, source references, policy review, and computed hashes.
+The Meta draft and any live-path approval must read that same profile. Do
+not rewrite content at the confirmation click. If a quality override exists,
+include its reason, confirmation timestamp, and visible warning in the same
+profile; changing it invalidates the draft. If institutional or reviewer
+attestation is used on the live path, changing it also invalidates approval.
 
 For event recaps, a planning row marked “sẵn sàng” is not proof that the row
 contains enough story material. If it has only an event name, images, or a
@@ -104,11 +102,10 @@ it cannot install dependencies, edit files, handle credentials, approve
 content, or publish. A technical choice never substitutes for human content
 approval.
 
-In the local single-owner setup, the human's approval decision is a button
-click on the local review page opened by `npm run review:open`. The agent
-records nothing itself; it reports the page's signed decision verbatim. It
-never infers, chooses, or writes approval. Recording and publishing happen only
-via that signed decision.
+When `FB_DRAFT_MODE=true`, tell the user to review the unpublished Fanpage
+draft on Facebook. Do not mention or open a local review page. When draft
+mode is off, the live-path decision is a button click on `npm run review:open`.
+The agent never infers, chooses, or writes `approval.json`.
 
 When the user must confirm, choose, or provide missing information, use the
 `AskQuestion` dialog when the adapter exposes it. Keep one decision point per
@@ -120,6 +117,11 @@ silence or a general acknowledgement is not.
 ## User Experience
 
 The preferred interface is chat, not JSON editing. Accept rough text, keywords, and dragged-and-dropped images. Normalize them into the internal JSON contract, ask only blocking clarification questions, and show a short natural-language summary before generation. Before starting setup or implementation, run `workflow/technical-requirement-gate.md` whenever the request adds infrastructure, access, scale, data, provider, channel, or approval-boundary requirements. Never ask a normal user to manually provide IDs, hashes, states, or a formatted JSON job unless the chat client cannot support attachments or the user explicitly requests file mode.
+
+Before caption drafts, sample the connected Fanpage cadence so copy matches
+recent Khoa posts rather than a lecture about what the event means. When
+facts are sparse, list source suggestions for the user to pick; do not write
+unselected hits.
 
 ## Brand Quality Standard
 
@@ -136,7 +138,9 @@ concrete supplied detail -> practical takeaway -> soft CTA.
 
 ```text
 education: Hook -> Explanation -> Example or distinction -> Practical takeaway -> Gentle CTA
-fact_led_announcement: Editorial lead -> Facts/results -> Context/concrete detail -> Takeaway -> Specific CTA
+fact_led_announcement + khoa_result_recap: Sapo hành trình -> Thời–không -> Chặng thi -> Kết quả viết thành câu -> Việc đã làm -> Mời ảnh / hẹn mùa sau
+  (nén website Khoa: giữ động từ nguồn; không “đưa sinh viên vào …”; “gọi tên N đội xuất sắc nhất” chứ không “gọi Top N lên sân khấu”)
+fact_led_announcement + official_notice: Thời điểm + ai + việc gì -> Chi tiết đã xác minh -> Bước tiếp theo
 image_led_photostory: Moment hook -> Context -> Concrete observation -> What was practiced/felt -> Short takeaway -> Soft CTA
 people_story: Person + context -> Quote/moment -> Reader value -> Soft CTA
 admissions/career: Opportunity -> Verified facts -> Who it is for -> Clear next step
@@ -164,10 +168,10 @@ Before handing off for review, confirm:
 - every factual claim has a source reference or is marked `needs_verification`;
 - the body matches the image and supplied topic;
 - the policy review has no blocking errors, or only source-verification
-  blocking errors when the post will be published as a Meta draft
-  (`FB_DRAFT_MODE=true` and job from a Google Drive plan); in that draft
-  path, the Page admin's review on Meta Business Suite is the final
-  attestation and the agent may proceed after explicit chat confirmation;
+  blocking errors when the post will be a Meta unpublished draft
+  (`FB_DRAFT_MODE=true`, chat or Drive job); in that draft path, the Page
+  admin's review on Facebook is the final attestation and the agent may
+  proceed after explicit chat confirmation;
 - the selected Page is in the configured allowlist;
 - any quality override is explicitly confirmed for this post and shown as a warning;
 - any institutional attestation is backend-verified, scoped, and shown in review metadata;
@@ -181,18 +185,36 @@ Before handing off for review, confirm:
   per-post `AskQuestion` gate for every post. The footer is always appended
   after the main body and before hashtags; the user may edit it for the current
   post but may not omit it. Never mutate the global default.
-- Materialize the selected chat draft into the existing review artifacts before
-  opening the human-approval review page; do not wait until the approval click.
-- For local single-owner approval, open the review page with `npm run review:open`
-  and report the signed decision returned by that page.
+- Materialize the selected chat draft into local job artifacts before creating
+  a Meta draft (or, only if `FB_DRAFT_MODE` is unset, before opening the local
+  review page).
+- When `FB_DRAFT_MODE=true`, create the unpublished Fanpage draft with
+  `npm run meta:publish -- --draft <post_job_id>` after chat confirmation.
+  Do not run `npm run review:open`. When draft mode is off, open the local
+  review page and report its signed decision.
+- Before any Google Drive or Fanpage step, run `npm run connections:ensure`.
+  If a session is expired, that command opens the connect page; do not only
+  report that the session expired. Drive plan and photos go through the
+  faculty Google OAuth app (`npm run google:connect` / local Drive reader),
+  not Cursor’s Google Drive MCP plugin. Do not call `mcp_auth` on
+  `plugin-google-drive`. If a Cursor Google Drive MCP server shows
+  `needsAuth`, ignore it for this pipeline.
 - Read `.agents/skills/draft-content/SKILL.md` for Khoa Kinh tế HVNH caption voice and hashtag rules.
+- Before drafting captions, run `npm run page:voice` and match the live Fanpage
+  cadence (or `config/page-voice-samples.json` if the feed is unread). Do not
+  copy facts from those samples.
+- When facts are sparse, run `npm run source:suggest -- --query "<chủ đề>"`
+  and list hits for the user to pick before writing. Unselected hits are not
+  caption facts.
 - Read the relevant skill under `.agents/skills/facebook-education-post/` when the task is content creation.
 - Read `workflow/technical-requirement-gate.md` and use the technical advisor when a new technical requirement is detected.
 - Use `backend/assets/attachment-adapter.mjs` for host envelopes and
   `backend/assets/attachment-materializer.mjs` for deterministic local
   materialization. Never persist host references or signed URLs.
 - Use MCP tools only for their declared purpose in `mcp/contracts/`.
-- The only allowed publish operation is `publish_approved_post(post_job_id)`.
+- The live publisher is only `publish_approved_post(post_job_id)` after a
+  signed local approval. The draft publisher is `createDraftPost` via
+  `npm run meta:publish -- --draft <post_job_id>` when `FB_DRAFT_MODE=true`.
 
 ## Failure Handling
 

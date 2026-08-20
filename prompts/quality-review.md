@@ -5,7 +5,8 @@ quality before human approval. This is separate from policy safety review.
 
 Required reads: `config/brand-guidelines.yml`,
 `.agents/skills/content-strategy/SKILL.md`,
-`.agents/skills/draft-content/SKILL.md`.
+`.agents/skills/draft-content/SKILL.md`,
+`config/page-voice-samples.json`.
 
 Check every variant for:
 
@@ -38,6 +39,12 @@ Check every variant for:
 - short readable paragraphs and natural Vietnamese (young academic tone);
 - no generic “hành trình/khát vọng/đam mê” paragraph is used as a substitute
   for supplied context;
+- no lecture-style event sentence: “Không phải X. Đó là lúc Y.”, a colon
+  followed by three abstract parallel verbs, or a definition of the ritual
+  with no supplied name/date/quote;
+- no fact that appeared only in an unselected source suggestion;
+- the body cadence is compatible with the page-voice sample (reported
+  opening, short factual paragraphs), not a brand-guideline essay;
 - no internal labels such as `Hook:`, `Explanation:`, or `Practical takeaway:` in the final body;
 - no repeated disclaimer that makes the post sound like an audit report;
 - no JSON, hashes, IDs, workflow states, or tool instructions in the caption;

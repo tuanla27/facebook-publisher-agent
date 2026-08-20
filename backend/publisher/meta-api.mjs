@@ -32,13 +32,7 @@ export class MetaApiAdapter {
     return `${this.baseUrl}/${this.graphVersion}/${String(path).replace(/^\//, "")}`;
   }
 
-  async request(operation, path, form) {
-    let response;
-    try {
-      response = await this.fetchImpl(this.url(path), { method: "POST", body: form });
-    } catch {
-      throw new MetaApiError("Meta API network request failed", { operation, retryable: true });
-    }
+  async parseResponse(operation, response) {
     let data;
     try {
       data = await response.json();
@@ -59,6 +53,33 @@ export class MetaApiAdapter {
       );
     }
     return data;
+  }
+
+  async request(operation, path, form) {
+    let response;
+    try {
+      response = await this.fetchImpl(this.url(path), { method: "POST", body: form });
+    } catch {
+      throw new MetaApiError("Meta API network request failed", { operation, retryable: true });
+    }
+    return this.parseResponse(operation, response);
+  }
+
+  async getJson(operation, path, params = {}) {
+    const search = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value == null || value === "") continue;
+      search.set(key, String(value));
+    }
+    const query = search.toString();
+    const url = query ? `${this.url(path)}?${query}` : this.url(path);
+    let response;
+    try {
+      response = await this.fetchImpl(url);
+    } catch {
+      throw new MetaApiError("Meta API network request failed", { operation, retryable: true });
+    }
+    return this.parseResponse(operation, response);
   }
 
   async uploadImage({ pageId, accessToken, bytes, fileName, mimeType }) {
@@ -95,22 +116,20 @@ export class MetaApiAdapter {
     return this.request("create_page_draft_post", `${pageId}/feed`, form);
   }
 
+  async listPagePosts({ pageId, accessToken, limit = 8 }) {
+    const capped = Math.min(Math.max(Number(limit) || 8, 1), 12);
+    return this.getJson("list_page_posts", `${pageId}/posts`, {
+      fields: "message,created_time",
+      limit: String(capped),
+      access_token: accessToken
+    });
+  }
+
   async isDraftVisible({ postId, accessToken }) {
-    const url = `${this.url(postId)}?fields=is_published&access_token=${encodeURIComponent(accessToken)}`;
-    let response;
-    try {
-      response = await this.fetchImpl(url);
-    } catch {
-      throw new MetaApiError("Meta API network request failed", { operation: "is_draft_visible", retryable: true });
-    }
-    let data;
-    try { data = await response.json(); } catch { data = {}; }
-    if (!response.ok || data.error) {
-      const classification = classifyMetaFailure(response.status, data);
-      throw new MetaApiError(data.error?.message || `Meta API request failed (${response.status})`, {
-        ...classification, status: response.status, operation: "is_draft_visible"
-      });
-    }
+    const data = await this.getJson("is_draft_visible", postId, {
+      fields: "is_published",
+      access_token: accessToken
+    });
     return { exists: Boolean(data.id), is_published: data.is_published === true, raw: data };
   }
 }

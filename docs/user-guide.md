@@ -23,7 +23,7 @@ Fanpage theo tên. Nếu đã có Fanpage được kết nối, có thể bỏ q
 3. Kéo ảnh sẽ đăng vào cuộc trò chuyện. Ưu tiên ảnh đang hành động hơn ảnh xếp hàng. Hệ thống sẽ tự lấy ảnh gốc; bạn không cần chép ảnh vào thư mục hay sửa JSON. Nếu ứng dụng chỉ gửi được ảnh xem trước, hệ thống sẽ yêu cầu bạn copy ảnh gốc vào thư mục `inputs/` và gửi lại đường dẫn — ảnh xem trước không được dùng để đăng.
 4. Nói thêm đối tượng đọc và giọng văn nếu cần.
 5. Xem phần tóm tắt và trả lời câu hỏi còn thiếu nếu có.
-6. Chờ hệ thống quét ảnh, tạo bản nháp và mở trang duyệt.
+6. Chờ hệ thống quét ảnh, tạo bản nháp trên Fanpage (chưa hiện công khai). Bạn duyệt trên Facebook rồi mới đăng.
 
 Ví dụ:
 
@@ -41,22 +41,15 @@ Viết caption recap buổi Economics Challenge.
 
 ## Duyệt Bài
 
-Khi preview xuất hiện, kiểm tra:
+Mặc định hệ thống tạo **bản nháp trên Fanpage** (chưa hiện công khai). Bạn:
 
-- Đúng Fanpage.
-- Đúng ảnh.
-- Caption đúng ý.
-- Không có thông tin bạn không muốn nêu.
+- Vào Facebook, xem bài chưa đăng.
+- Kiểm tra đúng Fanpage, đúng ảnh, caption đúng ý.
+- Bấm đăng trên Facebook khi ổn.
 
-Chọn một trong ba phương án:
+Trong chat, xác nhận “chạy bài này” chỉ để **tạo bản nháp**, không phải đăng công khai.
 
-```text
-1. Duyệt và đăng
-2. Muốn sửa
-3. Hủy bài này
-```
-
-Nếu muốn sửa, nói rõ phần cần sửa. Hệ thống sẽ tạo bản mới để bạn xem lại.
+Nếu muốn sửa, nói rõ phần cần sửa. Hệ thống sẽ tạo bản mới.
 
 ## Ảnh Nên Gửi
 

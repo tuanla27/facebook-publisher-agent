@@ -9,6 +9,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { loadGoogleDriveTokens, saveGoogleDriveTokens } from "./google-drive-oauth-store.mjs";
 import { isPreferredSheetName } from "./google-drive-config.mjs";
+import { classifyGoogleSessionError, refreshGoogleDriveTokens } from "../connections/ensure.mjs";
 
 const VI_TZ_OFFSET_MS = 7 * 60 * 60 * 1000;
 
@@ -52,11 +53,24 @@ async function buildOAuthDriveClient(env) {
       "Google Drive is not connected. Run npm run google:connect, then retry."
     );
   }
+  let liveTokens = tokens;
+  try {
+    liveTokens = await refreshGoogleDriveTokens(tokens, { env });
+  } catch (error) {
+    const kind = classifyGoogleSessionError(error);
+    if (kind === "expired") {
+      fail("DRIVE_OAUTH_EXPIRED", "Google Drive session expired. Run npm run connections:ensure.");
+    }
+    if (kind === "transient") {
+      fail("DRIVE_OAUTH_TRANSIENT", "Google Drive is temporarily unreachable.");
+    }
+    throw error;
+  }
   const auth = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
-  auth.setCredentials(tokens);
+  auth.setCredentials(liveTokens);
   auth.on("tokens", async (updated) => {
     try {
-      await saveGoogleDriveTokens({ ...tokens, ...updated }, { env });
+      await saveGoogleDriveTokens({ ...liveTokens, ...updated }, { env });
     } catch {
       // The current request can still use the refreshed token. A later run
       // will report the storage error rather than exposing token material.
@@ -66,7 +80,7 @@ async function buildOAuthDriveClient(env) {
     sheets: google.sheets({ version: "v4", auth }),
     drive: google.drive({ version: "v3", auth }),
     auth_mode: "oauth",
-    connected_at: tokens.connected_at ?? null
+    connected_at: liveTokens.connected_at ?? null
   };
 }
 

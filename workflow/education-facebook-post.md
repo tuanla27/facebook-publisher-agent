@@ -97,11 +97,16 @@ must state, using the existing brief fields:
 
 For `event_recap`, run a material check before drafting. A row marked
 `sẵn sàng` is not sufficient when it contains only an event name, images, or a
-generic observation-only instruction. Ask one consolidated clarification for
-the concrete moment, participant/round count, result highlight, named
-people/partners, voting method, and official media link. The user may leave
-items blank, but must provide at least one concrete event detail or explicitly
-choose an observation-only photostory. Do not call the copywriter while this
+generic observation-only instruction. First search existing sources
+(`npm run source:suggest -- --query "<chủ đề>"`, Khoa website, connected
+Fanpage) and list candidate facts for the user to accept or reject in one
+`AskQuestion` (`allow_multiple: true`, plus `Other`). Do not write unselected
+hits. Then, if the recap still lacks a concrete event detail, ask the
+consolidated clarification for the moment, participant/round count, result
+highlight, named people/partners, voting method, and official media link.
+The user may leave items blank, but must provide at least one concrete event
+detail, select a suggestion that supplies one, or explicitly choose an
+observation-only photostory. Do not call the copywriter while this
 clarification is pending.
 
 Direct field observations may be recorded as observations with a `field://`
@@ -185,11 +190,15 @@ explanations of why a team won, how voting worked, who judged, or what was
 practiced require corresponding supplied facts. Remove any generic
 philosophical sentence that does not connect to a concrete event detail.
 Do not open a result notice from the photo.
+Before writing, sample the connected Fanpage with `npm run page:voice` (or
+`config/page-voice-samples.json`). Match how Khoa actually opens a recap —
+time, organizer, what happened — and reject lecture lines such as
+“Không phải X. Đó là lúc Y.”
 
 ### 8. Materialize the review profile
 
-Before showing a preview or opening the human-approval dialog, create the
-existing local review artifacts from the chat draft. Materialize:
+Before creating a Meta draft or opening the live-path review page, create the
+existing local job artifacts from the chat draft. Materialize:
 
 - the normalized input and selected Page;
 - image analysis and the exact publishable asset manifest;
@@ -199,10 +208,9 @@ existing local review artifacts from the chat draft. Materialize:
 - any institutional attestation, including covered scopes and verified role;
 - the content and asset hashes.
 
-Validate the artifacts and render the preview from this materialized profile.
-The profile is the immutable source for approval and publishing. If the user
-selects `Duyệt và đăng`, only write the approval decision for this profile;
-never create, rewrite, or re-hash the caption after that selection.
+Validate the artifacts from this materialized profile. The profile is the
+immutable source for the Meta draft and for any live-path approval. Do not
+create, rewrite, or re-hash the caption after the user confirms the draft.
 
 ### 9. Review policy and brand quality
 
@@ -234,33 +242,40 @@ If there is a blocking error, distinguish two cases:
 - **Hard block** (safety, brand, image, Page allowlist, medical, legal, financial): stop at `POLICY_REVIEWED` with `status: blocked`. Do not create a review task or a Meta draft.
 - **Source-verification block only** (all blocking errors match `isReviewerAttestablePolicy`): the post may still proceed, but the path depends on the publish mode:
   - **Live path** (`FB_DRAFT_MODE` not set): stop at `NEEDS_HUMAN_APPROVAL` and require the reviewer to attest on the local review page (admin key gate) before approval. The signed `approval.json` must contain the institutional attestation.
-  - **Draft path** (`FB_DRAFT_MODE=true` and job from a Google Drive plan): the draft is not public. Keep affected claims as `needs_verification`, show the warning in chat, get explicit chat confirmation to run this post, then create a Meta draft. The Page admin reviews and publishes from Meta Business Suite — that decision is the final attestation. Do not require a local attestation code or signed `approval.json` for this path.
+  - **Draft path** (`FB_DRAFT_MODE=true`, chat or Drive job): the draft is not public. Keep affected claims as `needs_verification`, show the warning in chat, get explicit chat confirmation to run this post, then create a Meta draft. The Page admin reviews and publishes on Facebook — that decision is the final attestation. Do not require a local attestation code or signed `approval.json` for this path. Do not open the local review page.
 
 ### 10. Human approval gate
 
-Set the artifact status to `NEEDS_HUMAN_APPROVAL`. The reviewer must see:
+Set the artifact status to `NEEDS_HUMAN_APPROVAL`.
 
-- exact caption variant;
-- exact image preview and asset IDs;
-- exact asset SHA-256 manifest and upload order;
-- Page name and ID;
-- source references and verification notes;
-- policy warnings;
-- content hash.
+When `FB_DRAFT_MODE=true`, do not open a local review page. The reviewer sees
+the unpublished Fanpage post on Facebook (caption, images, Page). Chat
+confirmation only creates that draft; it does not make the post public.
 
-Approval must record the exact content hash, asset IDs, asset manifest hash, Page ID, reviewer identity, and timestamp. Changing, replacing, reordering, or removing an image invalidates approval.
+When `FB_DRAFT_MODE` is unset, the local review page must show the exact
+caption variant, image preview, Page name, sources, policy warnings, and
+hashes. A signed `approval.json` is required before live publish.
 
-The approval backend must also record `reviewer_authenticated: true`. A local or model-generated reviewer identity is not sufficient.
+Changing, replacing, reordering, or removing an image invalidates the draft
+or live approval.
 
 ### 11. Publish only through the safe boundary
 
-After backend approval, call only:
+When `FB_DRAFT_MODE=true`, call only:
+
+```text
+npm run meta:publish -- --draft <post_job_id>
+```
+
+That creates an unpublished Meta post. Do not call `publish_approved_post`.
+
+When draft mode is off, after signed local approval, call only:
 
 ```text
 publish_approved_post(post_job_id)
 ```
 
-The publisher must fetch the approved version, recompute content and asset hashes, verify authorization and the server-side Page allowlist, enforce idempotency, resolve immutable assets, detect MIME types, upload all approved images in `publish_order`, and create the Page post with those uploaded media IDs. If any check fails, do not publish. A text-only post is not allowed for this workflow.
+The live publisher must fetch the approved version, recompute content and asset hashes, verify authorization and the server-side Page allowlist, enforce idempotency, resolve immutable assets, detect MIME types, upload all approved images in `publish_order`, and create the Page post with those uploaded media IDs. If any check fails, do not publish. A text-only post is not allowed for this workflow unless `FB_DRAFT_ALLOW_TEXT_ONLY=true`.
 
 ## Versioning
 

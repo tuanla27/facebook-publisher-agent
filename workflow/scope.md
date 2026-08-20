@@ -12,8 +12,8 @@ The core must be usable with:
 - local files under `artifacts/<post_job_id>/`;
 - one or more attached images;
 - a connected Facebook Page;
-- a human decision on the local review page (`npm run review:open`);
-- the guarded `publish_approved_post(post_job_id)` boundary.
+- a human decision: Meta unpublished draft by default (`FB_DRAFT_MODE=true`), or the local review page (`npm run review:open`) only when draft mode is off;
+- the guarded publisher (`createDraftPost` or `publish_approved_post(post_job_id)`).
 
 The core should require only a small Node.js install and the Meta OAuth
 configuration. A database server, object-storage account, web dashboard,

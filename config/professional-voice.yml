@@ -8,9 +8,8 @@
 #
 # Quy tắc dùng:
 # - Website: LUÔN áp dụng professional-voice.
-# - Facebook draft: áp dụng brand-guidelines.yml (young academic) mặc định;
-#   chỉ chuyển sang professional-voice khi bài là thông báo chính thức /
-#   thông báo tuyển sinh / văn bản học viện.
+# - Facebook recap kết quả/cuộc thi đã diễn ra: học khoa_result_recap
+#   (nén website Khoa), không dùng giọng thông báo lịch khô.
 
 voice:
   register: "chuyên nghiệp, biên tập, chuẩn mực"
@@ -41,9 +40,47 @@ structure:
       - "Ảnh action ưu tiên; ảnh tập thể chỉ dùng khi không có ảnh hành động."
       - "Tối thiểu 1 ảnh, khuyến nghị 2–4 ảnh cho bài sự kiện."
   facebook_official:
-    body_max_chars: 1500
-    paragraphs: "2–3 câu mỗi đoạn, tối đa 5 đoạn"
-    emoji: "0–1, chỉ khi thực sự cần nhấn cảm xúc"
+    body_max_chars: 2200
+    paragraphs: "2–4 câu mỗi đoạn; recap kết quả 5–8 đoạn; thông báo lịch 2–4 đoạn"
+    emoji: "0–1 với thông báo chính thức; recap Fanpage theo mẫu người vận hành (emoji đầu đoạn)"
+
+# Giọng tổng kết/công bố kết quả trên website Khoa (hvnh.edu.vn/eco).
+# Học từ bài EC 2025–2026, PMC 2025, I-impACT 2025. Cadence only — không copy
+# số liệu, tên đội, hay cảm xúc của bài mẫu sang bài khác.
+khoa_result_recap:
+  use_when:
+    - "công bố kết quả cuộc thi"
+    - "thông báo sự kiện đã diễn ra"
+    - "tổng kết đêm chung kết"
+    - "đăng thành tích / đội thắng"
+    - "đưa ngày, địa điểm, bảng giải"
+  do_not_use_when:
+    - "thông báo lịch sắp tới (dùng official_notice: thời điểm + ai + việc gì)"
+    - "chỉ có tên sự kiện và ảnh, chưa có diễn biến/kết quả"
+  facebook_vs_website:
+    website: "Bài dài, có H2, danh sách khách mời/tài trợ nếu nguồn có, không emoji."
+    facebook: "Cùng xương sống kể chuyện, nén 220–400 từ trước footer. Không đổ danh sách khách mời. Emoji đầu đoạn chỉ khi người vận hành dùng mẫu recap Fanpage."
+  spine:
+    - "Sapo: mùa thi / hành trình đã có nguồn + không khí đêm chung kết."
+    - "Đoạn thời–không: Tối/Sáng ngày …, tại [nơi], [sự việc] diễn ra …"
+    - "Quy mô và chặng thi viết thành câu, không thành bảng."
+    - "Kết quả viết thành câu ‘gọi tên / giành ngôi / thuộc về’, có mệnh đề vì sao chỉ khi nguồn có."
+    - "Một nhịp ‘không chỉ là cuộc thi’ — câu sau phải là việc thí sinh đã làm (có nguồn)."
+    - "Khép: mùa đã xong + mời nhìn ảnh + hẹn mùa sau (không bịa năm nếu nguồn không nói)."
+  write_like:
+    - "Sau hành trình [thời lượng có nguồn], [tên cuộc thi] đã đi đến chặng cuối bằng một đêm chung kết [không khí có nguồn]."
+    - "Tối ngày …, hội trường … trở thành nơi diễn ra màn tranh tài giữa các đội xuất sắc nhất."
+    - "Danh hiệu Quán quân gọi tên [đội]; vị trí Á quân thuộc về [đội]; giải Quý quân được trao cho …"
+    - "Đội [tên] đã xuất sắc giành ngôi vị Quán quân với [dự án / phần thi có nguồn]."
+    - "Không chỉ là một cuộc thi, [tên] còn là nơi sinh viên [việc đã có nguồn: phản biện, lập kế hoạch, pitching…]."
+    - "Được tổ chức từ năm …, [tên] hướng đến việc giúp sinh viên cọ xát / rèn [kỹ năng có nguồn] — giữ động từ của nguồn, đừng nén thành ‘đưa sinh viên vào’."
+    - "Hẹn gặp lại tại [tên cuộc thi] [mùa sau nếu nguồn hoặc CTA người vận hành chọn]."
+  never:
+    - "Quán quân: X. Á quân: Y. Quý quân: Z. — kiểu điện tín."
+    - "Câu cụt 5–8 từ liên tiếp thay cho đoạn kể."
+    - "Bịa sĩ số khán giả, ‘nổ tung’, ‘nhiều tháng luyện tập’, lý do thắng nếu nguồn không ghi."
+    - "Copy siêu cấp ‘quy mô lớn nhất / sân chơi uy tín nhất’ trừ khi nguồn đã chọn có câu đó."
+    - "Nén vụng kiểu ‘đưa sinh viên vào lập kế hoạch, teamwork và phong thái’."
 
 intent_templates:
   # Mở rộng cấu trúc intent trong content-strategy cho dạng bài dài website.
@@ -51,8 +88,8 @@ intent_templates:
     website: "Sapo khái niệm → H2 Giải thích → H2 Ví dụ/phân biệt → H2 Một điều mang về → nguồn đọc thêm"
     facebook_official: "Hook khái niệm → Giải thích ngắn → Một ví dụ → Một điều mang về → CTA đọc bài đầy đủ trên website"
   event_recap:
-    website: "Sapo khoảnh khắc → H2 Diễn biến → H2 Sinh viên thực hành/trải nghiệm gì → H2 Ý nghĩa → nguồn ảnh"
-    facebook_official: "Khoảnh khắc → Sự việc đã xảy ra → Sinh viên làm/trải nghiệm gì → Một ý nghĩa → CTA xem album/bài đầy đủ"
+    website: "Sapo hành trình mùa thi → thời–không → diễn biến/chặng thi → kết quả viết thành câu → ý nghĩa bám việc đã làm → hẹn mùa sau + ảnh"
+    facebook_official: "Cùng xương sống khoa_result_recap, nén cho Fanpage; không mở bằng ảnh; kết quả không liệt kê khô"
   people_story:
     website: "Sapo người + bối cảnh → H2 Định nghĩa khoảnh khắc/trích dẫn → H2 Độc giả học được gì → CTA"
     facebook_official: "Người + vai trò → Trích dẫn/khoảnh khắc → Độc giả gặp được ai → CTA"
